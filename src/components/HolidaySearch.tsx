@@ -1,0 +1,116 @@
+import { useState, useMemo } from 'react';
+import { Search, Calendar, Church, Flag, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
+import { cn } from '@/lib/utils';
+
+interface HolidaySearchProps {
+  onNavigateToMonth: (year: number, month: number) => void;
+}
+
+function formatFullDate(dateString: string): string {
+  const [yearStr, monthStr, dayStr] = dateString.split('-');
+  const day = parseInt(dayStr, 10);
+  const month = parseInt(monthStr, 10) - 1;
+  const year = parseInt(yearStr, 10);
+  return `${day} ${BULGARIAN_MONTHS[month]} ${year}`;
+}
+
+function getHolidayIcon(type: Holiday['type']) {
+  switch (type) {
+    case 'national':
+      return Flag;
+    case 'orthodox':
+      return Church;
+    default:
+      return Calendar;
+  }
+}
+
+export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
+  const [query, setQuery] = useState('');
+  const allHolidays = useMemo(() => getAllHolidays(), []);
+
+  const searchResults = useMemo(() => {
+    if (query.trim().length < 2) return [];
+    
+    const lowerQuery = query.toLowerCase();
+    return allHolidays
+      .filter(h => h.name.toLowerCase().includes(lowerQuery))
+      .slice(0, 10);
+  }, [query, allHolidays]);
+
+  const handleResultClick = (holiday: Holiday) => {
+    const [yearStr, monthStr] = holiday.date.split('-');
+    const year = parseInt(yearStr, 10);
+    const month = parseInt(monthStr, 10) - 1;
+    onNavigateToMonth(year, month);
+    setQuery('');
+  };
+
+  return (
+    <div className="relative w-full max-w-md mx-auto">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          type="text"
+          placeholder="Търсене на празник..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="pl-10 pr-10"
+        />
+        {query && (
+          <button
+            onClick={() => setQuery('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      {searchResults.length > 0 && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 overflow-hidden">
+          <ul className="max-h-80 overflow-y-auto">
+            {searchResults.map((holiday, index) => {
+              const Icon = getHolidayIcon(holiday.type);
+              return (
+                <li key={`${holiday.date}-${index}`}>
+                  <button
+                    onClick={() => handleResultClick(holiday)}
+                    className={cn(
+                      "w-full px-4 py-3 flex items-start gap-3 hover:bg-secondary/50 transition-colors text-left border-b border-border/50 last:border-b-0"
+                    )}
+                  >
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 mt-0.5 shrink-0",
+                        holiday.type === 'national' && "text-holiday-national",
+                        holiday.type === 'orthodox' && "text-holiday-orthodox",
+                        holiday.type === 'nonworking' && "text-holiday-nonworking"
+                      )}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-foreground text-sm">
+                        {holiday.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatFullDate(holiday.date)}
+                      </p>
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {query.trim().length >= 2 && searchResults.length === 0 && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 p-4 text-center text-sm text-muted-foreground">
+          Няма намерени празници
+        </div>
+      )}
+    </div>
+  );
+}
