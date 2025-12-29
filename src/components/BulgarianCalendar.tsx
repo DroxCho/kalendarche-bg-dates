@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
 import { HolidaySidebar } from './HolidaySidebar';
+import { HolidaySearch } from './HolidaySearch';
 import { getMonthRange } from '@/data/bulgarianHolidays';
 
 export function BulgarianCalendar() {
@@ -10,8 +11,17 @@ export function BulgarianCalendar() {
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
 
+  const handleNavigateToMonth = useCallback((year: number, month: number) => {
+    const index = months.findIndex(m => m.year === year && m.month === month);
+    if (index !== -1) {
+      setCurrentIndex(index);
+    }
+  }, [months]);
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
+      <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
+      
       <MonthPaginator
         currentIndex={currentIndex}
         onIndexChange={setCurrentIndex}

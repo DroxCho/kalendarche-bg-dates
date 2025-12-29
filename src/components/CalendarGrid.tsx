@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BULGARIAN_DAYS, getHolidaysForDate, isWeekend, Holiday } from '@/data/bulgarianHolidays';
+import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
 
 interface CalendarGridProps {
@@ -12,7 +12,8 @@ interface DayInfo {
   dayNumber: number;
   isCurrentMonth: boolean;
   isToday: boolean;
-  isWeekend: boolean;
+  isSaturday: boolean;
+  isSunday: boolean;
   holidays: Holiday[];
 }
 
@@ -49,42 +50,47 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
     for (let i = firstDayOfWeek - 1; i >= 0; i--) {
       const dayNumber = daysInPrevMonth - i;
       const date = new Date(prevYear, prevMonth, dayNumber);
+      const dayOfWeek = date.getDay();
       result.push({
         date,
         dayNumber,
         isCurrentMonth: false,
         isToday: date.getTime() === today.getTime(),
-        isWeekend: isWeekend(date),
+        isSaturday: dayOfWeek === 6,
+        isSunday: dayOfWeek === 0,
         holidays: getHolidaysForDate(formatDateString(date)),
       });
     }
 
-    // Current month days
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
+      const dayOfWeek = date.getDay();
       result.push({
         date,
         dayNumber: day,
         isCurrentMonth: true,
         isToday: date.getTime() === today.getTime(),
-        isWeekend: isWeekend(date),
+        isSaturday: dayOfWeek === 6,
+        isSunday: dayOfWeek === 0,
         holidays: getHolidaysForDate(formatDateString(date)),
       });
     }
 
     // Next month days to fill the grid
-    const remainingDays = 42 - result.length; // 6 rows * 7 days
+    const remainingDays = 42 - result.length;
     const nextMonth = month === 11 ? 0 : month + 1;
     const nextYear = month === 11 ? year + 1 : year;
 
     for (let day = 1; day <= remainingDays; day++) {
       const date = new Date(nextYear, nextMonth, day);
+      const dayOfWeek = date.getDay();
       result.push({
         date,
         dayNumber: day,
         isCurrentMonth: false,
         isToday: date.getTime() === today.getTime(),
-        isWeekend: isWeekend(date),
+        isSaturday: dayOfWeek === 6,
+        isSunday: dayOfWeek === 0,
         holidays: getHolidaysForDate(formatDateString(date)),
       });
     }
@@ -101,7 +107,9 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
             key={day}
             className={cn(
               "text-center py-2 text-sm font-semibold",
-              index >= 5 ? "text-primary" : "text-foreground"
+              index === 5 && "text-[hsl(var(--day-saturday))]",
+              index === 6 && "text-[hsl(var(--day-sunday))]",
+              index < 5 && "text-foreground"
             )}
           >
             {day}
@@ -117,14 +125,16 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
             className={cn(
               "calendar-day",
               !day.isCurrentMonth && "opacity-40",
-              day.isWeekend && day.isCurrentMonth && "calendar-day-weekend",
+              day.isSaturday && day.isCurrentMonth && "calendar-day-saturday",
+              day.isSunday && day.isCurrentMonth && "calendar-day-sunday",
               day.isToday && "calendar-day-today"
             )}
           >
             <span
               className={cn(
                 "calendar-day-number",
-                day.isWeekend && "text-primary",
+                day.isSaturday && "text-[hsl(var(--day-saturday))]",
+                day.isSunday && "text-[hsl(var(--day-sunday))]",
                 day.isToday && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
               )}
             >

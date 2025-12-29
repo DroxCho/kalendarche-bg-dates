@@ -39,9 +39,12 @@
     /* Custom calendar colors */
     --holiday-national: 348 75% 45%;
     --holiday-orthodox: 43 80% 50%;
-    --holiday-nonworking: 40 15% 75%;
+    --holiday-nonworking: 0 70% 50%;
     --day-today: 348 70% 35%;
-    --day-weekend: 40 20% 90%;
+    --day-saturday: 210 80% 55%;
+    --day-saturday-bg: 210 80% 95%;
+    --day-sunday: 0 70% 50%;
+    --day-sunday-bg: 0 70% 95%;
 
     /* Fonts */
     --font-display: 'Cormorant Garamond', serif;
@@ -84,9 +87,12 @@
 
     --holiday-national: 348 70% 55%;
     --holiday-orthodox: 43 75% 55%;
-    --holiday-nonworking: 0 10% 30%;
+    --holiday-nonworking: 0 65% 55%;
     --day-today: 348 65% 50%;
-    --day-weekend: 0 10% 15%;
+    --day-saturday: 210 75% 60%;
+    --day-saturday-bg: 210 50% 20%;
+    --day-sunday: 0 65% 55%;
+    --day-sunday-bg: 0 40% 18%;
   }
 }
 
@@ -127,8 +133,12 @@
     @apply text-sm md:text-base font-medium;
   }
 
-  .calendar-day-weekend {
-    @apply bg-[hsl(var(--day-weekend))];
+  .calendar-day-saturday {
+    @apply bg-[hsl(var(--day-saturday-bg))];
+  }
+
+  .calendar-day-sunday {
+    @apply bg-[hsl(var(--day-sunday-bg))];
   }
 
   .calendar-day-today {
@@ -136,7 +146,7 @@
   }
 
   .holiday-badge {
-    @apply text-[10px] md:text-xs px-1 py-0.5 rounded-sm mt-1 leading-tight text-center w-full truncate;
+    @apply text-[10px] md:text-xs px-1 py-0.5 rounded-sm mt-1 leading-tight text-center w-full whitespace-normal break-words hyphens-auto;
   }
 
   .holiday-national {
