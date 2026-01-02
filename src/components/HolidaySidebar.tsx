@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
-import { Calendar, Church, Flag } from 'lucide-react';
+import { Calendar, Church, Flag, Star, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HolidaySidebarProps {
@@ -21,9 +21,31 @@ function getHolidayIcon(type: Holiday['type']) {
       return Flag;
     case 'orthodox':
       return Church;
+    case 'nameday':
+      return Star;
+    case 'folk':
+      return Star;
+    case 'fasting':
+      return Moon;
     default:
       return Calendar;
   }
+}
+
+function getHolidayColorClass(type: Holiday['type'], variant: 'bg' | 'border' | 'text') {
+  const colorMap: Record<Holiday['type'], string> = {
+    national: 'holiday-national',
+    orthodox: 'holiday-orthodox',
+    nonworking: 'holiday-nonworking',
+    nameday: 'holiday-nameday',
+    folk: 'holiday-folk',
+    fasting: 'holiday-fasting',
+  };
+  
+  const base = colorMap[type];
+  if (variant === 'bg') return `bg-[hsl(var(--${base}))]/10`;
+  if (variant === 'border') return `border-[hsl(var(--${base}))]/30`;
+  return `text-[hsl(var(--${base}))]`;
 }
 
 export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
@@ -38,7 +60,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
   }, [year, month]);
 
   return (
-    <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8">
+    <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto">
       <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2">
         <Calendar className="w-5 h-5 text-primary" />
         Празници през {BULGARIAN_MONTHS[month]}
@@ -57,18 +79,24 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
                 key={`${holiday.date}-${index}`}
                 className={cn(
                   "p-3 rounded-lg border transition-colors",
-                  holiday.type === 'national' && "bg-holiday-national/10 border-holiday-national/30",
-                  holiday.type === 'orthodox' && "bg-holiday-orthodox/10 border-holiday-orthodox/30",
-                  holiday.type === 'nonworking' && "bg-holiday-nonworking/10 border-holiday-nonworking/30"
+                  holiday.type === 'national' && "bg-[hsl(var(--holiday-national))]/10 border-[hsl(var(--holiday-national))]/30",
+                  holiday.type === 'orthodox' && "bg-[hsl(var(--holiday-orthodox))]/10 border-[hsl(var(--holiday-orthodox))]/30",
+                  holiday.type === 'nonworking' && "bg-[hsl(var(--holiday-nonworking))]/10 border-[hsl(var(--holiday-nonworking))]/30",
+                  holiday.type === 'nameday' && "bg-[hsl(var(--holiday-nameday))]/10 border-[hsl(var(--holiday-nameday))]/30",
+                  holiday.type === 'folk' && "bg-[hsl(var(--holiday-folk))]/10 border-[hsl(var(--holiday-folk))]/30",
+                  holiday.type === 'fasting' && "bg-[hsl(var(--holiday-fasting))]/10 border-[hsl(var(--holiday-fasting))]/30"
                 )}
               >
                 <div className="flex items-start gap-3">
                   <Icon
                     className={cn(
                       "w-4 h-4 mt-0.5 shrink-0",
-                      holiday.type === 'national' && "text-holiday-national",
-                      holiday.type === 'orthodox' && "text-holiday-orthodox",
-                      holiday.type === 'nonworking' && "text-holiday-nonworking"
+                      holiday.type === 'national' && "text-[hsl(var(--holiday-national))]",
+                      holiday.type === 'orthodox' && "text-[hsl(var(--holiday-orthodox))]",
+                      holiday.type === 'nonworking' && "text-[hsl(var(--holiday-nonworking))]",
+                      holiday.type === 'nameday' && "text-[hsl(var(--holiday-nameday))]",
+                      holiday.type === 'folk' && "text-[hsl(var(--holiday-folk))]",
+                      holiday.type === 'fasting' && "text-[hsl(var(--holiday-fasting))]"
                     )}
                   />
                   <div className="flex-1 min-w-0">

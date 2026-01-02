@@ -40,6 +40,9 @@
     --holiday-national: 348 75% 45%;
     --holiday-orthodox: 43 80% 50%;
     --holiday-nonworking: 0 70% 50%;
+    --holiday-nameday: 280 60% 55%;
+    --holiday-folk: 25 85% 55%;
+    --holiday-fasting: 260 50% 50%;
     --day-today: 348 70% 35%;
     --day-saturday: 210 80% 55%;
     --day-saturday-bg: 210 80% 95%;
@@ -88,6 +91,9 @@
     --holiday-national: 348 70% 55%;
     --holiday-orthodox: 43 75% 55%;
     --holiday-nonworking: 0 65% 55%;
+    --holiday-nameday: 280 55% 60%;
+    --holiday-folk: 25 80% 60%;
+    --holiday-fasting: 260 45% 55%;
     --day-today: 348 65% 50%;
     --day-saturday: 210 75% 60%;
     --day-saturday-bg: 210 50% 20%;
@@ -158,6 +164,18 @@
   }
 
   .holiday-nonworking {
-    @apply bg-[hsl(var(--holiday-nonworking))] text-foreground/80;
+    @apply bg-[hsl(var(--holiday-nonworking))] text-primary-foreground;
+  }
+
+  .holiday-nameday {
+    @apply bg-[hsl(var(--holiday-nameday))] text-primary-foreground;
+  }
+
+  .holiday-folk {
+    @apply bg-[hsl(var(--holiday-folk))] text-primary-foreground;
+  }
+
+  .holiday-fasting {
+    @apply bg-[hsl(var(--holiday-fasting))] text-primary-foreground;
   }
 }
