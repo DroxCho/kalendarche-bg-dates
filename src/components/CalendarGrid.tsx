@@ -2,10 +2,13 @@ import { useState, useMemo } from 'react';
 import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
+import { HolidayType } from './HolidayFilter';
+import { Leaf } from 'lucide-react';
 
 interface CalendarGridProps {
   year: number;
   month: number; // 0-indexed
+  activeFilters?: HolidayType[];
 }
 
 interface DayInfo {
@@ -35,7 +38,7 @@ function formatDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function CalendarGrid({ year, month }: CalendarGridProps) {
+export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -107,6 +110,11 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
     setModalOpen(true);
   };
 
+  const filterHolidays = (holidays: Holiday[]) => {
+    if (!activeFilters || activeFilters.length === 0) return [];
+    return holidays.filter(h => activeFilters.includes(h.type));
+  };
+
   return (
     <div className="animate-fade-in">
       {/* Day headers */}
@@ -128,54 +136,66 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
 
       {/* Calendar grid */}
       <div className="grid grid-cols-7 border-t border-l border-border rounded-lg overflow-hidden">
-        {days.map((day, index) => (
-          <div
-            key={index}
-            onClick={() => handleDayClick(day)}
-            className={cn(
-              "calendar-day cursor-pointer hover:bg-muted/50 transition-colors",
-              !day.isCurrentMonth && "opacity-40",
-              day.isSaturday && day.isCurrentMonth && "calendar-day-saturday",
-              day.isSunday && day.isCurrentMonth && "calendar-day-sunday",
-              day.isToday && "calendar-day-today"
-            )}
-          >
-            <span
+        {days.map((day, index) => {
+          const filteredHolidays = filterHolidays(day.holidays);
+          const hasFastingDay = day.holidays.some(h => h.type === 'fasting');
+          
+          return (
+            <div
+              key={index}
+              onClick={() => handleDayClick(day)}
               className={cn(
-                "calendar-day-number",
-                day.isSaturday && "text-[hsl(var(--day-saturday))]",
-                day.isSunday && "text-[hsl(var(--day-sunday))]",
-                day.isToday && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
+                "calendar-day cursor-pointer hover:bg-muted/50 transition-colors",
+                !day.isCurrentMonth && "opacity-40",
+                day.isSaturday && day.isCurrentMonth && "calendar-day-saturday",
+                day.isSunday && day.isCurrentMonth && "calendar-day-sunday",
+                day.isToday && "calendar-day-today"
               )}
             >
-              {day.dayNumber}
-            </span>
-            
-            {day.holidays.slice(0, 2).map((holiday, hIndex) => (
-              <div
-                key={hIndex}
+              {/* Fasting icon in top right corner */}
+              {hasFastingDay && day.isCurrentMonth && (
+                <div className="absolute top-0.5 right-0.5 print:top-0 print:right-0">
+                  <Leaf className="w-3 h-3 text-[hsl(var(--holiday-fasting))]" />
+                </div>
+              )}
+              
+              <span
                 className={cn(
-                  "holiday-badge",
-                  holiday.type === 'national' && "holiday-national",
-                  holiday.type === 'orthodox' && "holiday-orthodox",
-                  holiday.type === 'nonworking' && "holiday-nonworking",
-                  holiday.type === 'nameday' && "holiday-nameday",
-                  holiday.type === 'folk' && "holiday-folk",
-                  holiday.type === 'fasting' && "holiday-fasting"
+                  "calendar-day-number",
+                  day.isSaturday && "text-[hsl(var(--day-saturday))]",
+                  day.isSunday && "text-[hsl(var(--day-sunday))]",
+                  day.isToday && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
                 )}
-                title={holiday.name}
               >
-                {holiday.name}
-              </div>
-            ))}
-            
-            {day.holidays.length > 2 && (
-              <div className="text-[10px] text-muted-foreground mt-0.5 font-medium">
-                +{day.holidays.length - 2} още
-              </div>
-            )}
-          </div>
-        ))}
+                {day.dayNumber}
+              </span>
+              
+              {filteredHolidays.slice(0, 2).map((holiday, hIndex) => (
+                <div
+                  key={hIndex}
+                  className={cn(
+                    "holiday-badge",
+                    holiday.type === 'national' && "holiday-national",
+                    holiday.type === 'orthodox' && "holiday-orthodox",
+                    holiday.type === 'nonworking' && "holiday-nonworking",
+                    holiday.type === 'nameday' && "holiday-nameday",
+                    holiday.type === 'folk' && "holiday-folk",
+                    holiday.type === 'fasting' && "holiday-fasting"
+                  )}
+                  title={holiday.name}
+                >
+                  {holiday.name}
+                </div>
+              ))}
+              
+              {filteredHolidays.length > 2 && (
+                <div className="text-[10px] text-muted-foreground mt-0.5 font-medium">
+                  +{filteredHolidays.length - 2} още
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <HolidayModal

@@ -179,3 +179,41 @@
     @apply bg-[hsl(var(--holiday-fasting))] text-primary-foreground;
   }
 }
+
+/* Print styles */
+@media print {
+  body {
+    @apply bg-white text-black;
+  }
+  
+  .print\\:hidden {
+    display: none !important;
+  }
+  
+  .calendar-day {
+    @apply min-h-[60px] border-black/20;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .calendar-day-saturday,
+  .calendar-day-sunday {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .holiday-badge {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .holiday-national,
+  .holiday-orthodox,
+  .holiday-nonworking,
+  .holiday-nameday,
+  .holiday-folk,
+  .holiday-fasting {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

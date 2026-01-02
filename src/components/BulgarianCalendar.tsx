@@ -1,13 +1,17 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
 import { HolidaySidebar } from './HolidaySidebar';
 import { HolidaySearch } from './HolidaySearch';
+import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { getMonthRange } from '@/data/bulgarianHolidays';
+
+const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
 
 export function BulgarianCalendar() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
 
@@ -18,6 +22,20 @@ export function BulgarianCalendar() {
     }
   }, [months]);
 
+  // Find current month index for "Today" button
+  const todayMonthIndex = useMemo(() => {
+    const today = new Date();
+    return months.findIndex(m => m.year === today.getFullYear() && m.month === today.getMonth());
+  }, [months]);
+
+  const isViewingCurrentMonth = currentIndex === todayMonthIndex;
+
+  const handleGoToToday = useCallback(() => {
+    if (todayMonthIndex !== -1) {
+      setCurrentIndex(todayMonthIndex);
+    }
+  }, [todayMonthIndex]);
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
@@ -25,6 +43,13 @@ export function BulgarianCalendar() {
       <MonthPaginator
         currentIndex={currentIndex}
         onIndexChange={setCurrentIndex}
+        onGoToToday={handleGoToToday}
+        showTodayButton={!isViewingCurrentMonth && todayMonthIndex !== -1}
+      />
+      
+      <HolidayFilter
+        activeFilters={activeFilters}
+        onFilterChange={setActiveFilters}
       />
       
       <div className="flex flex-col lg:flex-row gap-6">
@@ -32,13 +57,14 @@ export function BulgarianCalendar() {
           <CalendarGrid
             year={currentMonth.year}
             month={currentMonth.month}
+            activeFilters={activeFilters}
           />
           <div className="mt-6">
             <CalendarLegend />
           </div>
         </div>
         
-        <div className="lg:w-72 shrink-0">
+        <div className="lg:w-72 shrink-0 print:hidden">
           <HolidaySidebar
             year={currentMonth.year}
             month={currentMonth.month}
