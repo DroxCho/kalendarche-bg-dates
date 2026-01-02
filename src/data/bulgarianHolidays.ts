@@ -1,4 +1,4 @@
-export type HolidayType = 'national' | 'orthodox' | 'nonworking';
+export type HolidayType = 'national' | 'orthodox' | 'nonworking' | 'nameday' | 'folk' | 'fasting';
 
 export interface Holiday {
   date: string; // Format: YYYY-MM-DD
@@ -73,30 +73,119 @@ function getHolidaysForYear(year: number): Holiday[] {
   const goodFriday = addDays(easter, -2);
   const holySaturday = addDays(easter, -1);
   const easterMonday = addDays(easter, 1);
+  const palmSunday = addDays(easter, -7);
+  const lazarusSaturday = addDays(easter, -8);
+  const ascension = addDays(easter, 39);
+  const pentecost = addDays(easter, 49);
+  const holySpirit = addDays(easter, 50);
+  const greatLentStart = addDays(easter, -48);
+  const greatLentEnd = addDays(easter, -1);
+  const meatfareSunday = addDays(easter, -56);
+  const cheesefareDay = addDays(easter, -49);
   
+  // Easter-related Orthodox holidays
   holidays.push(
+    { date: formatDate(greatLentStart), name: 'Начало на Великия пост', type: 'fasting' },
+    { date: formatDate(greatLentEnd), name: 'Край на Великия пост', type: 'fasting' },
+    { date: formatDate(cheesefareDay), name: 'Сирни Заговезни', type: 'folk' },
+    { date: formatDate(lazarusSaturday), name: 'Лазаровден', type: 'folk' },
+    { date: formatDate(palmSunday), name: 'Цветница', type: 'orthodox' },
     { date: formatDate(goodFriday), name: 'Разпети петък', type: 'orthodox' },
     { date: formatDate(holySaturday), name: 'Велика събота', type: 'orthodox' },
     { date: formatDate(easter), name: 'Великден', type: 'orthodox' },
     { date: formatDate(easterMonday), name: 'Великден (втори ден)', type: 'orthodox' },
+    { date: formatDate(ascension), name: 'Спасовден', type: 'orthodox' },
+    { date: formatDate(pentecost), name: 'Петдесетница', type: 'orthodox' },
+    { date: formatDate(holySpirit), name: 'Духовден', type: 'orthodox' },
   );
 
-  // Major Orthodox holidays
+  // Major Orthodox holidays (fixed dates)
   holidays.push(
     { date: `${year}-01-06`, name: 'Богоявление (Йордановден)', type: 'orthodox' },
-    { date: `${year}-01-07`, name: 'Ивановден', type: 'orthodox' },
-    { date: `${year}-02-14`, name: 'Св. Трифон Зарезан', type: 'orthodox' },
+    { date: `${year}-02-02`, name: 'Сретение Господне', type: 'orthodox' },
     { date: `${year}-03-25`, name: 'Благовещение', type: 'orthodox' },
     { date: `${year}-05-21`, name: 'Св. Константин и Елена', type: 'orthodox' },
     { date: `${year}-06-24`, name: 'Еньовден', type: 'orthodox' },
+    { date: `${year}-06-29`, name: 'Петровден', type: 'orthodox' },
     { date: `${year}-07-17`, name: 'Св. Марина', type: 'orthodox' },
+    { date: `${year}-07-20`, name: 'Илинден', type: 'orthodox' },
+    { date: `${year}-08-06`, name: 'Преображение Господне', type: 'orthodox' },
     { date: `${year}-08-15`, name: 'Успение Богородично', type: 'orthodox' },
+    { date: `${year}-08-29`, name: 'Обезглавяване на Йоан Кръстител', type: 'orthodox' },
+    { date: `${year}-09-08`, name: 'Рождество Богородично', type: 'orthodox' },
     { date: `${year}-09-14`, name: 'Кръстовден', type: 'orthodox' },
     { date: `${year}-10-14`, name: 'Петковден', type: 'orthodox' },
     { date: `${year}-10-26`, name: 'Димитровден', type: 'orthodox' },
     { date: `${year}-11-08`, name: 'Архангеловден', type: 'orthodox' },
     { date: `${year}-11-21`, name: 'Въведение Богородично', type: 'orthodox' },
     { date: `${year}-12-06`, name: 'Никулден', type: 'orthodox' },
+  );
+
+  // Name days (Имени дни)
+  holidays.push(
+    { date: `${year}-01-01`, name: 'Васильовден', type: 'nameday' },
+    { date: `${year}-01-07`, name: 'Ивановден', type: 'nameday' },
+    { date: `${year}-01-17`, name: 'Антоновден', type: 'nameday' },
+    { date: `${year}-01-18`, name: 'Атанасовден', type: 'nameday' },
+    { date: `${year}-02-01`, name: 'Трифоновден (Имен ден)', type: 'nameday' },
+    { date: `${year}-02-03`, name: 'Симеоновден', type: 'nameday' },
+    { date: `${year}-03-09`, name: 'Младенци', type: 'nameday' },
+    { date: `${year}-03-19`, name: 'Тодоровден', type: 'nameday' },
+    { date: `${year}-04-23`, name: 'Гергьовден', type: 'nameday' },
+    { date: `${year}-05-02`, name: 'Борисовден', type: 'nameday' },
+    { date: `${year}-05-11`, name: 'Св. Методий', type: 'nameday' },
+    { date: `${year}-05-18`, name: 'Александровден', type: 'nameday' },
+    { date: `${year}-06-30`, name: 'Павловден', type: 'nameday' },
+    { date: `${year}-07-07`, name: 'Недельо', type: 'nameday' },
+    { date: `${year}-07-25`, name: 'Анна', type: 'nameday' },
+    { date: `${year}-08-09`, name: 'Панталеймоновден', type: 'nameday' },
+    { date: `${year}-09-17`, name: 'Вяра, Надежда, Любов', type: 'nameday' },
+    { date: `${year}-10-01`, name: 'Покров Богородичен', type: 'nameday' },
+    { date: `${year}-10-27`, name: 'Прокопиевден', type: 'nameday' },
+    { date: `${year}-11-11`, name: 'Мина', type: 'nameday' },
+    { date: `${year}-11-30`, name: 'Андреевден', type: 'nameday' },
+    { date: `${year}-12-04`, name: 'Варвара', type: 'nameday' },
+    { date: `${year}-12-05`, name: 'Сава', type: 'nameday' },
+    { date: `${year}-12-20`, name: 'Игнажден', type: 'nameday' },
+    { date: `${year}-12-27`, name: 'Стефановден', type: 'nameday' },
+  );
+
+  // Bulgarian folk feasts (Народни празници)
+  holidays.push(
+    { date: `${year}-01-01`, name: 'Сурва (Сурвакане)', type: 'folk' },
+    { date: `${year}-01-21`, name: 'Бабинден', type: 'folk' },
+    { date: `${year}-02-14`, name: 'Св. Трифон Зарезан', type: 'folk' },
+    { date: `${year}-03-01`, name: 'Баба Марта', type: 'folk' },
+    { date: `${year}-05-06`, name: 'Гергьовден', type: 'folk' },
+    { date: `${year}-07-27`, name: 'Св. Седмочисленици', type: 'folk' },
+    { date: `${year}-12-19`, name: 'Зимен Свети Никола', type: 'folk' },
+    { date: `${year}-12-24`, name: 'Коледуване', type: 'folk' },
+  );
+
+  // Fasting periods (Постни дни)
+  // Petrov post - starts Monday after Pentecost, ends June 28
+  const petrovPostStart = addDays(pentecost, 1);
+  holidays.push(
+    { date: formatDate(petrovPostStart), name: 'Начало на Петров пост', type: 'fasting' },
+    { date: `${year}-06-28`, name: 'Край на Петров пост', type: 'fasting' },
+  );
+
+  // Bogorodichen post - August 1-14
+  holidays.push(
+    { date: `${year}-08-01`, name: 'Начало на Богородичен пост', type: 'fasting' },
+    { date: `${year}-08-14`, name: 'Край на Богородичен пост', type: 'fasting' },
+  );
+
+  // Christmas post - November 15 - December 24
+  holidays.push(
+    { date: `${year}-11-15`, name: 'Начало на Коледен пост', type: 'fasting' },
+    { date: `${year}-12-24`, name: 'Край на Коледен пост', type: 'fasting' },
+  );
+
+  // Rusalia week (week after Pentecost)
+  const rusaliaStart = addDays(pentecost, 1);
+  holidays.push(
+    { date: formatDate(rusaliaStart), name: 'Русалска неделя', type: 'folk' },
   );
 
   return holidays;

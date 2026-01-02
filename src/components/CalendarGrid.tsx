@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
+import { HolidayModal } from './HolidayModal';
 
 interface CalendarGridProps {
   year: number;
@@ -35,6 +36,9 @@ function formatDateString(date: Date): string {
 }
 
 export function CalendarGrid({ year, month }: CalendarGridProps) {
+  const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+
   const days = useMemo(() => {
     const result: DayInfo[] = [];
     const daysInMonth = getDaysInMonth(year, month);
@@ -98,6 +102,11 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
     return result;
   }, [year, month]);
 
+  const handleDayClick = (day: DayInfo) => {
+    setSelectedDay(day);
+    setModalOpen(true);
+  };
+
   return (
     <div className="animate-fade-in">
       {/* Day headers */}
@@ -122,8 +131,9 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
         {days.map((day, index) => (
           <div
             key={index}
+            onClick={() => handleDayClick(day)}
             className={cn(
-              "calendar-day",
+              "calendar-day cursor-pointer hover:bg-muted/50 transition-colors",
               !day.isCurrentMonth && "opacity-40",
               day.isSaturday && day.isCurrentMonth && "calendar-day-saturday",
               day.isSunday && day.isCurrentMonth && "calendar-day-sunday",
@@ -148,7 +158,10 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
                   "holiday-badge",
                   holiday.type === 'national' && "holiday-national",
                   holiday.type === 'orthodox' && "holiday-orthodox",
-                  holiday.type === 'nonworking' && "holiday-nonworking"
+                  holiday.type === 'nonworking' && "holiday-nonworking",
+                  holiday.type === 'nameday' && "holiday-nameday",
+                  holiday.type === 'folk' && "holiday-folk",
+                  holiday.type === 'fasting' && "holiday-fasting"
                 )}
                 title={holiday.name}
               >
@@ -157,13 +170,20 @@ export function CalendarGrid({ year, month }: CalendarGridProps) {
             ))}
             
             {day.holidays.length > 2 && (
-              <div className="text-[10px] text-muted-foreground mt-0.5">
-                +{day.holidays.length - 2}
+              <div className="text-[10px] text-muted-foreground mt-0.5 font-medium">
+                +{day.holidays.length - 2} още
               </div>
             )}
           </div>
         ))}
       </div>
+
+      <HolidayModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        date={selectedDay?.date || null}
+        holidays={selectedDay?.holidays || []}
+      />
     </div>
   );
 }
