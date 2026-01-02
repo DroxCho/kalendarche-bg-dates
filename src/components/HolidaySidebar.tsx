@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
-import { Calendar, Church, Flag, Star, Moon } from 'lucide-react';
+import { Calendar, Cross, Flag, Star, Leaf } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface HolidaySidebarProps {
@@ -20,13 +20,13 @@ function getHolidayIcon(type: Holiday['type']) {
     case 'national':
       return Flag;
     case 'orthodox':
-      return Church;
+      return Cross;
     case 'nameday':
       return Star;
     case 'folk':
-      return Star;
+      return Flag;
     case 'fasting':
-      return Moon;
+      return Leaf;
     default:
       return Calendar;
   }
