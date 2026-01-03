@@ -1,7 +1,15 @@
-import { ChevronLeft, ChevronRight, CalendarCheck, Printer } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { BULGARIAN_MONTHS, getMonthRange } from '@/data/bulgarianHolidays';
+import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
+import { generateICSForMonth } from '@/lib/icsExport';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { generateICSFile, generateICSForYear } from '@/lib/icsExport';
 
 interface MonthPaginatorProps {
   currentIndex: number;
@@ -28,6 +36,21 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleExportMonth = () => {
+    const holidays = getAllHolidays();
+    generateICSForMonth(holidays, currentMonth.year, currentMonth.month);
+  };
+
+  const handleExportYear = () => {
+    const holidays = getAllHolidays();
+    generateICSForYear(holidays, currentMonth.year);
+  };
+
+  const handleExportAll = () => {
+    const holidays = getAllHolidays();
+    generateICSFile(holidays, 'bulgarian-calendar-all');
   };
 
   return (
@@ -63,6 +86,30 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
         </h2>
 
         <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 print:hidden"
+              >
+                <Download className="h-4 w-4" />
+                <span className="hidden sm:inline">Експорт</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handleExportMonth}>
+                Експорт на месец (.ics)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportYear}>
+                Експорт на година (.ics)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportAll}>
+                Експорт на всичко (.ics)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
           <Button
             variant="outline"
             size="sm"

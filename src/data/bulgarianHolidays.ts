@@ -163,23 +163,90 @@ function getHolidaysForYear(year: number): Holiday[] {
   );
 
   // Fasting periods (Постни дни)
-  // Petrov post - starts Monday after Pentecost, ends June 28
+  
+  // Great Lent fasting days (every day during Great Lent is a fasting day)
+  for (let i = 0; i < 48; i++) {
+    const fastingDay = addDays(greatLentStart, i);
+    if (i === 0) {
+      holidays.push({ date: formatDate(fastingDay), name: 'Начало на Великия пост (Чисти понеделник)', type: 'fasting' });
+    } else if (i === 47) {
+      holidays.push({ date: formatDate(fastingDay), name: 'Велика събота - край на поста', type: 'fasting' });
+    } else {
+      holidays.push({ date: formatDate(fastingDay), name: 'Великопостен ден', type: 'fasting' });
+    }
+  }
+  
+  // Petrov post (Apostles' Fast) - Monday after Pentecost to June 28
   const petrovPostStart = addDays(pentecost, 1);
-  holidays.push(
-    { date: formatDate(petrovPostStart), name: 'Начало на Петров пост', type: 'fasting' },
-    { date: `${year}-06-28`, name: 'Край на Петров пост', type: 'fasting' },
-  );
+  const petrovPostEnd = new Date(year, 5, 28); // June 28
+  let currentDay = new Date(petrovPostStart);
+  while (currentDay <= petrovPostEnd) {
+    const formattedDate = formatDate(currentDay);
+    if (currentDay.getTime() === petrovPostStart.getTime()) {
+      holidays.push({ date: formattedDate, name: 'Начало на Петров пост', type: 'fasting' });
+    } else if (currentDay.getTime() === petrovPostEnd.getTime()) {
+      holidays.push({ date: formattedDate, name: 'Край на Петров пост', type: 'fasting' });
+    } else {
+      holidays.push({ date: formattedDate, name: 'Петров пост', type: 'fasting' });
+    }
+    currentDay = addDays(currentDay, 1);
+  }
 
-  // Bogorodichen post - August 1-14
-  holidays.push(
-    { date: `${year}-08-01`, name: 'Начало на Богородичен пост', type: 'fasting' },
-    { date: `${year}-08-14`, name: 'Край на Богородичен пост', type: 'fasting' },
-  );
+  // Bogorodichen post (Dormition Fast) - August 1-14
+  for (let day = 1; day <= 14; day++) {
+    const date = `${year}-08-${String(day).padStart(2, '0')}`;
+    if (day === 1) {
+      holidays.push({ date, name: 'Начало на Богородичен пост', type: 'fasting' });
+    } else if (day === 14) {
+      holidays.push({ date, name: 'Край на Богородичен пост', type: 'fasting' });
+    } else {
+      holidays.push({ date, name: 'Богородичен пост', type: 'fasting' });
+    }
+  }
 
-  // Christmas post - November 15 - December 24
+  // Christmas post (Advent/Nativity Fast) - November 15 - December 24
+  for (let day = 15; day <= 30; day++) {
+    const date = `${year}-11-${String(day).padStart(2, '0')}`;
+    if (day === 15) {
+      holidays.push({ date, name: 'Начало на Коледен пост (Филипов пост)', type: 'fasting' });
+    } else {
+      holidays.push({ date, name: 'Коледен пост', type: 'fasting' });
+    }
+  }
+  for (let day = 1; day <= 24; day++) {
+    const date = `${year}-12-${String(day).padStart(2, '0')}`;
+    if (day === 24) {
+      holidays.push({ date, name: 'Бъдни вечер - край на Коледен пост', type: 'fasting' });
+    } else {
+      holidays.push({ date, name: 'Коледен пост', type: 'fasting' });
+    }
+  }
+
+  // Weekly fasting days (Wednesday and Friday)
+  const startOfYear = new Date(year, 0, 1);
+  const endOfYear = new Date(year, 11, 31);
+  for (let d = new Date(startOfYear); d <= endOfYear; d = addDays(d, 1)) {
+    const dayOfWeek = d.getDay();
+    // Wednesday (3) and Friday (5) are traditional fasting days
+    if (dayOfWeek === 3 || dayOfWeek === 5) {
+      const dateStr = formatDate(d);
+      // Check if it's not already covered by a major fast
+      const existingFast = holidays.find(h => h.date === dateStr && h.type === 'fasting');
+      if (!existingFast) {
+        holidays.push({ 
+          date: dateStr, 
+          name: dayOfWeek === 3 ? 'Сряда - постен ден' : 'Петък - постен ден', 
+          type: 'fasting' 
+        });
+      }
+    }
+  }
+
+  // Special single-day fasts
   holidays.push(
-    { date: `${year}-11-15`, name: 'Начало на Коледен пост', type: 'fasting' },
-    { date: `${year}-12-24`, name: 'Край на Коледен пост', type: 'fasting' },
+    { date: `${year}-01-05`, name: 'Пост на Богоявление', type: 'fasting' },
+    { date: `${year}-08-29`, name: 'Пост за Усекновение', type: 'fasting' },
+    { date: `${year}-09-14`, name: 'Пост на Кръстовден', type: 'fasting' },
   );
 
   // Rusalia week (week after Pentecost)
