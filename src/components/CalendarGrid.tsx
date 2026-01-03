@@ -3,12 +3,15 @@ import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHol
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
-import { Leaf } from 'lucide-react';
+import { Leaf, StickyNote } from 'lucide-react';
 
 interface CalendarGridProps {
   year: number;
   month: number; // 0-indexed
   activeFilters?: HolidayType[];
+  notes?: Record<string, string>;
+  onSaveNote?: (date: string, note: string) => void;
+  onDeleteNote?: (date: string) => void;
 }
 
 interface DayInfo {
@@ -38,7 +41,7 @@ function formatDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) {
+export function CalendarGrid({ year, month, activeFilters, notes = {}, onSaveNote, onDeleteNote }: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -150,6 +153,8 @@ export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) 
         {days.map((day, index) => {
           const filteredHolidays = filterHolidays(day.holidays);
           const hasFastingDay = day.holidays.some(h => h.type === 'fasting');
+          const dateString = formatDateString(day.date);
+          const hasNote = !!notes[dateString];
           
           return (
             <div
@@ -167,6 +172,13 @@ export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) 
               {hasFastingDay && day.isCurrentMonth && (
                 <div className="absolute top-0.5 right-0.5 print:top-0 print:right-0">
                   <Leaf className="w-3 h-3 text-[hsl(var(--holiday-fasting))]" />
+                </div>
+              )}
+              
+              {/* Note indicator */}
+              {hasNote && day.isCurrentMonth && (
+                <div className="absolute top-0.5 left-0.5 print:hidden">
+                  <StickyNote className="w-3 h-3 text-amber-500" />
                 </div>
               )}
               
@@ -217,6 +229,9 @@ export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) 
         onOpenChange={setModalOpen}
         date={selectedDay?.date || null}
         holidays={selectedDay?.holidays || []}
+        note={selectedDay ? notes[formatDateString(selectedDay.date)] : undefined}
+        onSaveNote={onSaveNote}
+        onDeleteNote={onDeleteNote}
       />
     </div>
   );
