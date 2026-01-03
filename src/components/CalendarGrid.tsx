@@ -115,6 +115,17 @@ export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) 
     return holidays.filter(h => activeFilters.includes(h.type));
   };
 
+  // Check if a fasting holiday should show its name (start, end, or single-day)
+  const shouldShowFastingName = (holiday: Holiday): boolean => {
+    if (holiday.type !== 'fasting') return true;
+    const name = holiday.name.toLowerCase();
+    return name.includes('начало') || 
+           name.includes('край') || 
+           name.includes('пост на') || 
+           name.includes('пост за') ||
+           name.includes('усекновение');
+  };
+
   return (
     <div className="animate-fade-in">
       {/* Day headers */}
@@ -170,7 +181,10 @@ export function CalendarGrid({ year, month, activeFilters }: CalendarGridProps) 
                 {day.dayNumber}
               </span>
               
-              {filteredHolidays.slice(0, 2).map((holiday, hIndex) => (
+              {filteredHolidays
+                .filter(holiday => shouldShowFastingName(holiday))
+                .slice(0, 2)
+                .map((holiday, hIndex) => (
                 <div
                   key={hIndex}
                   className={cn(
