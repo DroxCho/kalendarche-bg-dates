@@ -8,6 +8,7 @@ import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { YearView } from './YearView';
 import { getMonthRange } from '@/data/bulgarianHolidays';
 import { useCalendarNotes } from '@/hooks/useCalendarNotes';
+import { NotificationToggle } from './NotificationToggle';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, Grid3X3 } from 'lucide-react';
 
@@ -17,7 +18,7 @@ export function BulgarianCalendar() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
   const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
-  const { notes, addNote, removeNote } = useCalendarNotes();
+  const { notes, addNote, updateNote, removeNote } = useCalendarNotes();
   
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
@@ -66,6 +67,7 @@ export function BulgarianCalendar() {
         />
         
         <div className="flex items-center gap-1 print:hidden">
+          <NotificationToggle />
           <Button
             variant={viewMode === 'month' ? 'default' : 'outline'}
             size="sm"
@@ -100,7 +102,8 @@ export function BulgarianCalendar() {
               month={currentMonth.month}
               activeFilters={activeFilters}
               notes={notes}
-              onSaveNote={addNote}
+              onAddNote={addNote}
+              onUpdateNote={updateNote}
               onDeleteNote={removeNote}
             />
             <div className="mt-6">
