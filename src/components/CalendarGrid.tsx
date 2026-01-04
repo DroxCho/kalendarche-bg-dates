@@ -4,14 +4,16 @@ import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
 import { Leaf, StickyNote } from 'lucide-react';
+import { CalendarNote } from '@/hooks/useCalendarNotes';
 
 interface CalendarGridProps {
   year: number;
   month: number; // 0-indexed
   activeFilters?: HolidayType[];
-  notes?: Record<string, string>;
-  onSaveNote?: (date: string, note: string) => void;
-  onDeleteNote?: (date: string) => void;
+  notes?: Record<string, CalendarNote[]>;
+  onAddNote?: (date: string, text: string) => void;
+  onUpdateNote?: (date: string, noteId: string, text: string) => void;
+  onDeleteNote?: (date: string, noteId: string) => void;
 }
 
 interface DayInfo {
@@ -41,7 +43,7 @@ function formatDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function CalendarGrid({ year, month, activeFilters, notes = {}, onSaveNote, onDeleteNote }: CalendarGridProps) {
+export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote, onUpdateNote, onDeleteNote }: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -154,7 +156,8 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onSaveNot
           const filteredHolidays = filterHolidays(day.holidays);
           const hasFastingDay = day.holidays.some(h => h.type === 'fasting');
           const dateString = formatDateString(day.date);
-          const hasNote = !!notes[dateString];
+          const dateNotes = notes[dateString] || [];
+          const notesCount = dateNotes.length;
           
           return (
             <div
@@ -175,10 +178,15 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onSaveNot
                 </div>
               )}
               
-              {/* Note indicator */}
-              {hasNote && day.isCurrentMonth && (
-                <div className="absolute top-0.5 left-0.5 print:hidden">
-                  <StickyNote className="w-3 h-3 text-amber-500" />
+              {/* Note indicators - one icon per note */}
+              {notesCount > 0 && day.isCurrentMonth && (
+                <div className="absolute top-0.5 left-0.5 flex gap-0.5 print:hidden">
+                  {Array.from({ length: Math.min(notesCount, 3) }).map((_, i) => (
+                    <StickyNote key={i} className="w-3 h-3 text-amber-500" />
+                  ))}
+                  {notesCount > 3 && (
+                    <span className="text-[8px] text-amber-600 font-bold">+{notesCount - 3}</span>
+                  )}
                 </div>
               )}
               
@@ -229,8 +237,9 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onSaveNot
         onOpenChange={setModalOpen}
         date={selectedDay?.date || null}
         holidays={selectedDay?.holidays || []}
-        note={selectedDay ? notes[formatDateString(selectedDay.date)] : undefined}
-        onSaveNote={onSaveNote}
+        notes={selectedDay ? notes[formatDateString(selectedDay.date)] || [] : []}
+        onAddNote={onAddNote}
+        onUpdateNote={onUpdateNote}
         onDeleteNote={onDeleteNote}
       />
     </div>

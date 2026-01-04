@@ -8,15 +8,17 @@ import { Holiday, BULGARIAN_DAYS_FULL, BULGARIAN_MONTHS } from '@/data/bulgarian
 import { cn } from '@/lib/utils';
 import { Calendar, Cross, Flag, Star, Leaf } from 'lucide-react';
 import { NoteEditor } from './NoteEditor';
+import { CalendarNote } from '@/hooks/useCalendarNotes';
 
 interface HolidayModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   date: Date | null;
   holidays: Holiday[];
-  note?: string;
-  onSaveNote?: (date: string, note: string) => void;
-  onDeleteNote?: (date: string) => void;
+  notes: CalendarNote[];
+  onAddNote?: (date: string, text: string) => void;
+  onUpdateNote?: (date: string, noteId: string, text: string) => void;
+  onDeleteNote?: (date: string, noteId: string) => void;
 }
 
 const holidayDescriptions: Record<string, string> = {
@@ -133,7 +135,7 @@ function getHolidayTypeName(type: Holiday['type']): string {
   }
 }
 
-export function HolidayModal({ open, onOpenChange, date, holidays, note, onSaveNote, onDeleteNote }: HolidayModalProps) {
+export function HolidayModal({ open, onOpenChange, date, holidays, notes, onAddNote, onUpdateNote, onDeleteNote }: HolidayModalProps) {
   if (!date) return null;
 
   const dayOfWeek = date.getDay();
@@ -208,13 +210,13 @@ export function HolidayModal({ open, onOpenChange, date, holidays, note, onSaveN
           )}
         </div>
 
-        {onSaveNote && onDeleteNote && (
+        {onAddNote && onUpdateNote && onDeleteNote && (
           <NoteEditor
             date={dateString}
-            existingNote={note}
-            onSave={onSaveNote}
+            notes={notes}
+            onAdd={onAddNote}
+            onUpdate={onUpdateNote}
             onDelete={onDeleteNote}
-            onClose={() => onOpenChange(false)}
           />
         )}
       </DialogContent>
