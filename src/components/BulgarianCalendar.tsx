@@ -9,6 +9,7 @@ import { YearView } from './YearView';
 import { getMonthRange } from '@/data/bulgarianHolidays';
 import { useCalendarNotes } from '@/hooks/useCalendarNotes';
 import { NotificationToggle } from './NotificationToggle';
+import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, Grid3X3 } from 'lucide-react';
 
@@ -67,6 +68,7 @@ export function BulgarianCalendar() {
         />
         
         <div className="flex items-center gap-1 print:hidden">
+          <ThemeToggle />
           <NotificationToggle />
           <Button
             variant={viewMode === 'month' ? 'default' : 'outline'}
