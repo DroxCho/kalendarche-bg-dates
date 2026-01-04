@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
@@ -46,6 +46,16 @@ function formatDateString(date: Date): string {
 export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote, onUpdateNote, onDeleteNote }: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const todayRef = useRef<HTMLDivElement>(null);
+  const hasScrolled = useRef(false);
+
+  // Scroll to today on initial mount
+  useEffect(() => {
+    if (todayRef.current && !hasScrolled.current) {
+      todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      hasScrolled.current = true;
+    }
+  }, []);
 
   const days = useMemo(() => {
     const result: DayInfo[] = [];
@@ -162,6 +172,7 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
           return (
             <div
               key={index}
+              ref={day.isToday && day.isCurrentMonth ? todayRef : null}
               onClick={() => handleDayClick(day)}
               className={cn(
                 "calendar-day cursor-pointer hover:bg-muted/50 transition-colors",
