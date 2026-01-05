@@ -56,8 +56,8 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
   return (
     <div className="space-y-4">
       {/* Main navigation */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between print:justify-center">
+        <div className="flex items-center gap-2 print:hidden">
           <Button
             variant="outline"
             size="icon"
@@ -73,7 +73,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
               variant="secondary"
               size="sm"
               onClick={onGoToToday}
-              className="gap-1.5 print:hidden"
+              className="gap-1.5"
             >
               <CalendarCheck className="h-4 w-4" />
               Днес
@@ -81,17 +81,17 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
           )}
         </div>
 
-        <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground">
+        <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground print:text-black">
           {BULGARIAN_MONTHS[currentMonth.month]} {currentMonth.year}
         </h2>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 print:hidden">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-1.5 print:hidden"
+                className="gap-1.5"
               >
                 <Download className="h-4 w-4" />
                 <span className="hidden sm:inline">Експорт</span>
@@ -114,7 +114,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
             variant="outline"
             size="sm"
             onClick={handlePrint}
-            className="gap-1.5 print:hidden"
+            className="gap-1.5"
           >
             <Printer className="h-4 w-4" />
             <span className="hidden sm:inline">Печат</span>
