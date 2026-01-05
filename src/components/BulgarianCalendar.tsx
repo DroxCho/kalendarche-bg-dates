@@ -57,9 +57,11 @@ export function BulgarianCalendar() {
 
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
-      <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
+      <div className="print:hidden">
+        <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
+      </div>
       
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="flex items-center justify-between flex-wrap gap-3 print:justify-center">
         <MonthPaginator
           currentIndex={currentIndex}
           onIndexChange={setCurrentIndex}
