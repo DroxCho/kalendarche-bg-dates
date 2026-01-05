@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
@@ -8,8 +8,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { generateICSFile, generateICSForYear } from '@/lib/icsExport';
+import { exportMonthToPDF, exportYearToPDF, exportAllToPDF } from '@/lib/pdfExport';
 
 interface MonthPaginatorProps {
   currentIndex: number;
@@ -17,9 +19,10 @@ interface MonthPaginatorProps {
   onGoToToday?: () => void;
   showTodayButton?: boolean;
   onPrintAll?: () => void;
+  activeFilters?: string[];
 }
 
-export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll }: MonthPaginatorProps) {
+export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll, activeFilters = [] }: MonthPaginatorProps) {
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
 
@@ -58,6 +61,18 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
   const handleExportAll = () => {
     const holidays = getAllHolidays();
     generateICSFile(holidays, 'bulgarian-calendar-all');
+  };
+
+  const handleExportMonthPDF = () => {
+    exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
+  };
+
+  const handleExportYearPDF = () => {
+    exportYearToPDF(currentMonth.year, activeFilters);
+  };
+
+  const handleExportAllPDF = () => {
+    exportAllToPDF(activeFilters);
   };
 
   return (
@@ -106,13 +121,26 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleExportMonth}>
-                Експорт на месец (.ics)
+                Месец (.ics)
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportYear}>
-                Експорт на година (.ics)
+                Година (.ics)
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportAll}>
-                Експорт на всичко (.ics)
+                Всичко (.ics)
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleExportMonthPDF}>
+                <FileText className="h-4 w-4 mr-2" />
+                Месец (PDF)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportYearPDF}>
+                <FileText className="h-4 w-4 mr-2" />
+                Година (PDF)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleExportAllPDF}>
+                <FileText className="h-4 w-4 mr-2" />
+                Всичко (PDF)
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
