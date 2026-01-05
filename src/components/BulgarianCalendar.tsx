@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
@@ -6,6 +6,7 @@ import { HolidaySidebar } from './HolidaySidebar';
 import { HolidaySearch } from './HolidaySearch';
 import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { YearView } from './YearView';
+import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange } from '@/data/bulgarianHolidays';
 import { useCalendarNotes } from '@/hooks/useCalendarNotes';
 import { NotificationToggle } from './NotificationToggle';
@@ -19,6 +20,7 @@ export function BulgarianCalendar() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
   const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
+  const [printAll, setPrintAll] = useState(false);
   const { notes, addNote, updateNote, removeNote } = useCalendarNotes();
   
   const months = getMonthRange();
@@ -55,18 +57,35 @@ export function BulgarianCalendar() {
     }
   }, [months, currentMonth.year]);
 
+  const handlePrintAll = useCallback(() => {
+    setPrintAll(true);
+  }, []);
+
+  // Trigger print when printAll is set, then reset
+  useEffect(() => {
+    if (printAll) {
+      // Small delay to ensure DOM updates
+      const timeout = setTimeout(() => {
+        window.print();
+        setPrintAll(false);
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [printAll]);
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
       <div className="print:hidden">
         <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
       </div>
       
-      <div className="flex items-center justify-between flex-wrap gap-3 print:justify-center">
+      <div className={`flex items-center justify-between flex-wrap gap-3 print:justify-center ${printAll ? 'print:hidden' : ''}`}>
         <MonthPaginator
           currentIndex={currentIndex}
           onIndexChange={setCurrentIndex}
           onGoToToday={handleGoToToday}
           showTodayButton={(!isViewingCurrentMonth || viewMode === 'year') && todayMonthIndex !== -1}
+          onPrintAll={handlePrintAll}
         />
         
         <div className="flex items-center gap-1 print:hidden">
@@ -98,41 +117,49 @@ export function BulgarianCalendar() {
         onFilterChange={setActiveFilters}
       />
       
-      {viewMode === 'month' ? (
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex-1 min-w-0">
-            <CalendarGrid
-              year={currentMonth.year}
-              month={currentMonth.month}
-              activeFilters={activeFilters}
-              notes={notes}
-              onAddNote={addNote}
-              onUpdateNote={updateNote}
-              onDeleteNote={removeNote}
+      {/* Print all calendar - only visible when printing all */}
+      {printAll && (
+        <PrintAllCalendar activeFilters={activeFilters} notes={notes} />
+      )}
+      
+      {/* Regular view - hidden when printing all */}
+      <div className={printAll ? 'print:hidden' : ''}>
+        {viewMode === 'month' ? (
+          <div className="flex flex-col lg:flex-row gap-6">
+            <div className="flex-1 min-w-0">
+              <CalendarGrid
+                year={currentMonth.year}
+                month={currentMonth.month}
+                activeFilters={activeFilters}
+                notes={notes}
+                onAddNote={addNote}
+                onUpdateNote={updateNote}
+                onDeleteNote={removeNote}
+              />
+              <div className="mt-6">
+                <CalendarLegend />
+              </div>
+            </div>
+            
+            <div className="lg:w-72 shrink-0 print:hidden">
+              <HolidaySidebar
+                year={currentMonth.year}
+                month={currentMonth.month}
+              />
+            </div>
+          </div>
+        ) : (
+          <div>
+            <YearView 
+              year={currentMonth.year} 
+              onMonthClick={handleYearMonthClick}
             />
             <div className="mt-6">
               <CalendarLegend />
             </div>
           </div>
-          
-          <div className="lg:w-72 shrink-0 print:hidden">
-            <HolidaySidebar
-              year={currentMonth.year}
-              month={currentMonth.month}
-            />
-          </div>
-        </div>
-      ) : (
-        <div>
-          <YearView 
-            year={currentMonth.year} 
-            onMonthClick={handleYearMonthClick}
-          />
-          <div className="mt-6">
-            <CalendarLegend />
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
