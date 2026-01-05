@@ -16,9 +16,10 @@ interface MonthPaginatorProps {
   onIndexChange: (index: number) => void;
   onGoToToday?: () => void;
   showTodayButton?: boolean;
+  onPrintAll?: () => void;
 }
 
-export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton }: MonthPaginatorProps) {
+export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll }: MonthPaginatorProps) {
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
 
@@ -34,8 +35,14 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
     }
   };
 
-  const handlePrint = () => {
+  const handlePrintMonth = () => {
     window.print();
+  };
+
+  const handlePrintAll = () => {
+    if (onPrintAll) {
+      onPrintAll();
+    }
   };
 
   const handleExportMonth = () => {
@@ -110,15 +117,26 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handlePrint}
-            className="gap-1.5"
-          >
-            <Printer className="h-4 w-4" />
-            <span className="hidden sm:inline">Печат</span>
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5"
+              >
+                <Printer className="h-4 w-4" />
+                <span className="hidden sm:inline">Печат</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={handlePrintMonth}>
+                Печат на месец
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handlePrintAll}>
+                Печат на цял календар
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
           
           <Button
             variant="outline"

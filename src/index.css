@@ -229,4 +229,16 @@
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
+
+  /* Print all calendar page breaks */
+  .print-month-page {
+    page-break-after: always;
+    break-after: page;
+    padding-bottom: 1rem;
+  }
+
+  .print-month-page:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
 }
