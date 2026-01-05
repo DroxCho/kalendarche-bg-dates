@@ -86,6 +86,7 @@ export function BulgarianCalendar() {
           onGoToToday={handleGoToToday}
           showTodayButton={(!isViewingCurrentMonth || viewMode === 'year') && todayMonthIndex !== -1}
           onPrintAll={handlePrintAll}
+          activeFilters={activeFilters}
         />
         
         <div className="flex items-center gap-1 print:hidden">
