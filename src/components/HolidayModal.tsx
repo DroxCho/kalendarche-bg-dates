@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { Calendar, Cross, Flag, Star, Leaf } from 'lucide-react';
 import { NoteEditor } from './NoteEditor';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
+import { ShareButtons } from './ShareButtons';
 
 interface HolidayModalProps {
   open: boolean;
@@ -219,6 +220,8 @@ export function HolidayModal({ open, onOpenChange, date, holidays, notes, onAddN
             onDelete={onDeleteNote}
           />
         )}
+
+        <ShareButtons date={date} holidays={holidays} />
       </DialogContent>
     </Dialog>
   );
