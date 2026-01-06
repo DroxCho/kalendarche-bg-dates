@@ -7,12 +7,14 @@ import { HolidaySearch } from './HolidaySearch';
 import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { YearView } from './YearView';
 import { PrintAllCalendar } from './PrintAllCalendar';
-import { getMonthRange } from '@/data/bulgarianHolidays';
+import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
 import { useCalendarNotes } from '@/hooks/useCalendarNotes';
 import { NotificationToggle } from './NotificationToggle';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { CalendarDays, Grid3X3 } from 'lucide-react';
+import { parseUrlDate } from '@/lib/sharing';
+import { HolidayModal } from './HolidayModal';
 
 const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
 
@@ -21,10 +23,34 @@ export function BulgarianCalendar() {
   const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
   const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
   const [printAll, setPrintAll] = useState(false);
+  const [sharedDate, setSharedDate] = useState<Date | null>(null);
+  const [sharedModalOpen, setSharedModalOpen] = useState(false);
   const { notes, addNote, updateNote, removeNote } = useCalendarNotes();
   
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
+
+  // Handle shared URL on mount
+  useEffect(() => {
+    const dateStr = parseUrlDate();
+    if (dateStr) {
+      const [year, month, day] = dateStr.split('-').map(Number);
+      const date = new Date(year, month - 1, day);
+      
+      // Navigate to the month
+      const index = months.findIndex(m => m.year === year && m.month === month - 1);
+      if (index !== -1) {
+        setCurrentIndex(index);
+      }
+      
+      // Open modal for that date
+      setSharedDate(date);
+      setSharedModalOpen(true);
+      
+      // Clean URL without refreshing page
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, [months]);
 
   const handleNavigateToMonth = useCallback((year: number, month: number) => {
     const index = months.findIndex(m => m.year === year && m.month === month);
@@ -161,6 +187,20 @@ export function BulgarianCalendar() {
           </div>
         )}
       </div>
+
+      {/* Shared date modal */}
+      <HolidayModal
+        open={sharedModalOpen}
+        onOpenChange={setSharedModalOpen}
+        date={sharedDate}
+        holidays={sharedDate ? getHolidaysForDate(
+          `${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`
+        ) : []}
+        notes={sharedDate ? notes[`${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`] || [] : []}
+        onAddNote={addNote}
+        onUpdateNote={updateNote}
+        onDeleteNote={removeNote}
+      />
     </div>
   );
 }
