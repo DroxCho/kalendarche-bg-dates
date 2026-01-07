@@ -2,6 +2,8 @@ import jsPDF from 'jspdf';
 import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays, Holiday } from '@/data/bulgarianHolidays';
 
 const DAYS_OF_WEEK = ['Пон', 'Вто', 'Сря', 'Чет', 'Пет', 'Съб', 'Нед'];
+const DAYS_OF_WEEK_ASCII = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const MONTHS_ASCII = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 interface PDFExportOptions {
   year: number;
@@ -21,31 +23,64 @@ function getDaysInMonth(year: number, month: number) {
 
 function getFirstDayOfMonth(year: number, month: number) {
   const day = new Date(year, month, 1).getDay();
-  return day === 0 ? 6 : day - 1; // Convert Sunday (0) to 6, Monday (1) to 0
+  return day === 0 ? 6 : day - 1;
+}
+
+// Convert Cyrillic to ASCII-safe transliteration for PDF
+function transliterate(text: string): string {
+  const map: Record<string, string> = {
+    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ж': 'Zh', 'З': 'Z',
+    'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P',
+    'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch',
+    'Ш': 'Sh', 'Щ': 'Sht', 'Ъ': 'A', 'Ь': '', 'Ю': 'Yu', 'Я': 'Ya',
+    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ж': 'zh', 'з': 'z',
+    'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
+    'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch',
+    'ш': 'sh', 'щ': 'sht', 'ъ': 'a', 'ь': '', 'ю': 'yu', 'я': 'ya'
+  };
+  
+  return text.split('').map(char => map[char] || char).join('');
+}
+
+// Draw colored square with symbol for legend
+function drawLegendIcon(pdf: jsPDF, x: number, y: number, color: number[], symbol: string) {
+  pdf.setFillColor(color[0], color[1], color[2]);
+  pdf.rect(x, y, 4, 4, 'F');
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFontSize(5);
+  pdf.text(symbol, x + 2, y + 3, { align: 'center' });
 }
 
 export async function exportMonthToPDF({ year, month, activeFilters }: PDFExportOptions) {
   const pdf = new jsPDF('landscape', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
   
   // Add title
   pdf.setFontSize(24);
   pdf.setFont('helvetica', 'bold');
-  const title = `${BULGARIAN_MONTHS[month]} ${year}`;
+  const title = `${MONTHS_ASCII[month]} ${year}`;
   const titleWidth = pdf.getTextWidth(title);
   pdf.text(title, (pageWidth - titleWidth) / 2, 20);
   
+  // Subtitle with Bulgarian month name (transliterated)
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(100, 100, 100);
+  const subtitle = `(${transliterate(BULGARIAN_MONTHS[month])})`;
+  const subtitleWidth = pdf.getTextWidth(subtitle);
+  pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 27);
+  pdf.setTextColor(0, 0, 0);
+  
   // Calendar grid settings
   const marginLeft = 10;
-  const marginTop = 30;
+  const marginTop = 35;
   const cellWidth = (pageWidth - marginLeft * 2) / 7;
   const cellHeight = 22;
   
   // Draw day headers
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'bold');
-  DAYS_OF_WEEK.forEach((day, i) => {
+  DAYS_OF_WEEK_ASCII.forEach((day, i) => {
     const x = marginLeft + i * cellWidth;
     pdf.setFillColor(240, 240, 240);
     pdf.rect(x, marginTop, cellWidth, 8, 'F');
@@ -136,8 +171,8 @@ export async function exportMonthToPDF({ year, month, activeFilters }: PDFExport
               pdf.setTextColor(100, 100, 100);
           }
           
-          // Truncate text if too long
-          let text = holiday.name;
+          // Transliterate and truncate text if too long
+          let text = transliterate(holiday.name);
           const maxWidth = cellWidth - 4;
           while (pdf.getTextWidth(text) > maxWidth && text.length > 3) {
             text = text.slice(0, -4) + '...';
@@ -149,7 +184,7 @@ export async function exportMonthToPDF({ year, month, activeFilters }: PDFExport
         
         if (holidays.length > 3) {
           pdf.setTextColor(100, 100, 100);
-          pdf.text(`+${holidays.length - 3} още`, x + 2, textY);
+          pdf.text(`+${holidays.length - 3} more`, x + 2, textY);
         }
       }
       
@@ -165,21 +200,28 @@ export async function exportMonthToPDF({ year, month, activeFilters }: PDFExport
   pdf.setFont('helvetica', 'normal');
   
   const legendItems = [
-    { label: 'Национален', color: [180, 50, 80] },
-    { label: 'Православен', color: [200, 150, 50] },
-    { label: 'Имен ден', color: [150, 80, 180] },
-    { label: 'Народен', color: [220, 120, 50] },
-    { label: 'Постен', color: [130, 90, 180] },
+    { label: 'National', color: [180, 50, 80], symbol: 'N' },
+    { label: 'Orthodox', color: [200, 150, 50], symbol: '+' },
+    { label: 'Nameday', color: [150, 80, 180], symbol: '*' },
+    { label: 'Folk', color: [220, 120, 50], symbol: 'F' },
+    { label: 'Fasting', color: [130, 90, 180], symbol: 'L' },
   ];
   
   let legendX = marginLeft;
   legendItems.forEach(item => {
-    pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
-    pdf.rect(legendX, legendY, 4, 4, 'F');
+    drawLegendIcon(pdf, legendX, legendY, item.color, item.symbol);
     pdf.setTextColor(0, 0, 0);
     pdf.text(item.label, legendX + 6, legendY + 3);
     legendX += pdf.getTextWidth(item.label) + 15;
   });
+  
+  // Add "Today" indicator
+  pdf.setDrawColor(180, 50, 80);
+  pdf.setLineWidth(0.8);
+  pdf.rect(legendX, legendY, 4, 4, 'S');
+  pdf.setLineWidth(0.2);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('Today', legendX + 6, legendY + 3);
   
   pdf.save(`calendar-${year}-${String(month + 1).padStart(2, '0')}.pdf`);
 }
@@ -214,20 +256,29 @@ async function addMonthToPDF(pdf: jsPDF, year: number, month: number, activeFilt
   pdf.setFontSize(24);
   pdf.setFont('helvetica', 'bold');
   pdf.setTextColor(0, 0, 0);
-  const title = `${BULGARIAN_MONTHS[month]} ${year}`;
+  const title = `${MONTHS_ASCII[month]} ${year}`;
   const titleWidth = pdf.getTextWidth(title);
   pdf.text(title, (pageWidth - titleWidth) / 2, 20);
   
+  // Subtitle with Bulgarian month name (transliterated)
+  pdf.setFontSize(12);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setTextColor(100, 100, 100);
+  const subtitle = `(${transliterate(BULGARIAN_MONTHS[month])})`;
+  const subtitleWidth = pdf.getTextWidth(subtitle);
+  pdf.text(subtitle, (pageWidth - subtitleWidth) / 2, 27);
+  pdf.setTextColor(0, 0, 0);
+  
   // Calendar grid settings
   const marginLeft = 10;
-  const marginTop = 30;
+  const marginTop = 35;
   const cellWidth = (pageWidth - marginLeft * 2) / 7;
   const cellHeight = 22;
   
   // Draw day headers
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'bold');
-  DAYS_OF_WEEK.forEach((day, i) => {
+  DAYS_OF_WEEK_ASCII.forEach((day, i) => {
     const x = marginLeft + i * cellWidth;
     pdf.setFillColor(240, 240, 240);
     pdf.rect(x, marginTop, cellWidth, 8, 'F');
@@ -318,7 +369,7 @@ async function addMonthToPDF(pdf: jsPDF, year: number, month: number, activeFilt
               pdf.setTextColor(100, 100, 100);
           }
           
-          let text = holiday.name;
+          let text = transliterate(holiday.name);
           const maxWidth = cellWidth - 4;
           while (pdf.getTextWidth(text) > maxWidth && text.length > 3) {
             text = text.slice(0, -4) + '...';
@@ -330,7 +381,7 @@ async function addMonthToPDF(pdf: jsPDF, year: number, month: number, activeFilt
         
         if (holidays.length > 3) {
           pdf.setTextColor(100, 100, 100);
-          pdf.text(`+${holidays.length - 3} още`, x + 2, textY);
+          pdf.text(`+${holidays.length - 3} more`, x + 2, textY);
         }
       }
       
@@ -339,4 +390,33 @@ async function addMonthToPDF(pdf: jsPDF, year: number, month: number, activeFilt
     }
     row++;
   }
+  
+  // Add legend at bottom
+  const legendY = marginTop + 8 + (row + 1) * cellHeight + 5;
+  pdf.setFontSize(8);
+  pdf.setFont('helvetica', 'normal');
+  
+  const legendItems = [
+    { label: 'National', color: [180, 50, 80], symbol: 'N' },
+    { label: 'Orthodox', color: [200, 150, 50], symbol: '+' },
+    { label: 'Nameday', color: [150, 80, 180], symbol: '*' },
+    { label: 'Folk', color: [220, 120, 50], symbol: 'F' },
+    { label: 'Fasting', color: [130, 90, 180], symbol: 'L' },
+  ];
+  
+  let legendX = marginLeft;
+  legendItems.forEach(item => {
+    drawLegendIcon(pdf, legendX, legendY, item.color, item.symbol);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(item.label, legendX + 6, legendY + 3);
+    legendX += pdf.getTextWidth(item.label) + 15;
+  });
+  
+  // Add "Today" indicator
+  pdf.setDrawColor(180, 50, 80);
+  pdf.setLineWidth(0.8);
+  pdf.rect(legendX, legendY, 4, 4, 'S');
+  pdf.setLineWidth(0.2);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text('Today', legendX + 6, legendY + 3);
 }
