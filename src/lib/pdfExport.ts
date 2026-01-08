@@ -29,13 +29,13 @@ async function initPdfWithCyrillicFont(): Promise<jsPDF> {
       loadDejaVuFontBold()
     ]);
     
-    pdf.addFileToVFS('NotoSans-Regular.ttf', normalFont);
-    pdf.addFont('NotoSans-Regular.ttf', 'NotoSans', 'normal');
+    pdf.addFileToVFS('DejaVuSans.ttf', normalFont);
+    pdf.addFont('DejaVuSans.ttf', 'DejaVuSans', 'normal');
     
-    pdf.addFileToVFS('NotoSans-Bold.ttf', boldFont);
-    pdf.addFont('NotoSans-Bold.ttf', 'NotoSans', 'bold');
+    pdf.addFileToVFS('DejaVuSans-Bold.ttf', boldFont);
+    pdf.addFont('DejaVuSans-Bold.ttf', 'DejaVuSans', 'bold');
     
-    pdf.setFont('NotoSans');
+    pdf.setFont('DejaVuSans');
   } catch (error) {
     console.warn('Failed to load Cyrillic font, falling back to helvetica:', error);
     pdf.setFont('helvetica');
@@ -53,7 +53,7 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 
   // Day headers - use Bulgarian days
   pdf.setFontSize(10);
-  pdf.setFont('NotoSans', 'bold');
+  pdf.setFont('DejaVuSans', 'bold');
   DAYS_OF_WEEK_BG.forEach((day, i) => {
     const x = marginLeft + i * cellWidth;
     pdf.setFillColor(245, 245, 245);
@@ -105,7 +105,7 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 
       // Day number
       pdf.setFontSize(12);
-      pdf.setFont('NotoSans', 'bold');
+      pdf.setFont('DejaVuSans', 'bold');
       if (dayOfWeek === 0) pdf.setTextColor(200, 50, 50);
       else if (dayOfWeek === 6) pdf.setTextColor(50, 100, 200);
       else pdf.setTextColor(50, 50, 50);
@@ -117,7 +117,7 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 
       if (dayHolidays.length > 0) {
         pdf.setFontSize(6);
-        pdf.setFont('NotoSans', 'normal');
+        pdf.setFont('DejaVuSans', 'normal');
         let textY = y + 11;
 
         dayHolidays.slice(0, 3).forEach(holiday => {
@@ -157,7 +157,7 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   const startX = 20;
   
   pdf.setFontSize(7);
-  pdf.setFont('NotoSans', 'normal');
+  pdf.setFont('DejaVuSans', 'normal');
   
   // Bulgarian labels for legend
   const items = [
@@ -190,7 +190,7 @@ function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: st
 
   // Title - use Bulgarian month name
   pdf.setFontSize(24);
-  pdf.setFont('NotoSans', 'bold');
+  pdf.setFont('DejaVuSans', 'bold');
   pdf.setTextColor(0, 0, 0);
   const title = `${BULGARIAN_MONTHS[month]} ${year}`;
   pdf.text(title, (pageWidth - pdf.getTextWidth(title)) / 2, 15);
