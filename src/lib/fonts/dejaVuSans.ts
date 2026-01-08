@@ -1,24 +1,27 @@
-// DejaVu Sans font - Cyrillic support for jsPDF
-// Font source: https://dejavu-fonts.github.io/
-// This is a subset containing Latin and Cyrillic characters
+// Cyrillic font support for jsPDF
+// Using Noto Sans which has proper unicode cmap tables
 
-export const DEJAVU_SANS_NORMAL = "WILL_BE_LOADED_DYNAMICALLY";
-export const DEJAVU_SANS_BOLD = "WILL_BE_LOADED_DYNAMICALLY";
-
-// Font loading utility
 let fontCache: { normal?: string; bold?: string } = {};
 
 export async function loadDejaVuFont(): Promise<string> {
   if (fontCache.normal) return fontCache.normal;
   
-  // Load from CDN - DejaVu Sans with Cyrillic support
+  // Use Noto Sans from Google Fonts with proper Cyrillic support
   const response = await fetch(
-    'https://cdn.jsdelivr.net/npm/@aspect/roboto-fontface@1.2.0/fonts/roboto/Roboto-Regular.ttf'
+    'https://fonts.gstatic.com/s/notosans/v36/o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyD9A99d41P6zHtY.ttf'
   );
+  
+  if (!response.ok) {
+    throw new Error('Failed to load font');
+  }
+  
   const arrayBuffer = await response.arrayBuffer();
-  const base64 = btoa(
-    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-  );
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = btoa(binary);
   fontCache.normal = base64;
   return base64;
 }
@@ -26,13 +29,22 @@ export async function loadDejaVuFont(): Promise<string> {
 export async function loadDejaVuFontBold(): Promise<string> {
   if (fontCache.bold) return fontCache.bold;
   
+  // Use Noto Sans Bold from Google Fonts
   const response = await fetch(
-    'https://cdn.jsdelivr.net/npm/@aspect/roboto-fontface@1.2.0/fonts/roboto/Roboto-Bold.ttf'
+    'https://fonts.gstatic.com/s/notosans/v36/o-0mIpQlx3QUlC5A4PNB6Ryti20_6n1iPHjcz6L1SoM-jCpoiyAaAu9d41P6zHtY.ttf'
   );
+  
+  if (!response.ok) {
+    throw new Error('Failed to load bold font');
+  }
+  
   const arrayBuffer = await response.arrayBuffer();
-  const base64 = btoa(
-    new Uint8Array(arrayBuffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-  );
+  const bytes = new Uint8Array(arrayBuffer);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  const base64 = btoa(binary);
   fontCache.bold = base64;
   return base64;
 }
