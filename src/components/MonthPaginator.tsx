@@ -63,16 +63,16 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
     generateICSFile(holidays, 'bulgarian-calendar-all');
   };
 
-  const handleExportMonthPDF = () => {
-    exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
+  const handleExportMonthPDF = async () => {
+    await exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
   };
 
-  const handleExportYearPDF = () => {
-    exportYearToPDF(currentMonth.year, activeFilters);
+  const handleExportYearPDF = async () => {
+    await exportYearToPDF(currentMonth.year, activeFilters);
   };
 
-  const handleExportAllPDF = () => {
-    exportAllToPDF(activeFilters);
+  const handleExportAllPDF = async () => {
+    await exportAllToPDF(activeFilters);
   };
 
   return (

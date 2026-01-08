@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
-import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
+import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
+import { loadDejaVuFont, loadDejaVuFontBold } from './fonts/dejaVuSans';
 
 interface PDFExportOptions {
   year: number;
@@ -7,7 +8,7 @@ interface PDFExportOptions {
   activeFilters: string[];
 }
 
-const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS_OF_WEEK_BG = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -18,27 +19,28 @@ function getFirstDayOfMonth(year: number, month: number) {
   return day === 0 ? 6 : day - 1;
 }
 
-// Transliterate Bulgarian to Latin for PDF
-function transliterate(text: string): string {
-  const map: Record<string, string> = {
-    'А': 'A', 'Б': 'B', 'В': 'V', 'Г': 'G', 'Д': 'D', 'Е': 'E', 'Ж': 'Zh', 'З': 'Z',
-    'И': 'I', 'Й': 'Y', 'К': 'K', 'Л': 'L', 'М': 'M', 'Н': 'N', 'О': 'O', 'П': 'P',
-    'Р': 'R', 'С': 'S', 'Т': 'T', 'У': 'U', 'Ф': 'F', 'Х': 'H', 'Ц': 'Ts', 'Ч': 'Ch',
-    'Ш': 'Sh', 'Щ': 'Sht', 'Ъ': 'A', 'Ь': '', 'Ю': 'Yu', 'Я': 'Ya',
-    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ж': 'zh', 'з': 'z',
-    'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p',
-    'р': 'r', 'с': 's', 'т': 't', 'у': 'u', 'ф': 'f', 'х': 'h', 'ц': 'ts', 'ч': 'ch',
-    'ш': 'sh', 'щ': 'sht', 'ъ': 'a', 'ь': '', 'ю': 'yu', 'я': 'ya'
-  };
-  return text.split('').map(char => map[char] || char).join('');
-}
-
-function transliterateMonth(month: number): string {
-  const months = [
-    'Yanuari', 'Fevruari', 'Mart', 'April', 'May', 'Yuni',
-    'Yuli', 'Avgust', 'Septemvri', 'Oktomvri', 'Noemvri', 'Dekemvri'
-  ];
-  return months[month];
+// Initialize PDF with Cyrillic font support
+async function initPdfWithCyrillicFont(): Promise<jsPDF> {
+  const pdf = new jsPDF('landscape', 'mm', 'a4');
+  
+  try {
+    const [normalFont, boldFont] = await Promise.all([
+      loadDejaVuFont(),
+      loadDejaVuFontBold()
+    ]);
+    
+    pdf.addFileToVFS('Roboto-Regular.ttf', normalFont);
+    pdf.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+    
+    pdf.addFileToVFS('Roboto-Bold.ttf', boldFont);
+    pdf.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+    
+    pdf.setFont('Roboto');
+  } catch (error) {
+    console.warn('Failed to load Cyrillic font, using default:', error);
+  }
+  
+  return pdf;
 }
 
 function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
@@ -48,10 +50,10 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
   const cellWidth = (pageWidth - marginLeft * 2) / 7;
   const cellHeight = 24;
 
-  // Day headers
+  // Day headers - use Bulgarian days
   pdf.setFontSize(10);
-  pdf.setFont('helvetica', 'bold');
-  DAYS_OF_WEEK.forEach((day, i) => {
+  pdf.setFont('Roboto', 'bold');
+  DAYS_OF_WEEK_BG.forEach((day, i) => {
     const x = marginLeft + i * cellWidth;
     pdf.setFillColor(245, 245, 245);
     pdf.rect(x, marginTop, cellWidth, 8, 'F');
@@ -102,7 +104,7 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 
       // Day number
       pdf.setFontSize(12);
-      pdf.setFont('helvetica', 'bold');
+      pdf.setFont('Roboto', 'bold');
       if (dayOfWeek === 0) pdf.setTextColor(200, 50, 50);
       else if (dayOfWeek === 6) pdf.setTextColor(50, 100, 200);
       else pdf.setTextColor(50, 50, 50);
@@ -114,7 +116,7 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 
       if (dayHolidays.length > 0) {
         pdf.setFontSize(6);
-        pdf.setFont('helvetica', 'normal');
+        pdf.setFont('Roboto', 'normal');
         let textY = y + 11;
 
         dayHolidays.slice(0, 3).forEach(holiday => {
@@ -127,7 +129,8 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
             default: pdf.setTextColor(100, 100, 100);
           }
 
-          let text = transliterate(holiday.name);
+          // Use original Bulgarian text (Cyrillic font is embedded)
+          let text = holiday.name;
           const maxWidth = cellWidth - 4;
           while (pdf.getTextWidth(text) > maxWidth && text.length > 3) {
             text = text.slice(0, -4) + '...';
@@ -153,14 +156,15 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   const startX = 20;
   
   pdf.setFontSize(7);
-  pdf.setFont('helvetica', 'normal');
+  pdf.setFont('Roboto', 'normal');
   
+  // Bulgarian labels for legend
   const items = [
-    { label: 'National', color: [180, 50, 80] as const },
-    { label: 'Orthodox', color: [180, 140, 40] as const },
-    { label: 'Nameday', color: [140, 70, 170] as const },
-    { label: 'Folk', color: [200, 110, 40] as const },
-    { label: 'Fasting', color: [120, 80, 160] as const },
+    { label: 'Национални', color: [180, 50, 80] as const },
+    { label: 'Православни', color: [180, 140, 40] as const },
+    { label: 'Имени дни', color: [140, 70, 170] as const },
+    { label: 'Народни', color: [200, 110, 40] as const },
+    { label: 'Пости', color: [120, 80, 160] as const },
   ];
   
   let x = startX;
@@ -176,32 +180,32 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   pdf.setLineWidth(0.8);
   pdf.rect(x, legendY - 2, 4, 4, 'S');
   pdf.setTextColor(60, 60, 60);
-  pdf.text('Today', x + 6, legendY + 1);
+  pdf.text('Днес', x + 6, legendY + 1);
 }
 
 function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
 
-  // Title
+  // Title - use Bulgarian month name
   pdf.setFontSize(24);
-  pdf.setFont('helvetica', 'bold');
+  pdf.setFont('Roboto', 'bold');
   pdf.setTextColor(0, 0, 0);
-  const title = `${transliterateMonth(month)} ${year}`;
+  const title = `${BULGARIAN_MONTHS[month]} ${year}`;
   pdf.text(title, (pageWidth - pdf.getTextWidth(title)) / 2, 15);
 
   drawCalendarGrid(pdf, year, month, activeFilters);
   drawLegend(pdf, pageHeight);
 }
 
-export function exportMonthToPDF({ year, month, activeFilters }: PDFExportOptions) {
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
+export async function exportMonthToPDF({ year, month, activeFilters }: PDFExportOptions) {
+  const pdf = await initPdfWithCyrillicFont();
   addMonthPage(pdf, year, month, activeFilters);
   pdf.save(`calendar-${year}-${String(month + 1).padStart(2, '0')}.pdf`);
 }
 
-export function exportYearToPDF(year: number, activeFilters: string[]) {
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
+export async function exportYearToPDF(year: number, activeFilters: string[]) {
+  const pdf = await initPdfWithCyrillicFont();
   
   for (let month = 0; month < 12; month++) {
     if (month > 0) pdf.addPage();
@@ -211,8 +215,8 @@ export function exportYearToPDF(year: number, activeFilters: string[]) {
   pdf.save(`calendar-${year}.pdf`);
 }
 
-export function exportAllToPDF(activeFilters: string[]) {
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
+export async function exportAllToPDF(activeFilters: string[]) {
+  const pdf = await initPdfWithCyrillicFont();
   const months = getMonthRange();
   
   for (let i = 0; i < months.length; i++) {
