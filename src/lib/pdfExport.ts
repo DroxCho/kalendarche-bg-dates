@@ -155,36 +155,51 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 function drawLegend(pdf: jsPDF, pageHeight: number) {
   const legendY = pageHeight - 12;
   const startX = 20;
-  
+
+  // Slightly larger markers so the "icon" letter inside is readable.
+  const markerSize = 4.5;
+
   pdf.setFontSize(7);
   pdf.setFont('DejaVuSans', 'normal');
-  
-  // Bulgarian labels for legend - using filled rectangles for better compatibility
+
+  // Legend with simple in-marker "icons" (letters) to mimic the UI icons.
+  // We use ASCII letters to guarantee they render even if the font fallback happens.
   const items = [
-    { label: 'Национални', color: [180, 50, 80] as const },
-    { label: 'Православни', color: [180, 140, 40] as const },
-    { label: 'Имени дни', color: [140, 70, 170] as const },
-    { label: 'Народни', color: [200, 110, 40] as const },
-    { label: 'Пости', color: [120, 80, 160] as const },
+    { label: 'Национални', icon: 'N', color: [180, 50, 80] as const },
+    { label: 'Православни', icon: 'O', color: [180, 140, 40] as const },
+    { label: 'Имени дни', icon: 'S', color: [140, 70, 170] as const },
+    { label: 'Народни', icon: 'F', color: [200, 110, 40] as const },
+    { label: 'Пости', icon: 'P', color: [120, 80, 160] as const },
   ];
-  
+
   let x = startX;
   items.forEach(item => {
-    // Use filled rectangle instead of circle for better PDF compatibility
+    // Marker
     pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
-    pdf.rect(x - 1.5, legendY - 1.5, 3, 3, 'F');
+    pdf.rect(x, legendY - markerSize / 2, markerSize, markerSize, 'F');
+
+    // Icon letter inside marker
+    pdf.setFont('DejaVuSans', 'bold');
+    pdf.setFontSize(6);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(item.icon, x + markerSize / 2, legendY + 1.2, { align: 'center' });
+
+    // Label
+    pdf.setFont('DejaVuSans', 'normal');
+    pdf.setFontSize(7);
     pdf.setTextColor(60, 60, 60);
-    pdf.text(item.label, x + 4, legendY + 1);
-    x += pdf.getTextWidth(item.label) + 15;
+    pdf.text(item.label, x + markerSize + 2, legendY + 1);
+
+    x += markerSize + 2 + pdf.getTextWidth(item.label) + 12;
   });
-  
+
   // "Today" indicator - outlined rectangle
   pdf.setDrawColor(180, 50, 80);
   pdf.setLineWidth(0.8);
-  pdf.rect(x, legendY - 2, 4, 4, 'S');
-  pdf.setLineWidth(0.2); // Reset line width
+  pdf.rect(x, legendY - markerSize / 2, markerSize, markerSize, 'S');
+  pdf.setLineWidth(0.2);
   pdf.setTextColor(60, 60, 60);
-  pdf.text('Днес', x + 6, legendY + 1);
+  pdf.text('Днес', x + markerSize + 2, legendY + 1);
 }
 
 function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
