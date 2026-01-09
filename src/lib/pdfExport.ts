@@ -159,7 +159,7 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   pdf.setFontSize(7);
   pdf.setFont('DejaVuSans', 'normal');
   
-  // Bulgarian labels for legend
+  // Bulgarian labels for legend - using filled rectangles for better compatibility
   const items = [
     { label: 'Национални', color: [180, 50, 80] as const },
     { label: 'Православни', color: [180, 140, 40] as const },
@@ -170,16 +170,19 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   
   let x = startX;
   items.forEach(item => {
+    // Use filled rectangle instead of circle for better PDF compatibility
     pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
-    pdf.circle(x, legendY, 2, 'F');
+    pdf.rect(x - 1.5, legendY - 1.5, 3, 3, 'F');
     pdf.setTextColor(60, 60, 60);
     pdf.text(item.label, x + 4, legendY + 1);
     x += pdf.getTextWidth(item.label) + 15;
   });
   
+  // "Today" indicator - outlined rectangle
   pdf.setDrawColor(180, 50, 80);
   pdf.setLineWidth(0.8);
   pdf.rect(x, legendY - 2, 4, 4, 'S');
+  pdf.setLineWidth(0.2); // Reset line width
   pdf.setTextColor(60, 60, 60);
   pdf.text('Днес', x + 6, legendY + 1);
 }
