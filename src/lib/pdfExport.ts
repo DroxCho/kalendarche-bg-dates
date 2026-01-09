@@ -162,14 +162,13 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   pdf.setFontSize(7);
   pdf.setFont('DejaVuSans', 'normal');
 
-  // Legend with simple in-marker "icons" (letters) to mimic the UI icons.
-  // We use ASCII letters to guarantee they render even if the font fallback happens.
+  // Legend with Cyrillic letters inside markers
   const items = [
-    { label: 'Национални', icon: 'N', color: [180, 50, 80] as const },
-    { label: 'Православни', icon: 'O', color: [180, 140, 40] as const },
-    { label: 'Имени дни', icon: 'S', color: [140, 70, 170] as const },
-    { label: 'Народни', icon: 'F', color: [200, 110, 40] as const },
-    { label: 'Пости', icon: 'P', color: [120, 80, 160] as const },
+    { label: 'Национални', icon: 'Н', color: [180, 50, 80] as const },
+    { label: 'Православни', icon: 'Х', color: [180, 140, 40] as const },
+    { label: 'Имени дни', icon: 'И', color: [140, 70, 170] as const },
+    { label: 'Народни', icon: 'Ф', color: [200, 110, 40] as const },
+    { label: 'Пости', icon: 'П', color: [120, 80, 160] as const },
   ];
 
   let x = startX;
