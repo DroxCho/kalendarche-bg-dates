@@ -3,7 +3,7 @@ import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHol
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
-import { Leaf, StickyNote } from 'lucide-react';
+import { Leaf, StickyNote, Flag, Cross, Star } from 'lucide-react';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 
 interface CalendarGridProps {
@@ -215,23 +215,40 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
               {filteredHolidays
                 .filter(holiday => shouldShowFastingName(holiday))
                 .slice(0, 2)
-                .map((holiday, hIndex) => (
-                <div
-                  key={hIndex}
-                  className={cn(
-                    "holiday-badge",
-                    holiday.type === 'national' && "holiday-national",
-                    holiday.type === 'orthodox' && "holiday-orthodox",
-                    holiday.type === 'nonworking' && "holiday-nonworking",
-                    holiday.type === 'nameday' && "holiday-nameday",
-                    holiday.type === 'folk' && "holiday-folk",
-                    holiday.type === 'fasting' && "holiday-fasting"
-                  )}
-                  title={holiday.name}
-                >
-                  {holiday.name}
-                </div>
-              ))}
+                .map((holiday, hIndex) => {
+                  const getHolidayIcon = () => {
+                    switch (holiday.type) {
+                      case 'national':
+                        return <Flag className="w-2.5 h-2.5 flex-shrink-0" />;
+                      case 'orthodox':
+                        return <Cross className="w-2.5 h-2.5 flex-shrink-0" />;
+                      case 'nameday':
+                        return <Star className="w-2.5 h-2.5 flex-shrink-0" />;
+                      default:
+                        return null;
+                    }
+                  };
+                  const icon = getHolidayIcon();
+                  
+                  return (
+                    <div
+                      key={hIndex}
+                      className={cn(
+                        "holiday-badge",
+                        holiday.type === 'national' && "holiday-national",
+                        holiday.type === 'orthodox' && "holiday-orthodox",
+                        holiday.type === 'nonworking' && "holiday-nonworking",
+                        holiday.type === 'nameday' && "holiday-nameday",
+                        holiday.type === 'folk' && "holiday-folk",
+                        holiday.type === 'fasting' && "holiday-fasting"
+                      )}
+                      title={holiday.name}
+                    >
+                      {icon}
+                      <span className="truncate">{holiday.name}</span>
+                    </div>
+                  );
+                })}
               
               {filteredHolidays.length > 2 && (
                 <div className="text-[10px] text-muted-foreground mt-0.5 font-medium">
