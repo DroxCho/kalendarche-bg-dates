@@ -152,7 +152,7 @@
   }
 
   .holiday-badge {
-    @apply text-[10px] md:text-xs px-1 py-0.5 rounded-sm mt-1 leading-tight text-center w-full whitespace-normal break-words hyphens-auto;
+    @apply text-[10px] md:text-xs px-1 py-0.5 rounded-sm mt-1 leading-tight w-full flex items-center gap-0.5 overflow-hidden;
   }
 
   .holiday-national {
