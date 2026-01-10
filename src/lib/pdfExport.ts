@@ -121,22 +121,34 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
         let textY = y + 11;
 
         dayHolidays.slice(0, 3).forEach(holiday => {
+          let textColor: [number, number, number];
           switch (holiday.type) {
-            case 'national': pdf.setTextColor(180, 50, 80); break;
-            case 'orthodox': pdf.setTextColor(180, 140, 40); break;
-            case 'nameday': pdf.setTextColor(140, 70, 170); break;
-            case 'folk': pdf.setTextColor(200, 110, 40); break;
-            case 'fasting': pdf.setTextColor(120, 80, 160); break;
-            default: pdf.setTextColor(100, 100, 100);
+            case 'national': textColor = [180, 50, 80]; break;
+            case 'orthodox': textColor = [180, 140, 40]; break;
+            case 'nameday': textColor = [140, 70, 170]; break;
+            case 'folk': textColor = [200, 110, 40]; break;
+            case 'fasting': textColor = [120, 80, 160]; break;
+            default: textColor = [100, 100, 100];
+          }
+          pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
+
+          // Draw icon for non-fasting holidays
+          const iconType = getIconForHolidayType(holiday.type);
+          const iconSize = 2.5;
+          let textStartX = x + 2;
+          
+          if (iconType) {
+            drawIcon(pdf, iconType, x + 3.5, textY - 1.2, iconSize, textColor);
+            textStartX = x + 6;
           }
 
           // Use original Bulgarian text (Cyrillic font is embedded)
           let text = holiday.name;
-          const maxWidth = cellWidth - 4;
+          const maxWidth = cellWidth - (iconType ? 8 : 4);
           while (pdf.getTextWidth(text) > maxWidth && text.length > 3) {
             text = text.slice(0, -4) + '...';
           }
-          pdf.text(text, x + 2, textY);
+          pdf.text(text, textStartX, textY);
           textY += 4;
         });
 
@@ -152,13 +164,18 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
   }
 }
 
-// Draw icon inside marker at given position
-function drawLegendIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: number) {
-  pdf.setDrawColor(255, 255, 255);
-  pdf.setFillColor(255, 255, 255);
+// Draw icon at given position (for legend markers)
+function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: number, color?: [number, number, number]) {
+  if (color) {
+    pdf.setDrawColor(color[0], color[1], color[2]);
+    pdf.setFillColor(color[0], color[1], color[2]);
+  } else {
+    pdf.setDrawColor(255, 255, 255);
+    pdf.setFillColor(255, 255, 255);
+  }
   pdf.setLineWidth(0.4);
   
-  const s = size * 0.5; // Scale factor for icon inside marker
+  const s = size * 0.5; // Scale factor for icon
   
   switch (iconType) {
     case 'flag':
@@ -194,13 +211,6 @@ function drawLegendIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, si
       // Draw star as filled polygon
       if (starPoints.length > 2) {
         pdf.setFillColor(255, 255, 255);
-        const first = starPoints[0];
-        let pathData = `M ${first[0]} ${first[1]}`;
-        for (let i = 1; i < starPoints.length; i++) {
-          pathData += ` L ${starPoints[i][0]} ${starPoints[i][1]}`;
-        }
-        pathData += ' Z';
-        // Use lines to approximate star
         for (let i = 0; i < starPoints.length; i++) {
           const next = starPoints[(i + 1) % starPoints.length];
           pdf.line(starPoints[i][0], starPoints[i][1], next[0], next[1]);
@@ -211,22 +221,31 @@ function drawLegendIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, si
     case 'leaf':
       // Leaf shape: curved teardrop
       pdf.setLineWidth(0.35);
-      // Draw leaf outline as lines approximating a leaf
       const leafTop = cy - s;
       const leafBottom = cy + s * 0.6;
       const leafLeft = cx - s * 0.5;
       const leafRight = cx + s * 0.5;
-      // Simple leaf: two curved lines meeting at top and bottom
-      pdf.line(cx, leafTop, leafLeft, cy); // Left edge top
-      pdf.line(leafLeft, cy, cx, leafBottom); // Left edge bottom
-      pdf.line(cx, leafTop, leafRight, cy); // Right edge top
-      pdf.line(leafRight, cy, cx, leafBottom); // Right edge bottom
-      // Center vein
+      pdf.line(cx, leafTop, leafLeft, cy);
+      pdf.line(leafLeft, cy, cx, leafBottom);
+      pdf.line(cx, leafTop, leafRight, cy);
+      pdf.line(leafRight, cy, cx, leafBottom);
       pdf.line(cx, leafTop + s * 0.3, cx, leafBottom - s * 0.2);
       break;
   }
   
   pdf.setLineWidth(0.2);
+}
+
+// Get icon type for holiday type
+function getIconForHolidayType(type: string): string | null {
+  switch (type) {
+    case 'national': return 'flag';
+    case 'orthodox': return 'cross';
+    case 'nameday': return 'star';
+    case 'folk': return 'flag';
+    case 'fasting': return null; // No icon for fasting
+    default: return null;
+  }
 }
 
 function drawLegend(pdf: jsPDF, pageHeight: number) {
@@ -253,7 +272,7 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
     pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'F');
 
     // Draw icon inside marker
-    drawLegendIcon(pdf, item.icon, x + markerSize / 2, legendY, markerSize);
+    drawIcon(pdf, item.icon, x + markerSize / 2, legendY, markerSize);
 
     // Label
     pdf.setFont('DejaVuSans', 'normal');
