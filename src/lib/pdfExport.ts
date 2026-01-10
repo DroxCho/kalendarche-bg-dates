@@ -152,36 +152,108 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
   }
 }
 
+// Draw icon inside marker at given position
+function drawLegendIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: number) {
+  pdf.setDrawColor(255, 255, 255);
+  pdf.setFillColor(255, 255, 255);
+  pdf.setLineWidth(0.4);
+  
+  const s = size * 0.5; // Scale factor for icon inside marker
+  
+  switch (iconType) {
+    case 'flag':
+      // Flag: pole + triangular flag
+      const poleX = cx - s * 0.4;
+      pdf.line(poleX, cy - s, poleX, cy + s); // Pole
+      // Flag triangle
+      pdf.triangle(
+        poleX, cy - s,
+        poleX + s * 1.2, cy - s * 0.4,
+        poleX, cy + s * 0.2,
+        'F'
+      );
+      break;
+    
+    case 'cross':
+      // Orthodox cross (simple +)
+      pdf.line(cx, cy - s, cx, cy + s); // Vertical
+      pdf.line(cx - s * 0.7, cy, cx + s * 0.7, cy); // Horizontal
+      break;
+    
+    case 'star':
+      // 5-point star
+      const points = 5;
+      const outerR = s;
+      const innerR = s * 0.4;
+      const starPoints: [number, number][] = [];
+      for (let i = 0; i < points * 2; i++) {
+        const r = i % 2 === 0 ? outerR : innerR;
+        const angle = (Math.PI / 2) + (i * Math.PI / points);
+        starPoints.push([cx + r * Math.cos(angle), cy - r * Math.sin(angle)]);
+      }
+      // Draw star as filled polygon
+      if (starPoints.length > 2) {
+        pdf.setFillColor(255, 255, 255);
+        const first = starPoints[0];
+        let pathData = `M ${first[0]} ${first[1]}`;
+        for (let i = 1; i < starPoints.length; i++) {
+          pathData += ` L ${starPoints[i][0]} ${starPoints[i][1]}`;
+        }
+        pathData += ' Z';
+        // Use lines to approximate star
+        for (let i = 0; i < starPoints.length; i++) {
+          const next = starPoints[(i + 1) % starPoints.length];
+          pdf.line(starPoints[i][0], starPoints[i][1], next[0], next[1]);
+        }
+      }
+      break;
+    
+    case 'leaf':
+      // Leaf shape: curved teardrop
+      pdf.setLineWidth(0.35);
+      // Draw leaf outline as lines approximating a leaf
+      const leafTop = cy - s;
+      const leafBottom = cy + s * 0.6;
+      const leafLeft = cx - s * 0.5;
+      const leafRight = cx + s * 0.5;
+      // Simple leaf: two curved lines meeting at top and bottom
+      pdf.line(cx, leafTop, leafLeft, cy); // Left edge top
+      pdf.line(leafLeft, cy, cx, leafBottom); // Left edge bottom
+      pdf.line(cx, leafTop, leafRight, cy); // Right edge top
+      pdf.line(leafRight, cy, cx, leafBottom); // Right edge bottom
+      // Center vein
+      pdf.line(cx, leafTop + s * 0.3, cx, leafBottom - s * 0.2);
+      break;
+  }
+  
+  pdf.setLineWidth(0.2);
+}
+
 function drawLegend(pdf: jsPDF, pageHeight: number) {
   const legendY = pageHeight - 12;
   const startX = 20;
-
-  // Slightly larger markers so the "icon" letter inside is readable.
-  const markerSize = 4.5;
+  const markerSize = 5;
 
   pdf.setFontSize(7);
   pdf.setFont('DejaVuSans', 'normal');
 
-  // Legend with Cyrillic letters inside markers
+  // Legend items with icon types matching CalendarLegend.tsx
   const items = [
-    { label: 'Национални', icon: 'Н', color: [180, 50, 80] as const },
-    { label: 'Православни', icon: 'Х', color: [180, 140, 40] as const },
-    { label: 'Имени дни', icon: 'И', color: [140, 70, 170] as const },
-    { label: 'Народни', icon: 'Ф', color: [200, 110, 40] as const },
-    { label: 'Пости', icon: 'П', color: [120, 80, 160] as const },
+    { label: 'Национални', icon: 'flag', color: [180, 50, 80] as const },
+    { label: 'Православни', icon: 'cross', color: [180, 140, 40] as const },
+    { label: 'Имени дни', icon: 'star', color: [140, 70, 170] as const },
+    { label: 'Народни', icon: 'flag', color: [200, 110, 40] as const },
+    { label: 'Пости', icon: 'leaf', color: [120, 80, 160] as const },
   ];
 
   let x = startX;
   items.forEach(item => {
-    // Marker
+    // Marker background
     pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
-    pdf.rect(x, legendY - markerSize / 2, markerSize, markerSize, 'F');
+    pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'F');
 
-    // Icon letter inside marker
-    pdf.setFont('DejaVuSans', 'bold');
-    pdf.setFontSize(6);
-    pdf.setTextColor(255, 255, 255);
-    pdf.text(item.icon, x + markerSize / 2, legendY + 1.2, { align: 'center' });
+    // Draw icon inside marker
+    drawLegendIcon(pdf, item.icon, x + markerSize / 2, legendY, markerSize);
 
     // Label
     pdf.setFont('DejaVuSans', 'normal');
@@ -195,7 +267,7 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   // "Today" indicator - outlined rectangle
   pdf.setDrawColor(180, 50, 80);
   pdf.setLineWidth(0.8);
-  pdf.rect(x, legendY - markerSize / 2, markerSize, markerSize, 'S');
+  pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'S');
   pdf.setLineWidth(0.2);
   pdf.setTextColor(60, 60, 60);
   pdf.text('Днес', x + markerSize + 2, legendY + 1);
