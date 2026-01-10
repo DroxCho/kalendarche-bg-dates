@@ -120,6 +120,13 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
         pdf.setFont('DejaVuSans', 'normal');
         let textY = y + 11;
 
+        // Check if there's a fasting day and draw leaf icon in upper right corner
+        const hasFasting = dayHolidays.some(h => h.type === 'fasting');
+        if (hasFasting) {
+          const fastingColor: [number, number, number] = [120, 80, 160];
+          drawIcon(pdf, 'leaf', x + cellWidth - 4, y + 4, 3, fastingColor);
+        }
+
         dayHolidays.slice(0, 3).forEach(holiday => {
           let textColor: [number, number, number];
           switch (holiday.type) {
