@@ -224,6 +224,8 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                         return <Cross className="w-2.5 h-2.5 flex-shrink-0" />;
                       case 'nameday':
                         return <Star className="w-2.5 h-2.5 flex-shrink-0" />;
+                      case 'folk':
+                        return <Flag className="w-2.5 h-2.5 flex-shrink-0" />;
                       default:
                         return null;
                     }
