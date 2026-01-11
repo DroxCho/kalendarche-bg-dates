@@ -6,7 +6,7 @@ import {
 } from '@/components/ui/dialog';
 import { Holiday, BULGARIAN_DAYS_FULL, BULGARIAN_MONTHS } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
-import { Calendar, Cross, Flag, Star, Leaf } from 'lucide-react';
+import { Calendar, Cross, Flag, Star, Leaf, Flower2 } from 'lucide-react';
 import { NoteEditor } from './NoteEditor';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { ShareButtons } from './ShareButtons';
@@ -109,7 +109,7 @@ function getHolidayIcon(type: Holiday['type']) {
     case 'nameday':
       return <Star className="h-5 w-5" />;
     case 'folk':
-      return <Flag className="h-5 w-5" />;
+      return <Flower2 className="h-5 w-5" />;
     case 'fasting':
       return <Leaf className="h-5 w-5" />;
     default:

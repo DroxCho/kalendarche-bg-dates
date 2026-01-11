@@ -3,7 +3,7 @@ import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHol
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
-import { Leaf, StickyNote, Flag, Cross, Star } from 'lucide-react';
+import { Leaf, StickyNote, Flag, Cross, Star, Flower2 } from 'lucide-react';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 
 interface CalendarGridProps {
@@ -225,7 +225,7 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                       case 'nameday':
                         return <Star className="w-2.5 h-2.5 flex-shrink-0" />;
                       case 'folk':
-                        return <Flag className="w-2.5 h-2.5 flex-shrink-0" />;
+                        return <Flower2 className="w-2.5 h-2.5 flex-shrink-0" />;
                       default:
                         return null;
                     }
