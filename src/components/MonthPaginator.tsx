@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { generateICSFile, generateICSForYear } from '@/lib/icsExport';
 import { exportMonthToPDF, exportYearToPDF, exportAllToPDF } from '@/lib/pdfExport';
+import { toast } from '@/hooks/use-toast';
 
 interface MonthPaginatorProps {
   currentIndex: number;
@@ -64,15 +65,69 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
   };
 
   const handleExportMonthPDF = async () => {
-    await exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
+    const { dismiss } = toast({
+      title: "Генериране на PDF...",
+      description: "Моля, изчакайте докато се създава файлът.",
+    });
+    try {
+      await exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
+      dismiss();
+      toast({
+        title: "PDF е готов!",
+        description: "Файлът беше успешно изтеглен.",
+      });
+    } catch (error) {
+      dismiss();
+      toast({
+        title: "Грешка",
+        description: "Възникна проблем при генерирането на PDF.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleExportYearPDF = async () => {
-    await exportYearToPDF(currentMonth.year, activeFilters);
+    const { dismiss } = toast({
+      title: "Генериране на PDF...",
+      description: "Създаване на календар за цялата година. Моля, изчакайте.",
+    });
+    try {
+      await exportYearToPDF(currentMonth.year, activeFilters);
+      dismiss();
+      toast({
+        title: "PDF е готов!",
+        description: "Файлът беше успешно изтеглен.",
+      });
+    } catch (error) {
+      dismiss();
+      toast({
+        title: "Грешка",
+        description: "Възникна проблем при генерирането на PDF.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleExportAllPDF = async () => {
-    await exportAllToPDF(activeFilters);
+    const { dismiss } = toast({
+      title: "Генериране на PDF...",
+      description: "Създаване на пълен календар. Това може да отнеме малко време.",
+    });
+    try {
+      await exportAllToPDF(activeFilters);
+      dismiss();
+      toast({
+        title: "PDF е готов!",
+        description: "Файлът беше успешно изтеглен.",
+      });
+    } catch (error) {
+      dismiss();
+      toast({
+        title: "Грешка",
+        description: "Възникна проблем при генерирането на PDF.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
