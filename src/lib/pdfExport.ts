@@ -238,6 +238,23 @@ function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: nu
       pdf.line(leafRight, cy, cx, leafBottom);
       pdf.line(cx, leafTop + s * 0.3, cx, leafBottom - s * 0.2);
       break;
+    
+    case 'flower':
+      // Simple flower: circle center with petals
+      pdf.setLineWidth(0.3);
+      const petalCount = 5;
+      const petalR = s * 0.4;
+      const centerR = s * 0.25;
+      // Draw petals
+      for (let i = 0; i < petalCount; i++) {
+        const angle = (i * 2 * Math.PI) / petalCount - Math.PI / 2;
+        const px = cx + Math.cos(angle) * petalR;
+        const py = cy + Math.sin(angle) * petalR;
+        pdf.circle(px, py, petalR * 0.5, 'S');
+      }
+      // Draw center
+      pdf.circle(cx, cy, centerR, 'F');
+      break;
   }
   
   pdf.setLineWidth(0.2);
@@ -249,7 +266,7 @@ function getIconForHolidayType(type: string): string | null {
     case 'national': return 'flag';
     case 'orthodox': return 'cross';
     case 'nameday': return 'star';
-    case 'folk': return 'flag';
+    case 'folk': return 'flower';
     case 'fasting': return null; // No icon for fasting
     default: return null;
   }
