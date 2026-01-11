@@ -1,4 +1,4 @@
-import { Flag, Cross, Star, Leaf } from 'lucide-react';
+import { Flag, Cross, Star, Leaf, Flower2 } from 'lucide-react';
 
 export function CalendarLegend() {
   return (
@@ -23,7 +23,7 @@ export function CalendarLegend() {
       </div>
       <div className="flex items-center gap-2">
         <div className="legend-icon w-4 h-4 rounded bg-[hsl(var(--holiday-folk))] flex items-center justify-center">
-          <Flag className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />
+          <Flower2 className="w-2.5 h-2.5 text-white" strokeWidth={2.5} />
         </div>
         <span className="text-muted-foreground print:text-black">Народен</span>
       </div>
