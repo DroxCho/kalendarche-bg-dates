@@ -285,7 +285,7 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
     { label: 'Национални', icon: 'flag', color: [180, 50, 80] as const },
     { label: 'Православни', icon: 'cross', color: [180, 140, 40] as const },
     { label: 'Имени дни', icon: 'star', color: [140, 70, 170] as const },
-    { label: 'Народни', icon: 'flag', color: [200, 110, 40] as const },
+    { label: 'Народни', icon: 'flower', color: [200, 110, 40] as const },
     { label: 'Пости', icon: 'leaf', color: [120, 80, 160] as const },
   ];
 
