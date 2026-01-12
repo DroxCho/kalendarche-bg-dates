@@ -27,6 +27,7 @@ export function BulgarianCalendar() {
   const [sharedDate, setSharedDate] = useState<Date | null>(null);
   const [sharedModalOpen, setSharedModalOpen] = useState(false);
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
+  const [printPreviewMode, setPrintPreviewMode] = useState<'month' | 'year'>('month');
   const { notes, addNote, updateNote, removeNote } = useCalendarNotes();
   
   const months = getMonthRange();
@@ -89,7 +90,8 @@ export function BulgarianCalendar() {
     setPrintAll(true);
   }, []);
 
-  const handlePrintPreview = useCallback(() => {
+  const handlePrintPreview = useCallback((mode: 'month' | 'year') => {
+    setPrintPreviewMode(mode);
     setPrintPreviewOpen(true);
   }, []);
 
@@ -217,6 +219,7 @@ export function BulgarianCalendar() {
         month={currentMonth.month}
         activeFilters={activeFilters}
         notes={notes}
+        mode={printPreviewMode}
       />
     </div>
   );

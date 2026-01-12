@@ -3,8 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
 import { CalendarGrid } from './CalendarGrid';
 import { CalendarLegend } from './CalendarLegend';
+import { YearView } from './YearView';
 import { HolidayType } from './HolidayFilter';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
+import { BULGARIAN_MONTHS } from '@/data/bulgarianHolidays';
 
 interface PrintPreviewProps {
   open: boolean;
@@ -13,6 +15,7 @@ interface PrintPreviewProps {
   month: number;
   activeFilters: HolidayType[];
   notes: Record<string, CalendarNote[]>;
+  mode?: 'month' | 'year';
 }
 
 export function PrintPreview({ 
@@ -21,7 +24,8 @@ export function PrintPreview({
   year, 
   month, 
   activeFilters,
-  notes 
+  notes,
+  mode = 'month'
 }: PrintPreviewProps) {
   const handlePrint = () => {
     onOpenChange(false);
@@ -32,10 +36,12 @@ export function PrintPreview({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className={mode === 'year' ? "max-w-5xl max-h-[90vh] overflow-y-auto" : "max-w-4xl max-h-[90vh] overflow-y-auto"}>
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>Преглед преди печат</span>
+            <span>
+              Преглед преди печат - {mode === 'year' ? `${year} година` : `${BULGARIAN_MONTHS[month]} ${year}`}
+            </span>
             <Button
               variant="default"
               size="sm"
@@ -63,6 +69,8 @@ export function PrintPreview({
               --card-foreground: 0 0% 0%;
               --border: 0 0% 70%;
               --muted-foreground: 0 0% 30%;
+              --primary: 0 0% 10%;
+              --primary-foreground: 0 0% 100%;
               --holiday-national: 348 80% 35%;
               --holiday-orthodox: 43 85% 40%;
               --holiday-nonworking: 0 75% 40%;
@@ -115,11 +123,13 @@ export function PrintPreview({
               color: black !important;
               font-weight: 700 !important;
             }
-            .print-preview-container h2 {
+            .print-preview-container h2,
+            .print-preview-container h3 {
               color: black !important;
             }
             .print-preview-container .bg-card {
               background: white !important;
+              border-color: rgba(0, 0, 0, 0.2) !important;
             }
             .print-preview-container .border-border {
               border-color: rgba(0, 0, 0, 0.2) !important;
@@ -132,18 +142,33 @@ export function PrintPreview({
             }
           `}</style>
           
-          <CalendarGrid
-            year={year}
-            month={month}
-            activeFilters={activeFilters}
-            notes={notes}
-            onAddNote={() => {}}
-            onUpdateNote={() => {}}
-            onDeleteNote={() => {}}
-          />
-          <div className="mt-6">
-            <CalendarLegend />
-          </div>
+          {mode === 'month' ? (
+            <>
+              <CalendarGrid
+                year={year}
+                month={month}
+                activeFilters={activeFilters}
+                notes={notes}
+                onAddNote={() => {}}
+                onUpdateNote={() => {}}
+                onDeleteNote={() => {}}
+              />
+              <div className="mt-6">
+                <CalendarLegend />
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-2xl font-bold text-center mb-4">{year}</h2>
+              <YearView 
+                year={year} 
+                onMonthClick={() => {}}
+              />
+              <div className="mt-6">
+                <CalendarLegend />
+              </div>
+            </>
+          )}
         </div>
         
         <p className="text-sm text-muted-foreground text-center mt-2">

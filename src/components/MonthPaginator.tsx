@@ -20,7 +20,7 @@ interface MonthPaginatorProps {
   onGoToToday?: () => void;
   showTodayButton?: boolean;
   onPrintAll?: () => void;
-  onPrintPreview?: () => void;
+  onPrintPreview?: (mode: 'month' | 'year') => void;
   activeFilters?: string[];
 }
 
@@ -214,12 +214,18 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {onPrintPreview && (
-                <DropdownMenuItem onClick={onPrintPreview}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Преглед преди печат
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem onClick={() => onPrintPreview('month')}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Преглед на месец
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onPrintPreview('year')}>
+                    <Eye className="h-4 w-4 mr-2" />
+                    Преглед на година
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
               )}
-              {onPrintPreview && <DropdownMenuSeparator />}
               <DropdownMenuItem onClick={handlePrintMonth}>
                 Печат на месец
               </DropdownMenuItem>
