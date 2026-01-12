@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download, FileText } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download, FileText, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
@@ -20,10 +20,11 @@ interface MonthPaginatorProps {
   onGoToToday?: () => void;
   showTodayButton?: boolean;
   onPrintAll?: () => void;
+  onPrintPreview?: () => void;
   activeFilters?: string[];
 }
 
-export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll, activeFilters = [] }: MonthPaginatorProps) {
+export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll, onPrintPreview, activeFilters = [] }: MonthPaginatorProps) {
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
 
@@ -212,6 +213,13 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              {onPrintPreview && (
+                <DropdownMenuItem onClick={onPrintPreview}>
+                  <Eye className="h-4 w-4 mr-2" />
+                  Преглед преди печат
+                </DropdownMenuItem>
+              )}
+              {onPrintPreview && <DropdownMenuSeparator />}
               <DropdownMenuItem onClick={handlePrintMonth}>
                 Печат на месец
               </DropdownMenuItem>
