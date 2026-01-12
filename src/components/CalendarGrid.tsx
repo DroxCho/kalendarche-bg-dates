@@ -130,15 +130,18 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
     return holidays.filter(h => activeFilters.includes(h.type));
   };
 
-  // Check if a fasting holiday should show its name (start, end, or single-day)
-  const shouldShowFastingName = (holiday: Holiday): boolean => {
-    if (holiday.type !== 'fasting') return true;
+  // Check if a fasting holiday is an ordinary Wednesday/Friday fast
+  const isOrdinaryFastingDay = (holiday: Holiday): boolean => {
+    if (holiday.type !== 'fasting') return false;
     const name = holiday.name.toLowerCase();
-    return name.includes('начало') || 
-           name.includes('край') || 
-           name.includes('пост на') || 
-           name.includes('пост за') ||
-           name.includes('усекновение');
+    return name === 'сряда - постен ден' || name === 'петък - постен ден';
+  };
+
+  // Check if a holiday should be displayed as a badge with name
+  const shouldShowHolidayBadge = (holiday: Holiday): boolean => {
+    // Hide ordinary Wednesday/Friday fasting days (icon in corner is enough)
+    if (isOrdinaryFastingDay(holiday)) return false;
+    return true;
   };
 
   return (
@@ -213,7 +216,7 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
               </span>
               
               {filteredHolidays
-                .filter(holiday => shouldShowFastingName(holiday))
+                .filter(holiday => shouldShowHolidayBadge(holiday))
                 .slice(0, 2)
                 .map((holiday, hIndex) => {
                   const getHolidayIcon = () => {
