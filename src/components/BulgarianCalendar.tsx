@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { CalendarDays, Grid3X3 } from 'lucide-react';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
+import { PrintPreview } from './PrintPreview';
 
 const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
 
@@ -25,6 +26,7 @@ export function BulgarianCalendar() {
   const [printAll, setPrintAll] = useState(false);
   const [sharedDate, setSharedDate] = useState<Date | null>(null);
   const [sharedModalOpen, setSharedModalOpen] = useState(false);
+  const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const { notes, addNote, updateNote, removeNote } = useCalendarNotes();
   
   const months = getMonthRange();
@@ -87,6 +89,10 @@ export function BulgarianCalendar() {
     setPrintAll(true);
   }, []);
 
+  const handlePrintPreview = useCallback(() => {
+    setPrintPreviewOpen(true);
+  }, []);
+
   // Trigger print when printAll is set, then reset
   useEffect(() => {
     if (printAll) {
@@ -112,6 +118,7 @@ export function BulgarianCalendar() {
           onGoToToday={handleGoToToday}
           showTodayButton={(!isViewingCurrentMonth || viewMode === 'year') && todayMonthIndex !== -1}
           onPrintAll={handlePrintAll}
+          onPrintPreview={handlePrintPreview}
           activeFilters={activeFilters}
         />
         
@@ -200,6 +207,16 @@ export function BulgarianCalendar() {
         onAddNote={addNote}
         onUpdateNote={updateNote}
         onDeleteNote={removeNote}
+      />
+
+      {/* Print preview modal */}
+      <PrintPreview
+        open={printPreviewOpen}
+        onOpenChange={setPrintPreviewOpen}
+        year={currentMonth.year}
+        month={currentMonth.month}
+        activeFilters={activeFilters}
+        notes={notes}
       />
     </div>
   );
