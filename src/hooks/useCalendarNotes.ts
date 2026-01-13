@@ -91,6 +91,28 @@ export function useCalendarNotes() {
     }
   }, [notes, saveNotes]);
 
+  const moveNote = useCallback((fromDate: string, toDate: string, noteId: string) => {
+    const fromNotes = notes[fromDate] || [];
+    const noteToMove = fromNotes.find(n => n.id === noteId);
+    
+    if (!noteToMove || fromDate === toDate) return;
+    
+    const updatedFromNotes = fromNotes.filter(n => n.id !== noteId);
+    const toNotes = notes[toDate] || [];
+    const updatedToNotes = [...toNotes, noteToMove];
+    
+    const newNotes = { ...notes };
+    
+    if (updatedFromNotes.length === 0) {
+      delete newNotes[fromDate];
+    } else {
+      newNotes[fromDate] = updatedFromNotes;
+    }
+    
+    newNotes[toDate] = updatedToNotes;
+    saveNotes(newNotes);
+  }, [notes, saveNotes]);
+
   const getNotesForDate = useCallback((date: string): CalendarNote[] => {
     return notes[date] || [];
   }, [notes]);
@@ -103,5 +125,5 @@ export function useCalendarNotes() {
     return notes[date]?.length || 0;
   }, [notes]);
 
-  return { notes, addNote, updateNote, removeNote, getNotesForDate, hasNotes, getNotesCount };
+  return { notes, addNote, updateNote, removeNote, moveNote, getNotesForDate, hasNotes, getNotesCount };
 }
