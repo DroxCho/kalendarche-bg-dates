@@ -5,7 +5,7 @@ import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
 import { Leaf, StickyNote, Flag, Cross, Star, Flower2 } from 'lucide-react';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
-
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 interface CalendarGridProps {
   year: number;
   month: number; // 0-indexed
@@ -185,11 +185,26 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                 day.isToday && "calendar-day-today"
               )}
             >
-              {/* Fasting icon in top right corner */}
+              {/* Fasting icon in top right corner with tooltip */}
               {hasFastingDay && day.isCurrentMonth && (
-                <div className="absolute top-0.5 right-0.5 print:top-0 print:right-0">
-                  <Leaf className="w-3 h-3 text-[hsl(var(--holiday-fasting))]" />
-                </div>
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute top-0.5 right-0.5 print:top-0 print:right-0 cursor-help">
+                        <Leaf className="w-3 h-3 text-[hsl(var(--holiday-fasting))]" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <div className="text-xs space-y-0.5">
+                        {day.holidays
+                          .filter(h => h.type === 'fasting')
+                          .map((h, i) => (
+                            <div key={i}>{h.name}</div>
+                          ))}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               
               {/* Note indicators - one icon per note */}
