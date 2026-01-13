@@ -14,6 +14,7 @@ interface CalendarGridProps {
   onAddNote?: (date: string, text: string) => void;
   onUpdateNote?: (date: string, noteId: string, text: string) => void;
   onDeleteNote?: (date: string, noteId: string) => void;
+  onMoveNote?: (fromDate: string, toDate: string, noteId: string) => void;
 }
 
 interface DayInfo {
@@ -43,9 +44,10 @@ function formatDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote, onUpdateNote, onDeleteNote }: CalendarGridProps) {
+export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote, onUpdateNote, onDeleteNote, onMoveNote }: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [dragOverDate, setDragOverDate] = useState<string | null>(null);
   const todayRef = useRef<HTMLDivElement>(null);
   const hasScrolled = useRef(false);
 
@@ -144,6 +146,47 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
     return true;
   };
 
+  // Drag and drop handlers
+  const handleDragStart = (e: React.DragEvent, fromDate: string, noteId: string, noteText: string) => {
+    e.stopPropagation();
+    e.dataTransfer.setData('application/json', JSON.stringify({ fromDate, noteId }));
+    e.dataTransfer.effectAllowed = 'move';
+    // Create a custom drag image
+    const dragEl = document.createElement('div');
+    dragEl.textContent = noteText.length > 30 ? noteText.slice(0, 30) + '...' : noteText;
+    dragEl.className = 'bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200 px-2 py-1 rounded text-xs shadow-lg';
+    dragEl.style.position = 'absolute';
+    dragEl.style.top = '-1000px';
+    document.body.appendChild(dragEl);
+    e.dataTransfer.setDragImage(dragEl, 0, 0);
+    setTimeout(() => document.body.removeChild(dragEl), 0);
+  };
+
+  const handleDragOver = (e: React.DragEvent, dateString: string) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    setDragOverDate(dateString);
+  };
+
+  const handleDragLeave = () => {
+    setDragOverDate(null);
+  };
+
+  const handleDrop = (e: React.DragEvent, toDate: string) => {
+    e.preventDefault();
+    setDragOverDate(null);
+    
+    try {
+      const data = JSON.parse(e.dataTransfer.getData('application/json'));
+      const { fromDate, noteId } = data;
+      if (fromDate && noteId && onMoveNote) {
+        onMoveNote(fromDate, toDate, noteId);
+      }
+    } catch (err) {
+      console.error('Failed to parse drag data:', err);
+    }
+  };
+
   return (
     <div className="animate-fade-in">
       {/* Day headers */}
@@ -177,12 +220,16 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
               key={index}
               ref={day.isToday && day.isCurrentMonth ? todayRef : null}
               onClick={() => handleDayClick(day)}
+              onDragOver={(e) => handleDragOver(e, dateString)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, dateString)}
               className={cn(
                 "calendar-day cursor-pointer hover:bg-muted/50 transition-colors",
                 !day.isCurrentMonth && "opacity-40",
                 day.isSaturday && day.isCurrentMonth && "calendar-day-saturday",
                 day.isSunday && day.isCurrentMonth && "calendar-day-sunday",
-                day.isToday && "calendar-day-today"
+                day.isToday && "calendar-day-today",
+                dragOverDate === dateString && "ring-2 ring-primary ring-inset bg-primary/10"
               )}
             >
               {/* Fasting icon in top right corner with tooltip */}
@@ -207,14 +254,22 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                 </TooltipProvider>
               )}
               
-              {/* Note indicators with tooltip */}
+              {/* Note indicators with tooltip - draggable */}
               {notesCount > 0 && day.isCurrentMonth && (
                 <TooltipProvider delayDuration={200}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="absolute top-0.5 left-0.5 flex gap-0.5 print:hidden cursor-help">
-                        {Array.from({ length: Math.min(notesCount, 3) }).map((_, i) => (
-                          <StickyNote key={i} className="w-3 h-3 text-amber-500" />
+                      <div className="absolute top-0.5 left-0.5 flex gap-0.5 print:hidden">
+                        {dateNotes.slice(0, 3).map((note, i) => (
+                          <div
+                            key={note.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, dateString, note.id, note.text)}
+                            className="cursor-grab active:cursor-grabbing"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <StickyNote className="w-3 h-3 text-amber-500 hover:text-amber-600 transition-colors" />
+                          </div>
                         ))}
                         {notesCount > 3 && (
                           <span className="text-[8px] text-amber-600 font-bold">+{notesCount - 3}</span>
@@ -223,7 +278,8 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
                       <div className="text-xs space-y-1">
-                        {dateNotes.slice(0, 3).map((note, i) => (
+                        <p className="text-muted-foreground italic mb-1">Плъзнете за преместване</p>
+                        {dateNotes.slice(0, 3).map((note) => (
                           <div key={note.id} className="truncate max-w-[200px]">
                             {note.text.length > 50 ? `${note.text.slice(0, 50)}...` : note.text}
                           </div>

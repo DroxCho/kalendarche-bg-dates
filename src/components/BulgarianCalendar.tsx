@@ -28,7 +28,7 @@ export function BulgarianCalendar() {
   const [sharedModalOpen, setSharedModalOpen] = useState(false);
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const [printPreviewMode, setPrintPreviewMode] = useState<'month' | 'year'>('month');
-  const { notes, addNote, updateNote, removeNote } = useCalendarNotes();
+  const { notes, addNote, updateNote, removeNote, moveNote } = useCalendarNotes();
   
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
@@ -171,6 +171,7 @@ export function BulgarianCalendar() {
                 onAddNote={addNote}
                 onUpdateNote={updateNote}
                 onDeleteNote={removeNote}
+                onMoveNote={moveNote}
               />
               <div className="mt-6">
                 <CalendarLegend />
