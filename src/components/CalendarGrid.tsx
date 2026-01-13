@@ -3,18 +3,25 @@ import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHol
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
-import { Leaf, StickyNote, Flag, Cross, Star, Flower2 } from 'lucide-react';
+import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake } from 'lucide-react';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
+import { Birthday } from '@/hooks/useBirthdays';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
 interface CalendarGridProps {
   year: number;
   month: number; // 0-indexed
   activeFilters?: HolidayType[];
   notes?: Record<string, CalendarNote[]>;
+  birthdays?: Birthday[];
   onAddNote?: (date: string, text: string) => void;
   onUpdateNote?: (date: string, noteId: string, text: string) => void;
   onDeleteNote?: (date: string, noteId: string) => void;
   onMoveNote?: (fromDate: string, toDate: string, noteId: string) => void;
+  onAddBirthday?: (name: string, month: number, day: number, year?: number) => void;
+  onUpdateBirthday?: (id: string, name: string, month: number, day: number, year?: number) => void;
+  onDeleteBirthday?: (id: string) => void;
+  calculateAge?: (birthday: Birthday, currentYear: number) => number | null;
 }
 
 interface DayInfo {
@@ -44,12 +51,31 @@ function formatDateString(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote, onUpdateNote, onDeleteNote, onMoveNote }: CalendarGridProps) {
+export function CalendarGrid({ 
+  year, 
+  month, 
+  activeFilters, 
+  notes = {}, 
+  birthdays = [],
+  onAddNote, 
+  onUpdateNote, 
+  onDeleteNote, 
+  onMoveNote,
+  onAddBirthday,
+  onUpdateBirthday,
+  onDeleteBirthday,
+  calculateAge
+}: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
   const todayRef = useRef<HTMLDivElement>(null);
   const hasScrolled = useRef(false);
+
+  // Get birthdays for a specific date
+  const getBirthdaysForDate = (month: number, day: number): Birthday[] => {
+    return birthdays.filter(b => b.month === month && b.day === day);
+  };
 
   // Scroll to today on initial mount
   useEffect(() => {
@@ -214,6 +240,8 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
           const dateString = formatDateString(day.date);
           const dateNotes = notes[dateString] || [];
           const notesCount = dateNotes.length;
+          const dateBirthdays = getBirthdaysForDate(day.date.getMonth() + 1, day.date.getDate());
+          const hasBirthday = dateBirthdays.length > 0;
           
           return (
             <div
@@ -292,6 +320,33 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                   </Tooltip>
                 </TooltipProvider>
               )}
+
+              {/* Birthday icon with tooltip */}
+              {hasBirthday && day.isCurrentMonth && (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute bottom-0.5 right-0.5 print:bottom-0 print:right-0 cursor-help">
+                        <Cake className="w-3 h-3 text-pink-500" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <div className="text-xs space-y-0.5">
+                        {dateBirthdays.map((b) => {
+                          const age = calculateAge?.(b, day.date.getFullYear());
+                          return (
+                            <div key={b.id} className="flex items-center gap-1">
+                              <Cake className="w-3 h-3 text-pink-500" />
+                              <span>{b.name}</span>
+                              {age !== null && <span className="text-muted-foreground">({age} г.)</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               
               <span
                 className={cn(
@@ -360,9 +415,14 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
         date={selectedDay?.date || null}
         holidays={selectedDay?.holidays || []}
         notes={selectedDay ? notes[formatDateString(selectedDay.date)] || [] : []}
+        birthdays={selectedDay ? getBirthdaysForDate(selectedDay.date.getMonth() + 1, selectedDay.date.getDate()) : []}
         onAddNote={onAddNote}
         onUpdateNote={onUpdateNote}
         onDeleteNote={onDeleteNote}
+        onAddBirthday={onAddBirthday}
+        onUpdateBirthday={onUpdateBirthday}
+        onDeleteBirthday={onDeleteBirthday}
+        calculateAge={calculateAge}
       />
     </div>
   );

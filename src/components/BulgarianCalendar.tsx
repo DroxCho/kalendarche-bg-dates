@@ -9,6 +9,7 @@ import { YearView } from './YearView';
 import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
 import { useCalendarNotes } from '@/hooks/useCalendarNotes';
+import { useBirthdays } from '@/hooks/useBirthdays';
 import { NotificationToggle } from './NotificationToggle';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -29,6 +30,7 @@ export function BulgarianCalendar() {
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const [printPreviewMode, setPrintPreviewMode] = useState<'month' | 'year'>('month');
   const { notes, addNote, updateNote, removeNote, moveNote } = useCalendarNotes();
+  const { birthdays, addBirthday, updateBirthday, removeBirthday, getBirthdaysForDateString, calculateAge } = useBirthdays();
   
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
@@ -168,10 +170,15 @@ export function BulgarianCalendar() {
                 month={currentMonth.month}
                 activeFilters={activeFilters}
                 notes={notes}
+                birthdays={birthdays}
                 onAddNote={addNote}
                 onUpdateNote={updateNote}
                 onDeleteNote={removeNote}
                 onMoveNote={moveNote}
+                onAddBirthday={addBirthday}
+                onUpdateBirthday={updateBirthday}
+                onDeleteBirthday={removeBirthday}
+                calculateAge={calculateAge}
               />
               <div className="mt-6">
                 <CalendarLegend />
@@ -207,9 +214,14 @@ export function BulgarianCalendar() {
           `${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`
         ) : []}
         notes={sharedDate ? notes[`${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`] || [] : []}
+        birthdays={sharedDate ? getBirthdaysForDateString(`${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`) : []}
         onAddNote={addNote}
         onUpdateNote={updateNote}
         onDeleteNote={removeNote}
+        onAddBirthday={addBirthday}
+        onUpdateBirthday={updateBirthday}
+        onDeleteBirthday={removeBirthday}
+        calculateAge={calculateAge}
       />
 
       {/* Print preview modal */}

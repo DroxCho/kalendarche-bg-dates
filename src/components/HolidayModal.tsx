@@ -8,7 +8,9 @@ import { Holiday, BULGARIAN_DAYS_FULL, BULGARIAN_MONTHS } from '@/data/bulgarian
 import { cn } from '@/lib/utils';
 import { Calendar, Cross, Flag, Star, Leaf, Flower2 } from 'lucide-react';
 import { NoteEditor } from './NoteEditor';
+import { BirthdayEditor } from './BirthdayEditor';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
+import { Birthday } from '@/hooks/useBirthdays';
 import { ShareButtons } from './ShareButtons';
 
 interface HolidayModalProps {
@@ -17,9 +19,14 @@ interface HolidayModalProps {
   date: Date | null;
   holidays: Holiday[];
   notes: CalendarNote[];
+  birthdays?: Birthday[];
   onAddNote?: (date: string, text: string) => void;
   onUpdateNote?: (date: string, noteId: string, text: string) => void;
   onDeleteNote?: (date: string, noteId: string) => void;
+  onAddBirthday?: (name: string, month: number, day: number, year?: number) => void;
+  onUpdateBirthday?: (id: string, name: string, month: number, day: number, year?: number) => void;
+  onDeleteBirthday?: (id: string) => void;
+  calculateAge?: (birthday: Birthday, currentYear: number) => number | null;
 }
 
 const holidayDescriptions: Record<string, string> = {
@@ -136,7 +143,21 @@ function getHolidayTypeName(type: Holiday['type']): string {
   }
 }
 
-export function HolidayModal({ open, onOpenChange, date, holidays, notes, onAddNote, onUpdateNote, onDeleteNote }: HolidayModalProps) {
+export function HolidayModal({ 
+  open, 
+  onOpenChange, 
+  date, 
+  holidays, 
+  notes, 
+  birthdays = [],
+  onAddNote, 
+  onUpdateNote, 
+  onDeleteNote,
+  onAddBirthday,
+  onUpdateBirthday,
+  onDeleteBirthday,
+  calculateAge
+}: HolidayModalProps) {
   if (!date) return null;
 
   const dayOfWeek = date.getDay();
@@ -218,6 +239,18 @@ export function HolidayModal({ open, onOpenChange, date, holidays, notes, onAddN
             onAdd={onAddNote}
             onUpdate={onUpdateNote}
             onDelete={onDeleteNote}
+          />
+        )}
+
+        {onAddBirthday && onUpdateBirthday && onDeleteBirthday && calculateAge && (
+          <BirthdayEditor
+            date={dateString}
+            birthdays={birthdays}
+            onAdd={onAddBirthday}
+            onUpdate={onUpdateBirthday}
+            onDelete={onDeleteBirthday}
+            currentYear={date.getFullYear()}
+            calculateAge={calculateAge}
           />
         )}
 
