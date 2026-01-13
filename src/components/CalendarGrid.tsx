@@ -207,16 +207,34 @@ export function CalendarGrid({ year, month, activeFilters, notes = {}, onAddNote
                 </TooltipProvider>
               )}
               
-              {/* Note indicators - one icon per note */}
+              {/* Note indicators with tooltip */}
               {notesCount > 0 && day.isCurrentMonth && (
-                <div className="absolute top-0.5 left-0.5 flex gap-0.5 print:hidden">
-                  {Array.from({ length: Math.min(notesCount, 3) }).map((_, i) => (
-                    <StickyNote key={i} className="w-3 h-3 text-amber-500" />
-                  ))}
-                  {notesCount > 3 && (
-                    <span className="text-[8px] text-amber-600 font-bold">+{notesCount - 3}</span>
-                  )}
-                </div>
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute top-0.5 left-0.5 flex gap-0.5 print:hidden cursor-help">
+                        {Array.from({ length: Math.min(notesCount, 3) }).map((_, i) => (
+                          <StickyNote key={i} className="w-3 h-3 text-amber-500" />
+                        ))}
+                        {notesCount > 3 && (
+                          <span className="text-[8px] text-amber-600 font-bold">+{notesCount - 3}</span>
+                        )}
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="max-w-xs">
+                      <div className="text-xs space-y-1">
+                        {dateNotes.slice(0, 3).map((note, i) => (
+                          <div key={note.id} className="truncate max-w-[200px]">
+                            {note.text.length > 50 ? `${note.text.slice(0, 50)}...` : note.text}
+                          </div>
+                        ))}
+                        {notesCount > 3 && (
+                          <div className="text-muted-foreground italic">+{notesCount - 3} още</div>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )}
               
               <span
