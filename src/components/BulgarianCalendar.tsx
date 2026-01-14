@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
@@ -10,10 +11,11 @@ import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
 import { useCalendarNotes } from '@/hooks/useCalendarNotes';
 import { useBirthdays } from '@/hooks/useBirthdays';
+import { useAuth } from '@/hooks/useAuth';
 import { NotificationToggle } from './NotificationToggle';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
-import { CalendarDays, Grid3X3 } from 'lucide-react';
+import { CalendarDays, Grid3X3, LogIn, LogOut, User } from 'lucide-react';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
 import { PrintPreview } from './PrintPreview';
@@ -31,6 +33,8 @@ export function BulgarianCalendar() {
   const [printPreviewMode, setPrintPreviewMode] = useState<'month' | 'year'>('month');
   const { notes, addNote, updateNote, removeNote, moveNote } = useCalendarNotes();
   const { birthdays, addBirthday, updateBirthday, removeBirthday, getBirthdaysForDateString, calculateAge } = useBirthdays();
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
   
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
@@ -147,6 +151,31 @@ export function BulgarianCalendar() {
             <Grid3X3 className="h-4 w-4" />
             <span className="hidden sm:inline">Година</span>
           </Button>
+          
+          {/* Auth buttons */}
+          {!loading && (
+            user ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={signOut}
+                className="gap-1.5"
+              >
+                <LogOut className="h-4 w-4" />
+                <span className="hidden sm:inline">Изход</span>
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/auth')}
+                className="gap-1.5"
+              >
+                <LogIn className="h-4 w-4" />
+                <span className="hidden sm:inline">Вход</span>
+              </Button>
+            )
+          )}
         </div>
       </div>
       
