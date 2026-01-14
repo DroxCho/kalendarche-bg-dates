@@ -155,15 +155,26 @@ export function BulgarianCalendar() {
           {/* Auth buttons */}
           {!loading && (
             user ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={signOut}
-                className="gap-1.5"
-              >
-                <LogOut className="h-4 w-4" />
-                <span className="hidden sm:inline">Изход</span>
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                  className="gap-1.5"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:inline">Профил</span>
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={signOut}
+                  className="gap-1.5"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Изход</span>
+                </Button>
+              </>
             ) : (
               <Button
                 variant="outline"
