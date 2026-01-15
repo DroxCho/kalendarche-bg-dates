@@ -9,9 +9,10 @@ import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { YearView } from './YearView';
 import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
-import { useCalendarNotes } from '@/hooks/useCalendarNotes';
-import { useBirthdays } from '@/hooks/useBirthdays';
+import { useCalendarNotes, ImportResult as NotesImportResult } from '@/hooks/useCalendarNotes';
+import { useBirthdays, ImportResult as BirthdaysImportResult } from '@/hooks/useBirthdays';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { NotificationToggle } from './NotificationToggle';
 import { ThemeToggle } from './ThemeToggle';
 import { Button } from '@/components/ui/button';
@@ -31,8 +32,24 @@ export function BulgarianCalendar() {
   const [sharedModalOpen, setSharedModalOpen] = useState(false);
   const [printPreviewOpen, setPrintPreviewOpen] = useState(false);
   const [printPreviewMode, setPrintPreviewMode] = useState<'month' | 'year'>('month');
-  const { notes, addNote, updateNote, removeNote, moveNote } = useCalendarNotes();
-  const { birthdays, addBirthday, updateBirthday, removeBirthday, getBirthdaysForDateString, calculateAge } = useBirthdays();
+  const { toast } = useToast();
+  
+  const handleNotesImport = useCallback((result: NotesImportResult) => {
+    toast({
+      title: 'Бележки импортирани',
+      description: `${result.count} бележки бяха синхронизирани с вашия профил.`
+    });
+  }, [toast]);
+  
+  const handleBirthdaysImport = useCallback((result: BirthdaysImportResult) => {
+    toast({
+      title: 'Рождени дни импортирани',
+      description: `${result.count} рождени дни бяха синхронизирани с вашия профил.`
+    });
+  }, [toast]);
+  
+  const { notes, addNote, updateNote, removeNote, moveNote } = useCalendarNotes(handleNotesImport);
+  const { birthdays, addBirthday, updateBirthday, removeBirthday, getBirthdaysForDateString, calculateAge } = useBirthdays(handleBirthdaysImport);
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   
