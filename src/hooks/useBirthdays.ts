@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
 
 const STORAGE_KEY = 'bulgarian-calendar-birthdays';
+const IMPORT_FLAG_KEY = 'bulgarian-calendar-birthdays-imported';
 
 export interface Birthday {
   id: string;
@@ -17,6 +19,7 @@ export function useBirthdays() {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   // Load birthdays from database or localStorage
   useEffect(() => {
@@ -40,6 +43,12 @@ export function useBirthdays() {
             createdAt: new Date(b.created_at).getTime()
           }));
           setBirthdays(mapped);
+
+          // Check if we should import localStorage data
+          const importFlag = localStorage.getItem(IMPORT_FLAG_KEY);
+          if (!importFlag) {
+            await importLocalStorageBirthdays(user.id, mapped);
+          }
         }
       } else {
         // Load from localStorage
@@ -56,8 +65,70 @@ export function useBirthdays() {
       setLoading(false);
     };
 
+    const importLocalStorageBirthdays = async (userId: string, existingBirthdays: Birthday[]) => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+          localStorage.setItem(IMPORT_FLAG_KEY, 'true');
+          return;
+        }
+
+        const localBirthdays: Birthday[] = JSON.parse(stored);
+        
+        // Find birthdays that don't exist in the database (by name + date combination)
+        const existingKeys = new Set(
+          existingBirthdays.map(b => `${b.name.toLowerCase()}-${b.month}-${b.day}`)
+        );
+        
+        const birthdaysToImport = localBirthdays.filter(
+          b => !existingKeys.has(`${b.name.toLowerCase()}-${b.month}-${b.day}`)
+        );
+
+        if (birthdaysToImport.length > 0) {
+          const insertData = birthdaysToImport.map(b => ({
+            id: crypto.randomUUID(),
+            user_id: userId,
+            name: b.name,
+            month: b.month,
+            day: b.day,
+            year: b.year ?? null
+          }));
+
+          const { data, error } = await supabase
+            .from('birthdays')
+            .insert(insertData)
+            .select();
+
+          if (!error && data) {
+            // Update local state with imported birthdays
+            const newBirthdays = [
+              ...existingBirthdays,
+              ...data.map(b => ({
+                id: b.id,
+                name: b.name,
+                month: b.month,
+                day: b.day,
+                year: b.year ?? undefined,
+                createdAt: new Date(b.created_at).getTime()
+              }))
+            ];
+            setBirthdays(newBirthdays);
+            
+            toast({
+              title: 'Рождени дни импортирани',
+              description: `${birthdaysToImport.length} рождени дни бяха синхронизирани с вашия профил.`
+            });
+          }
+        }
+
+        localStorage.setItem(IMPORT_FLAG_KEY, 'true');
+      } catch (e) {
+        console.error('Failed to import localStorage birthdays:', e);
+      }
+    };
+
     loadBirthdays();
-  }, [user]);
+  }, [user, toast]);
 
   // Save to localStorage (for non-authenticated users)
   const saveToLocalStorage = useCallback((newBirthdays: Birthday[]) => {
