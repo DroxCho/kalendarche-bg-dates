@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useToast } from './use-toast';
 
 const STORAGE_KEY = 'bulgarian-calendar-notes';
+const IMPORT_FLAG_KEY = 'bulgarian-calendar-notes-imported';
 
 export interface CalendarNote {
   id: string;
@@ -14,6 +16,7 @@ export function useCalendarNotes() {
   const [notes, setNotes] = useState<Record<string, CalendarNote[]>>({});
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { toast } = useToast();
 
   // Load notes from database or localStorage
   useEffect(() => {
@@ -40,6 +43,12 @@ export function useCalendarNotes() {
             });
           });
           setNotes(grouped);
+
+          // Check if we should import localStorage data
+          const importFlag = localStorage.getItem(IMPORT_FLAG_KEY);
+          if (!importFlag) {
+            await importLocalStorageNotes(user.id, grouped);
+          }
         }
       } else {
         // Load from localStorage
@@ -69,8 +78,86 @@ export function useCalendarNotes() {
       setLoading(false);
     };
 
+    const importLocalStorageNotes = async (userId: string, existingNotes: Record<string, CalendarNote[]>) => {
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) {
+          localStorage.setItem(IMPORT_FLAG_KEY, 'true');
+          return;
+        }
+
+        const parsed = JSON.parse(stored);
+        const localNotes: Record<string, CalendarNote[]> = {};
+        
+        for (const [date, value] of Object.entries(parsed)) {
+          if (typeof value === 'string') {
+            localNotes[date] = [{
+              id: crypto.randomUUID(),
+              text: value,
+              createdAt: Date.now()
+            }];
+          } else if (Array.isArray(value)) {
+            localNotes[date] = value as CalendarNote[];
+          }
+        }
+
+        // Find notes that don't exist in the database
+        const notesToImport: { date: string; note: CalendarNote }[] = [];
+        
+        for (const [date, dateNotes] of Object.entries(localNotes)) {
+          const existingDateNotes = existingNotes[date] || [];
+          const existingTexts = new Set(existingDateNotes.map(n => n.text));
+          
+          for (const note of dateNotes) {
+            if (!existingTexts.has(note.text)) {
+              notesToImport.push({ date, note });
+            }
+          }
+        }
+
+        if (notesToImport.length > 0) {
+          const insertData = notesToImport.map(({ date, note }) => ({
+            id: crypto.randomUUID(),
+            user_id: userId,
+            date,
+            text: note.text
+          }));
+
+          const { data, error } = await supabase
+            .from('calendar_notes')
+            .insert(insertData)
+            .select();
+
+          if (!error && data) {
+            // Update local state with imported notes
+            const newNotes = { ...existingNotes };
+            data.forEach(note => {
+              if (!newNotes[note.date]) {
+                newNotes[note.date] = [];
+              }
+              newNotes[note.date].push({
+                id: note.id,
+                text: note.text,
+                createdAt: new Date(note.created_at).getTime()
+              });
+            });
+            setNotes(newNotes);
+            
+            toast({
+              title: 'Бележки импортирани',
+              description: `${notesToImport.length} бележки бяха синхронизирани с вашия профил.`
+            });
+          }
+        }
+
+        localStorage.setItem(IMPORT_FLAG_KEY, 'true');
+      } catch (e) {
+        console.error('Failed to import localStorage notes:', e);
+      }
+    };
+
     loadNotes();
-  }, [user]);
+  }, [user, toast]);
 
   // Save to localStorage (for non-authenticated users)
   const saveToLocalStorage = useCallback((newNotes: Record<string, CalendarNote[]>) => {
