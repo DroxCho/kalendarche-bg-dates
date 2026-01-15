@@ -14,7 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      birthdays: {
+        Row: {
+          created_at: string
+          day: number
+          id: string
+          month: number
+          name: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          day: number
+          id?: string
+          month: number
+          name: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          day?: number
+          id?: string
+          month?: number
+          name?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
+      calendar_notes: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
