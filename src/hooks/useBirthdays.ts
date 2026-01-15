@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { useToast } from './use-toast';
 
 const STORAGE_KEY = 'bulgarian-calendar-birthdays';
 const IMPORT_FLAG_KEY = 'bulgarian-calendar-birthdays-imported';
@@ -15,11 +14,17 @@ export interface Birthday {
   createdAt: number;
 }
 
-export function useBirthdays() {
+export interface ImportResult {
+  type: 'birthdays';
+  count: number;
+}
+
+export function useBirthdays(onImport?: (result: ImportResult) => void) {
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
+  const onImportRef = useRef(onImport);
+  onImportRef.current = onImport;
 
   // Load birthdays from database or localStorage
   useEffect(() => {
@@ -114,10 +119,7 @@ export function useBirthdays() {
             ];
             setBirthdays(newBirthdays);
             
-            toast({
-              title: 'Рождени дни импортирани',
-              description: `${birthdaysToImport.length} рождени дни бяха синхронизирани с вашия профил.`
-            });
+            onImportRef.current?.({ type: 'birthdays', count: birthdaysToImport.length });
           }
         }
 
@@ -128,7 +130,7 @@ export function useBirthdays() {
     };
 
     loadBirthdays();
-  }, [user, toast]);
+  }, [user]);
 
   // Save to localStorage (for non-authenticated users)
   const saveToLocalStorage = useCallback((newBirthdays: Birthday[]) => {
@@ -170,11 +172,13 @@ export function useBirthdays() {
         setBirthdays(prev => [...prev, newBirthday]);
       }
     } else {
-      const newBirthdays = [...birthdays, newBirthday];
-      setBirthdays(newBirthdays);
-      saveToLocalStorage(newBirthdays);
+      setBirthdays(prev => {
+        const newBirthdays = [...prev, newBirthday];
+        saveToLocalStorage(newBirthdays);
+        return newBirthdays;
+      });
     }
-  }, [birthdays, user, saveToLocalStorage]);
+  }, [user, saveToLocalStorage]);
 
   const updateBirthday = useCallback(async (id: string, name: string, month: number, day: number, year?: number) => {
     const trimmedName = name.trim();
@@ -197,13 +201,15 @@ export function useBirthdays() {
         );
       }
     } else {
-      const updated = birthdays.map(b =>
-        b.id === id ? { ...b, name: trimmedName, month, day, year } : b
-      );
-      setBirthdays(updated);
-      saveToLocalStorage(updated);
+      setBirthdays(prev => {
+        const updated = prev.map(b =>
+          b.id === id ? { ...b, name: trimmedName, month, day, year } : b
+        );
+        saveToLocalStorage(updated);
+        return updated;
+      });
     }
-  }, [birthdays, user, saveToLocalStorage]);
+  }, [user, saveToLocalStorage]);
 
   const removeBirthday = useCallback(async (id: string) => {
     if (user) {
@@ -216,11 +222,13 @@ export function useBirthdays() {
         setBirthdays(prev => prev.filter(b => b.id !== id));
       }
     } else {
-      const filtered = birthdays.filter(b => b.id !== id);
-      setBirthdays(filtered);
-      saveToLocalStorage(filtered);
+      setBirthdays(prev => {
+        const filtered = prev.filter(b => b.id !== id);
+        saveToLocalStorage(filtered);
+        return filtered;
+      });
     }
-  }, [birthdays, user, saveToLocalStorage]);
+  }, [user, saveToLocalStorage]);
 
   const getBirthdaysForDate = useCallback((month: number, day: number): Birthday[] => {
     return birthdays.filter(b => b.month === month && b.day === day);

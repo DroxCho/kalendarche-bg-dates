@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
-import { useToast } from './use-toast';
 
 const STORAGE_KEY = 'bulgarian-calendar-notes';
 const IMPORT_FLAG_KEY = 'bulgarian-calendar-notes-imported';
@@ -12,11 +11,17 @@ export interface CalendarNote {
   createdAt: number;
 }
 
-export function useCalendarNotes() {
+export interface ImportResult {
+  type: 'notes';
+  count: number;
+}
+
+export function useCalendarNotes(onImport?: (result: ImportResult) => void) {
   const [notes, setNotes] = useState<Record<string, CalendarNote[]>>({});
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
-  const { toast } = useToast();
+  const onImportRef = useRef(onImport);
+  onImportRef.current = onImport;
 
   // Load notes from database or localStorage
   useEffect(() => {
@@ -143,10 +148,7 @@ export function useCalendarNotes() {
             });
             setNotes(newNotes);
             
-            toast({
-              title: 'Бележки импортирани',
-              description: `${notesToImport.length} бележки бяха синхронизирани с вашия профил.`
-            });
+            onImportRef.current?.({ type: 'notes', count: notesToImport.length });
           }
         }
 
@@ -157,7 +159,7 @@ export function useCalendarNotes() {
     };
 
     loadNotes();
-  }, [user, toast]);
+  }, [user]);
 
   // Save to localStorage (for non-authenticated users)
   const saveToLocalStorage = useCallback((newNotes: Record<string, CalendarNote[]>) => {
@@ -197,12 +199,14 @@ export function useCalendarNotes() {
         });
       }
     } else {
-      const dateNotes = notes[date] || [];
-      const newNotes = { ...notes, [date]: [...dateNotes, newNote] };
-      setNotes(newNotes);
-      saveToLocalStorage(newNotes);
+      setNotes(prev => {
+        const dateNotes = prev[date] || [];
+        const newNotes = { ...prev, [date]: [...dateNotes, newNote] };
+        saveToLocalStorage(newNotes);
+        return newNotes;
+      });
     }
-  }, [notes, user, saveToLocalStorage]);
+  }, [user, saveToLocalStorage]);
 
   const updateNote = useCallback(async (date: string, noteId: string, text: string) => {
     const trimmedText = text.trim();
@@ -229,15 +233,17 @@ export function useCalendarNotes() {
         });
       }
     } else {
-      const dateNotes = notes[date] || [];
-      const updatedNotes = dateNotes.map(n =>
-        n.id === noteId ? { ...n, text: trimmedText } : n
-      );
-      const newNotes = { ...notes, [date]: updatedNotes };
-      setNotes(newNotes);
-      saveToLocalStorage(newNotes);
+      setNotes(prev => {
+        const dateNotes = prev[date] || [];
+        const updatedNotes = dateNotes.map(n =>
+          n.id === noteId ? { ...n, text: trimmedText } : n
+        );
+        const newNotes = { ...prev, [date]: updatedNotes };
+        saveToLocalStorage(newNotes);
+        return newNotes;
+      });
     }
-  }, [notes, user, saveToLocalStorage]);
+  }, [user, saveToLocalStorage]);
 
   const removeNote = useCallback(async (date: string, noteId: string) => {
     if (user) {
@@ -258,19 +264,21 @@ export function useCalendarNotes() {
         });
       }
     } else {
-      const dateNotes = notes[date] || [];
-      const filteredNotes = dateNotes.filter(n => n.id !== noteId);
-      let newNotes: Record<string, CalendarNote[]>;
-      if (filteredNotes.length === 0) {
-        const { [date]: _, ...rest } = notes;
-        newNotes = rest;
-      } else {
-        newNotes = { ...notes, [date]: filteredNotes };
-      }
-      setNotes(newNotes);
-      saveToLocalStorage(newNotes);
+      setNotes(prev => {
+        const dateNotes = prev[date] || [];
+        const filteredNotes = dateNotes.filter(n => n.id !== noteId);
+        let newNotes: Record<string, CalendarNote[]>;
+        if (filteredNotes.length === 0) {
+          const { [date]: _, ...rest } = prev;
+          newNotes = rest;
+        } else {
+          newNotes = { ...prev, [date]: filteredNotes };
+        }
+        saveToLocalStorage(newNotes);
+        return newNotes;
+      });
     }
-  }, [notes, user, saveToLocalStorage]);
+  }, [user, saveToLocalStorage]);
 
   const moveNote = useCallback(async (fromDate: string, toDate: string, noteId: string) => {
     if (fromDate === toDate) return;
@@ -302,19 +310,21 @@ export function useCalendarNotes() {
         });
       }
     } else {
-      const updatedFromNotes = fromNotes.filter(n => n.id !== noteId);
-      const toNotes = notes[toDate] || [];
-      const updatedToNotes = [...toNotes, noteToMove];
+      setNotes(prev => {
+        const updatedFromNotes = (prev[fromDate] || []).filter(n => n.id !== noteId);
+        const toNotes = prev[toDate] || [];
+        const updatedToNotes = [...toNotes, noteToMove];
 
-      const newNotes = { ...notes };
-      if (updatedFromNotes.length === 0) {
-        delete newNotes[fromDate];
-      } else {
-        newNotes[fromDate] = updatedFromNotes;
-      }
-      newNotes[toDate] = updatedToNotes;
-      setNotes(newNotes);
-      saveToLocalStorage(newNotes);
+        const newNotes = { ...prev };
+        if (updatedFromNotes.length === 0) {
+          delete newNotes[fromDate];
+        } else {
+          newNotes[fromDate] = updatedFromNotes;
+        }
+        newNotes[toDate] = updatedToNotes;
+        saveToLocalStorage(newNotes);
+        return newNotes;
+      });
     }
   }, [notes, user, saveToLocalStorage]);
 
