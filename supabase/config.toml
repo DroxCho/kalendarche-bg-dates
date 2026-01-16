@@ -1,1 +1,4 @@
 project_id = "rakskddcjvvewctwoprn"
+
+[functions.send-birthday-reminders]
+verify_jwt = false
