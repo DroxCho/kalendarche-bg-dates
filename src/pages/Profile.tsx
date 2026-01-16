@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, Mail, Lock, LogOut, Trash2 } from 'lucide-react';
+import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +29,7 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -67,6 +68,55 @@ const Profile = () => {
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+  };
+
+  const handleExportData = async () => {
+    if (!user) return;
+    
+    setExporting(true);
+    try {
+      // Fetch notes
+      const { data: notesData, error: notesError } = await supabase
+        .from('calendar_notes')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (notesError) throw notesError;
+
+      // Fetch birthdays
+      const { data: birthdaysData, error: birthdaysError } = await supabase
+        .from('birthdays')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (birthdaysError) throw birthdaysError;
+
+      const exportData = {
+        exportedAt: new Date().toISOString(),
+        email: user.email,
+        notes: notesData || [],
+        birthdays: birthdaysData || [],
+      };
+
+      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `kalendar-backup-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({ 
+        title: 'Успех!', 
+        description: `Експортирани ${notesData?.length || 0} бележки и ${birthdaysData?.length || 0} рождени дни.` 
+      });
+    } catch (error: any) {
+      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+    } finally {
+      setExporting(false);
+    }
   };
 
   if (loading) {
@@ -162,6 +212,28 @@ const Profile = () => {
                 {changingPassword ? 'Промяна...' : 'Промени паролата'}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Data Management */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Управление на данни
+            </CardTitle>
+            <CardDescription>Експортирайте вашите бележки и рождени дни</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button 
+              variant="outline" 
+              className="w-full justify-start gap-2" 
+              onClick={handleExportData}
+              disabled={exporting}
+            >
+              <Download className="h-4 w-4" />
+              {exporting ? 'Експортиране...' : 'Експортирай всички данни (JSON)'}
+            </Button>
           </CardContent>
         </Card>
 
