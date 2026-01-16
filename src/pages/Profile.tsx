@@ -8,7 +8,9 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database, Bell } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,12 +32,99 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [exporting, setExporting] = useState(false);
+  
+  // Notification preferences
+  const [emailReminders, setEmailReminders] = useState(true);
+  const [reminderDays, setReminderDays] = useState('1');
+  const [loadingPrefs, setLoadingPrefs] = useState(true);
+  const [savingPrefs, setSavingPrefs] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  // Load notification preferences
+  useEffect(() => {
+    const loadPreferences = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('notification_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        
+        if (data) {
+          setEmailReminders(data.email_birthday_reminders);
+          setReminderDays(String(data.reminder_days_before));
+        }
+      } catch (error: any) {
+        console.error('Error loading preferences:', error);
+      } finally {
+        setLoadingPrefs(false);
+      }
+    };
+
+    if (user) {
+      loadPreferences();
+    }
+  }, [user]);
+
+  const saveNotificationPreferences = async (emailEnabled: boolean, days: string) => {
+    if (!user) return;
+    
+    setSavingPrefs(true);
+    try {
+      const { data: existing } = await supabase
+        .from('notification_preferences')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existing) {
+        const { error } = await supabase
+          .from('notification_preferences')
+          .update({
+            email_birthday_reminders: emailEnabled,
+            reminder_days_before: parseInt(days),
+          })
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from('notification_preferences')
+          .insert({
+            user_id: user.id,
+            email_birthday_reminders: emailEnabled,
+            reminder_days_before: parseInt(days),
+          });
+        
+        if (error) throw error;
+      }
+
+      toast({ title: 'Успех!', description: 'Настройките са запазени.' });
+    } catch (error: any) {
+      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+    } finally {
+      setSavingPrefs(false);
+    }
+  };
+
+  const handleEmailRemindersChange = (checked: boolean) => {
+    setEmailReminders(checked);
+    saveNotificationPreferences(checked, reminderDays);
+  };
+
+  const handleReminderDaysChange = (value: string) => {
+    setReminderDays(value);
+    saveNotificationPreferences(emailReminders, value);
+  };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -212,6 +301,50 @@ const Profile = () => {
                 {changingPassword ? 'Промяна...' : 'Промени паролата'}
               </Button>
             </form>
+          </CardContent>
+        </Card>
+
+        {/* Email Notifications */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
+              Напомняния за рождени дни
+            </CardTitle>
+            <CardDescription>Получавайте имейл напомняния за предстоящи рождени дни</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Имейл напомняния</Label>
+                <p className="text-sm text-muted-foreground">
+                  Получавайте известия за предстоящи рождени дни
+                </p>
+              </div>
+              <Switch
+                checked={emailReminders}
+                onCheckedChange={handleEmailRemindersChange}
+                disabled={loadingPrefs || savingPrefs}
+              />
+            </div>
+            
+            {emailReminders && (
+              <div className="space-y-2">
+                <Label>Напомни ме</Label>
+                <Select value={reminderDays} onValueChange={handleReminderDaysChange} disabled={loadingPrefs || savingPrefs}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Изберете..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">В деня на рождения ден</SelectItem>
+                    <SelectItem value="1">1 ден преди</SelectItem>
+                    <SelectItem value="2">2 дни преди</SelectItem>
+                    <SelectItem value="3">3 дни преди</SelectItem>
+                    <SelectItem value="7">1 седмица преди</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
           </CardContent>
         </Card>
 
