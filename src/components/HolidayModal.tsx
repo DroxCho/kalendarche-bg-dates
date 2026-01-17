@@ -9,8 +9,10 @@ import { cn } from '@/lib/utils';
 import { Calendar, Cross, Flag, Star, Leaf, Flower2 } from 'lucide-react';
 import { NoteEditor } from './NoteEditor';
 import { BirthdayEditor } from './BirthdayEditor';
+import { RecurringEventEditor } from './RecurringEventEditor';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
+import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
 import { ShareButtons } from './ShareButtons';
 
 interface HolidayModalProps {
@@ -20,6 +22,7 @@ interface HolidayModalProps {
   holidays: Holiday[];
   notes: CalendarNote[];
   birthdays?: Birthday[];
+  recurringEvents?: RecurringEvent[];
   onAddNote?: (date: string, text: string) => void;
   onUpdateNote?: (date: string, noteId: string, text: string) => void;
   onDeleteNote?: (date: string, noteId: string) => void;
@@ -27,6 +30,10 @@ interface HolidayModalProps {
   onUpdateBirthday?: (id: string, name: string, month: number, day: number, year?: number) => void;
   onDeleteBirthday?: (id: string) => void;
   calculateAge?: (birthday: Birthday, currentYear: number) => number | null;
+  onAddRecurringEvent?: (name: string, month: number, day: number, eventType: EventType, year?: number, icon?: EventIcon, color?: EventColor) => void;
+  onUpdateRecurringEvent?: (id: string, name: string, month: number, day: number, eventType: EventType, year?: number, icon?: EventIcon, color?: EventColor) => void;
+  onDeleteRecurringEvent?: (id: string) => void;
+  calculateYears?: (event: RecurringEvent, currentYear: number) => number | null;
 }
 
 const holidayDescriptions: Record<string, string> = {
@@ -150,13 +157,18 @@ export function HolidayModal({
   holidays, 
   notes, 
   birthdays = [],
+  recurringEvents = [],
   onAddNote, 
   onUpdateNote, 
   onDeleteNote,
   onAddBirthday,
   onUpdateBirthday,
   onDeleteBirthday,
-  calculateAge
+  calculateAge,
+  onAddRecurringEvent,
+  onUpdateRecurringEvent,
+  onDeleteRecurringEvent,
+  calculateYears
 }: HolidayModalProps) {
   if (!date) return null;
 
@@ -251,6 +263,18 @@ export function HolidayModal({
             onDelete={onDeleteBirthday}
             currentYear={date.getFullYear()}
             calculateAge={calculateAge}
+          />
+        )}
+
+        {onAddRecurringEvent && onUpdateRecurringEvent && onDeleteRecurringEvent && calculateYears && (
+          <RecurringEventEditor
+            date={dateString}
+            events={recurringEvents}
+            onAdd={onAddRecurringEvent}
+            onUpdate={onUpdateRecurringEvent}
+            onDelete={onDeleteRecurringEvent}
+            currentYear={date.getFullYear()}
+            calculateYears={calculateYears}
           />
         )}
 

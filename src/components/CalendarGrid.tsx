@@ -3,9 +3,10 @@ import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHol
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
-import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake } from 'lucide-react';
+import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake, Heart } from 'lucide-react';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
+import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CalendarGridProps {
@@ -14,6 +15,7 @@ interface CalendarGridProps {
   activeFilters?: HolidayType[];
   notes?: Record<string, CalendarNote[]>;
   birthdays?: Birthday[];
+  recurringEvents?: RecurringEvent[];
   onAddNote?: (date: string, text: string) => void;
   onUpdateNote?: (date: string, noteId: string, text: string) => void;
   onDeleteNote?: (date: string, noteId: string) => void;
@@ -22,6 +24,10 @@ interface CalendarGridProps {
   onUpdateBirthday?: (id: string, name: string, month: number, day: number, year?: number) => void;
   onDeleteBirthday?: (id: string) => void;
   calculateAge?: (birthday: Birthday, currentYear: number) => number | null;
+  onAddRecurringEvent?: (name: string, month: number, day: number, eventType: EventType, year?: number, icon?: EventIcon, color?: EventColor) => void;
+  onUpdateRecurringEvent?: (id: string, name: string, month: number, day: number, eventType: EventType, year?: number, icon?: EventIcon, color?: EventColor) => void;
+  onDeleteRecurringEvent?: (id: string) => void;
+  calculateYears?: (event: RecurringEvent, currentYear: number) => number | null;
 }
 
 interface DayInfo {
@@ -57,6 +63,7 @@ export function CalendarGrid({
   activeFilters, 
   notes = {}, 
   birthdays = [],
+  recurringEvents = [],
   onAddNote, 
   onUpdateNote, 
   onDeleteNote, 
@@ -64,7 +71,11 @@ export function CalendarGrid({
   onAddBirthday,
   onUpdateBirthday,
   onDeleteBirthday,
-  calculateAge
+  calculateAge,
+  onAddRecurringEvent,
+  onUpdateRecurringEvent,
+  onDeleteRecurringEvent,
+  calculateYears
 }: CalendarGridProps) {
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -75,6 +86,11 @@ export function CalendarGrid({
   // Get birthdays for a specific date
   const getBirthdaysForDate = (month: number, day: number): Birthday[] => {
     return birthdays.filter(b => b.month === month && b.day === day);
+  };
+
+  // Get recurring events for a specific date
+  const getEventsForDate = (month: number, day: number): RecurringEvent[] => {
+    return recurringEvents.filter(e => e.month === month && e.day === day);
   };
 
   // Scroll to today on initial mount
@@ -242,6 +258,8 @@ export function CalendarGrid({
           const notesCount = dateNotes.length;
           const dateBirthdays = getBirthdaysForDate(day.date.getMonth() + 1, day.date.getDate());
           const hasBirthday = dateBirthdays.length > 0;
+          const dateEvents = getEventsForDate(day.date.getMonth() + 1, day.date.getDate());
+          const hasEvents = dateEvents.length > 0;
           
           return (
             <div
@@ -347,6 +365,33 @@ export function CalendarGrid({
                   </Tooltip>
                 </TooltipProvider>
               )}
+
+              {/* Recurring events icon with tooltip */}
+              {hasEvents && day.isCurrentMonth && !hasBirthday && (
+                <TooltipProvider delayDuration={200}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="absolute bottom-0.5 right-0.5 print:bottom-0 print:right-0 cursor-help">
+                        <Heart className="w-3 h-3 text-purple-500" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <div className="text-xs space-y-0.5">
+                        {dateEvents.map((e) => {
+                          const years = calculateYears?.(e, day.date.getFullYear());
+                          return (
+                            <div key={e.id} className="flex items-center gap-1">
+                              <Heart className="w-3 h-3 text-purple-500" />
+                              <span>{e.name}</span>
+                              {years !== null && <span className="text-muted-foreground">({years} г.)</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
               
               <span
                 className={cn(
@@ -416,6 +461,7 @@ export function CalendarGrid({
         holidays={selectedDay?.holidays || []}
         notes={selectedDay ? notes[formatDateString(selectedDay.date)] || [] : []}
         birthdays={selectedDay ? getBirthdaysForDate(selectedDay.date.getMonth() + 1, selectedDay.date.getDate()) : []}
+        recurringEvents={selectedDay ? getEventsForDate(selectedDay.date.getMonth() + 1, selectedDay.date.getDate()) : []}
         onAddNote={onAddNote}
         onUpdateNote={onUpdateNote}
         onDeleteNote={onDeleteNote}
@@ -423,6 +469,10 @@ export function CalendarGrid({
         onUpdateBirthday={onUpdateBirthday}
         onDeleteBirthday={onDeleteBirthday}
         calculateAge={calculateAge}
+        onAddRecurringEvent={onAddRecurringEvent}
+        onUpdateRecurringEvent={onUpdateRecurringEvent}
+        onDeleteRecurringEvent={onDeleteRecurringEvent}
+        calculateYears={calculateYears}
       />
     </div>
   );

@@ -11,6 +11,7 @@ import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
 import { useCalendarNotes, ImportResult as NotesImportResult } from '@/hooks/useCalendarNotes';
 import { useBirthdays, ImportResult as BirthdaysImportResult } from '@/hooks/useBirthdays';
+import { useRecurringEvents, ImportResult as EventsImportResult } from '@/hooks/useRecurringEvents';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { NotificationToggle } from './NotificationToggle';
@@ -47,9 +48,17 @@ export function BulgarianCalendar() {
       description: `${result.count} рождени дни бяха синхронизирани с вашия профил.`
     });
   }, [toast]);
+
+  const handleEventsImport = useCallback((result: EventsImportResult) => {
+    toast({
+      title: 'Събития импортирани',
+      description: `${result.count} годишнини бяха синхронизирани с вашия профил.`
+    });
+  }, [toast]);
   
   const { notes, addNote, updateNote, removeNote, moveNote } = useCalendarNotes(handleNotesImport);
   const { birthdays, addBirthday, updateBirthday, removeBirthday, getBirthdaysForDateString, calculateAge } = useBirthdays(handleBirthdaysImport);
+  const { events: recurringEvents, addEvent, updateEvent, removeEvent, getEventsForDate, calculateYears } = useRecurringEvents(handleEventsImport);
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   
@@ -228,6 +237,7 @@ export function BulgarianCalendar() {
                 activeFilters={activeFilters}
                 notes={notes}
                 birthdays={birthdays}
+                recurringEvents={recurringEvents}
                 onAddNote={addNote}
                 onUpdateNote={updateNote}
                 onDeleteNote={removeNote}
@@ -236,6 +246,10 @@ export function BulgarianCalendar() {
                 onUpdateBirthday={updateBirthday}
                 onDeleteBirthday={removeBirthday}
                 calculateAge={calculateAge}
+                onAddRecurringEvent={addEvent}
+                onUpdateRecurringEvent={updateEvent}
+                onDeleteRecurringEvent={removeEvent}
+                calculateYears={calculateYears}
               />
               <div className="mt-6">
                 <CalendarLegend />
@@ -272,6 +286,7 @@ export function BulgarianCalendar() {
         ) : []}
         notes={sharedDate ? notes[`${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`] || [] : []}
         birthdays={sharedDate ? getBirthdaysForDateString(`${sharedDate.getFullYear()}-${String(sharedDate.getMonth() + 1).padStart(2, '0')}-${String(sharedDate.getDate()).padStart(2, '0')}`) : []}
+        recurringEvents={sharedDate ? getEventsForDate(sharedDate.getMonth() + 1, sharedDate.getDate()) : []}
         onAddNote={addNote}
         onUpdateNote={updateNote}
         onDeleteNote={removeNote}
@@ -279,6 +294,10 @@ export function BulgarianCalendar() {
         onUpdateBirthday={updateBirthday}
         onDeleteBirthday={removeBirthday}
         calculateAge={calculateAge}
+        onAddRecurringEvent={addEvent}
+        onUpdateRecurringEvent={updateEvent}
+        onDeleteRecurringEvent={removeEvent}
+        calculateYears={calculateYears}
       />
 
       {/* Print preview modal */}

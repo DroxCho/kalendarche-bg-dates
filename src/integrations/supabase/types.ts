@@ -95,6 +95,45 @@ export type Database = {
         }
         Relationships: []
       }
+      recurring_events: {
+        Row: {
+          color: string | null
+          created_at: string
+          day: number
+          event_type: string
+          icon: string | null
+          id: string
+          month: number
+          name: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          day: number
+          event_type?: string
+          icon?: string | null
+          id?: string
+          month: number
+          name: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          day?: number
+          event_type?: string
+          icon?: string | null
+          id?: string
+          month?: number
+          name?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
