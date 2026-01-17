@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database, Bell } from 'lucide-react';
+import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database, Bell, Upload } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +32,7 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [importing, setImporting] = useState(false);
   
   // Notification preferences
   const [emailReminders, setEmailReminders] = useState(true);
@@ -208,6 +209,109 @@ const Profile = () => {
     }
   };
 
+  const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+
+      if (!data.notes && !data.birthdays) {
+        throw new Error('Невалиден формат на файла. Липсват данни за бележки или рождени дни.');
+      }
+
+      let notesImported = 0;
+      let birthdaysImported = 0;
+      let notesSkipped = 0;
+      let birthdaysSkipped = 0;
+
+      // Import notes
+      if (data.notes && Array.isArray(data.notes)) {
+        for (const note of data.notes) {
+          // Check if note already exists (same date and text)
+          const { data: existing } = await supabase
+            .from('calendar_notes')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('date', note.date)
+            .eq('text', note.text)
+            .maybeSingle();
+
+          if (!existing) {
+            const { error } = await supabase
+              .from('calendar_notes')
+              .insert({
+                user_id: user.id,
+                date: note.date,
+                text: note.text,
+              });
+            
+            if (!error) {
+              notesImported++;
+            }
+          } else {
+            notesSkipped++;
+          }
+        }
+      }
+
+      // Import birthdays
+      if (data.birthdays && Array.isArray(data.birthdays)) {
+        for (const birthday of data.birthdays) {
+          // Check if birthday already exists (same name, month, day)
+          const { data: existing } = await supabase
+            .from('birthdays')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('name', birthday.name)
+            .eq('month', birthday.month)
+            .eq('day', birthday.day)
+            .maybeSingle();
+
+          if (!existing) {
+            const { error } = await supabase
+              .from('birthdays')
+              .insert({
+                user_id: user.id,
+                name: birthday.name,
+                month: birthday.month,
+                day: birthday.day,
+                year: birthday.year || null,
+              });
+            
+            if (!error) {
+              birthdaysImported++;
+            }
+          } else {
+            birthdaysSkipped++;
+          }
+        }
+      }
+
+      const skippedMessage = (notesSkipped > 0 || birthdaysSkipped > 0) 
+        ? ` (${notesSkipped + birthdaysSkipped} дублирани записи пропуснати)`
+        : '';
+
+      toast({ 
+        title: 'Успех!', 
+        description: `Импортирани ${notesImported} бележки и ${birthdaysImported} рождени дни${skippedMessage}.` 
+      });
+    } catch (error: any) {
+      console.error('Import error:', error);
+      toast({ 
+        title: 'Грешка при импортиране', 
+        description: error.message || 'Неуспешно импортиране на данните.', 
+        variant: 'destructive' 
+      });
+    } finally {
+      setImporting(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -355,18 +459,40 @@ const Profile = () => {
               <Database className="h-5 w-5" />
               Управление на данни
             </CardTitle>
-            <CardDescription>Експортирайте вашите бележки и рождени дни</CardDescription>
+            <CardDescription>Експортирайте или импортирайте вашите бележки и рождени дни</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
             <Button 
               variant="outline" 
               className="w-full justify-start gap-2" 
               onClick={handleExportData}
-              disabled={exporting}
+              disabled={exporting || importing}
             >
               <Download className="h-4 w-4" />
               {exporting ? 'Експортиране...' : 'Експортирай всички данни (JSON)'}
             </Button>
+            
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportData}
+                disabled={importing || exporting}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+              />
+              <Button 
+                variant="outline" 
+                className="w-full justify-start gap-2 pointer-events-none"
+                disabled={importing || exporting}
+              >
+                <Upload className="h-4 w-4" />
+                {importing ? 'Импортиране...' : 'Импортирай от файл (JSON)'}
+              </Button>
+            </div>
+            
+            <p className="text-xs text-muted-foreground">
+              Импортирането няма да презапише съществуващи записи. Дублираните записи ще бъдат пропуснати.
+            </p>
           </CardContent>
         </Card>
 
