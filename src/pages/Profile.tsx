@@ -195,11 +195,20 @@ const Profile = () => {
       
       if (birthdaysError) throw birthdaysError;
 
+      // Fetch recurring events
+      const { data: recurringEventsData, error: recurringEventsError } = await supabase
+        .from('recurring_events')
+        .select('*')
+        .eq('user_id', user.id);
+      
+      if (recurringEventsError) throw recurringEventsError;
+
       const exportData = {
         exportedAt: new Date().toISOString(),
         email: user.email,
         notes: notesData || [],
         birthdays: birthdaysData || [],
+        recurringEvents: recurringEventsData || [],
       };
 
       const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
@@ -214,7 +223,7 @@ const Profile = () => {
 
       toast({ 
         title: 'Успех!', 
-        description: `Експортирани ${notesData?.length || 0} бележки и ${birthdaysData?.length || 0} рождени дни.` 
+        description: `Експортирани ${notesData?.length || 0} бележки, ${birthdaysData?.length || 0} рождени дни и ${recurringEventsData?.length || 0} събития.` 
       });
     } catch (error: any) {
       toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
@@ -232,14 +241,16 @@ const Profile = () => {
       const text = await file.text();
       const data = JSON.parse(text);
 
-      if (!data.notes && !data.birthdays) {
-        throw new Error('Невалиден формат на файла. Липсват данни за бележки или рождени дни.');
+      if (!data.notes && !data.birthdays && !data.recurringEvents) {
+        throw new Error('Невалиден формат на файла. Липсват данни за бележки, рождени дни или събития.');
       }
 
       let notesImported = 0;
       let birthdaysImported = 0;
+      let eventsImported = 0;
       let notesSkipped = 0;
       let birthdaysSkipped = 0;
+      let eventsSkipped = 0;
 
       // Import notes
       if (data.notes && Array.isArray(data.notes)) {
@@ -304,13 +315,51 @@ const Profile = () => {
         }
       }
 
-      const skippedMessage = (notesSkipped > 0 || birthdaysSkipped > 0) 
-        ? ` (${notesSkipped + birthdaysSkipped} дублирани записи пропуснати)`
+      // Import recurring events
+      if (data.recurringEvents && Array.isArray(data.recurringEvents)) {
+        for (const event of data.recurringEvents) {
+          // Check if event already exists (same name, month, day, event_type)
+          const { data: existing } = await supabase
+            .from('recurring_events')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('name', event.name)
+            .eq('month', event.month)
+            .eq('day', event.day)
+            .eq('event_type', event.event_type || 'anniversary')
+            .maybeSingle();
+
+          if (!existing) {
+            const { error } = await supabase
+              .from('recurring_events')
+              .insert({
+                user_id: user.id,
+                name: event.name,
+                month: event.month,
+                day: event.day,
+                year: event.year || null,
+                event_type: event.event_type || 'anniversary',
+                icon: event.icon || 'heart',
+                color: event.color || 'purple',
+              });
+            
+            if (!error) {
+              eventsImported++;
+            }
+          } else {
+            eventsSkipped++;
+          }
+        }
+      }
+
+      const totalSkipped = notesSkipped + birthdaysSkipped + eventsSkipped;
+      const skippedMessage = totalSkipped > 0 
+        ? ` (${totalSkipped} дублирани записи пропуснати)`
         : '';
 
       toast({ 
         title: 'Успех!', 
-        description: `Импортирани ${notesImported} бележки и ${birthdaysImported} рождени дни${skippedMessage}.` 
+        description: `Импортирани ${notesImported} бележки, ${birthdaysImported} рождени дни и ${eventsImported} събития${skippedMessage}.` 
       });
     } catch (error: any) {
       console.error('Import error:', error);
