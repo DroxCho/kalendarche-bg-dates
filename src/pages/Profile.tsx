@@ -36,6 +36,7 @@ const Profile = () => {
   
   // Notification preferences
   const [emailReminders, setEmailReminders] = useState(true);
+  const [emailRecurringReminders, setEmailRecurringReminders] = useState(true);
   const [reminderDays, setReminderDays] = useState('1');
   const [loadingPrefs, setLoadingPrefs] = useState(true);
   const [savingPrefs, setSavingPrefs] = useState(false);
@@ -62,6 +63,7 @@ const Profile = () => {
         
         if (data) {
           setEmailReminders(data.email_birthday_reminders);
+          setEmailRecurringReminders(data.email_recurring_reminders ?? true);
           setReminderDays(String(data.reminder_days_before));
         }
       } catch (error: any) {
@@ -76,7 +78,11 @@ const Profile = () => {
     }
   }, [user]);
 
-  const saveNotificationPreferences = async (emailEnabled: boolean, days: string) => {
+  const saveNotificationPreferences = async (updates: {
+    emailBirthday?: boolean;
+    emailRecurring?: boolean;
+    days?: string;
+  }) => {
     if (!user) return;
     
     setSavingPrefs(true);
@@ -87,13 +93,15 @@ const Profile = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      const updateData: Record<string, unknown> = {};
+      if (updates.emailBirthday !== undefined) updateData.email_birthday_reminders = updates.emailBirthday;
+      if (updates.emailRecurring !== undefined) updateData.email_recurring_reminders = updates.emailRecurring;
+      if (updates.days !== undefined) updateData.reminder_days_before = parseInt(updates.days);
+
       if (existing) {
         const { error } = await supabase
           .from('notification_preferences')
-          .update({
-            email_birthday_reminders: emailEnabled,
-            reminder_days_before: parseInt(days),
-          })
+          .update(updateData)
           .eq('user_id', user.id);
         
         if (error) throw error;
@@ -102,8 +110,9 @@ const Profile = () => {
           .from('notification_preferences')
           .insert({
             user_id: user.id,
-            email_birthday_reminders: emailEnabled,
-            reminder_days_before: parseInt(days),
+            email_birthday_reminders: updates.emailBirthday ?? emailReminders,
+            email_recurring_reminders: updates.emailRecurring ?? emailRecurringReminders,
+            reminder_days_before: parseInt(updates.days ?? reminderDays),
           });
         
         if (error) throw error;
@@ -119,12 +128,17 @@ const Profile = () => {
 
   const handleEmailRemindersChange = (checked: boolean) => {
     setEmailReminders(checked);
-    saveNotificationPreferences(checked, reminderDays);
+    saveNotificationPreferences({ emailBirthday: checked });
+  };
+
+  const handleEmailRecurringRemindersChange = (checked: boolean) => {
+    setEmailRecurringReminders(checked);
+    saveNotificationPreferences({ emailRecurring: checked });
   };
 
   const handleReminderDaysChange = (value: string) => {
     setReminderDays(value);
-    saveNotificationPreferences(emailReminders, value);
+    saveNotificationPreferences({ days: value });
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -413,14 +427,14 @@ const Profile = () => {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Напомняния за рождени дни
+              Имейл напомняния
             </CardTitle>
-            <CardDescription>Получавайте имейл напомняния за предстоящи рождени дни</CardDescription>
+            <CardDescription>Получавайте имейл напомняния за предстоящи събития</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>Имейл напомняния</Label>
+                <Label>Рождени дни</Label>
                 <p className="text-sm text-muted-foreground">
                   Получавайте известия за предстоящи рождени дни
                 </p>
@@ -431,23 +445,42 @@ const Profile = () => {
                 disabled={loadingPrefs || savingPrefs}
               />
             </div>
-            
-            {emailReminders && (
-              <div className="space-y-2">
-                <Label>Напомни ме</Label>
-                <Select value={reminderDays} onValueChange={handleReminderDaysChange} disabled={loadingPrefs || savingPrefs}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Изберете..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">В деня на рождения ден</SelectItem>
-                    <SelectItem value="1">1 ден преди</SelectItem>
-                    <SelectItem value="2">2 дни преди</SelectItem>
-                    <SelectItem value="3">3 дни преди</SelectItem>
-                    <SelectItem value="7">1 седмица преди</SelectItem>
-                  </SelectContent>
-                </Select>
+
+            <Separator />
+
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label>Годишнини и събития</Label>
+                <p className="text-sm text-muted-foreground">
+                  Получавайте известия за годишнини и други повтарящи се събития
+                </p>
               </div>
+              <Switch
+                checked={emailRecurringReminders}
+                onCheckedChange={handleEmailRecurringRemindersChange}
+                disabled={loadingPrefs || savingPrefs}
+              />
+            </div>
+            
+            {(emailReminders || emailRecurringReminders) && (
+              <>
+                <Separator />
+                <div className="space-y-2">
+                  <Label>Напомни ме</Label>
+                  <Select value={reminderDays} onValueChange={handleReminderDaysChange} disabled={loadingPrefs || savingPrefs}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Изберете..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="0">В деня на събитието</SelectItem>
+                      <SelectItem value="1">1 ден преди</SelectItem>
+                      <SelectItem value="2">2 дни преди</SelectItem>
+                      <SelectItem value="3">3 дни преди</SelectItem>
+                      <SelectItem value="7">1 седмица преди</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>

@@ -72,6 +72,7 @@ export type Database = {
         Row: {
           created_at: string
           email_birthday_reminders: boolean
+          email_recurring_reminders: boolean
           id: string
           reminder_days_before: number
           updated_at: string
@@ -80,6 +81,7 @@ export type Database = {
         Insert: {
           created_at?: string
           email_birthday_reminders?: boolean
+          email_recurring_reminders?: boolean
           id?: string
           reminder_days_before?: number
           updated_at?: string
@@ -88,6 +90,7 @@ export type Database = {
         Update: {
           created_at?: string
           email_birthday_reminders?: boolean
+          email_recurring_reminders?: boolean
           id?: string
           reminder_days_before?: number
           updated_at?: string
