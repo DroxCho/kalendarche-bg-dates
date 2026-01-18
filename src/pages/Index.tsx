@@ -1,11 +1,56 @@
+import { useNavigate } from 'react-router-dom';
 import { BulgarianCalendar } from '@/components/BulgarianCalendar';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { LogIn, LogOut, User } from 'lucide-react';
 
 const Index = () => {
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <header className="text-center mb-8 animate-fade-in">
+        <header className="relative text-center mb-8 animate-fade-in">
+          {/* Profile buttons - top right */}
+          <div className="absolute right-0 top-0 flex items-center gap-1 print:hidden">
+            {!loading && (
+              user ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/profile')}
+                    className="gap-1.5"
+                  >
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">Профил</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={signOut}
+                    className="gap-1.5"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span className="hidden sm:inline">Изход</span>
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/auth')}
+                  className="gap-1.5"
+                >
+                  <LogIn className="h-4 w-4" />
+                  <span className="hidden sm:inline">Вход</span>
+                </Button>
+              )
+            )}
+          </div>
+
           <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-2">
             Български календар
           </h1>
