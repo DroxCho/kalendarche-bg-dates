@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -10,7 +10,8 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database, Bell, Upload } from 'lucide-react';
+import { ArrowLeft, User, Mail, Lock, LogOut, Trash2, Download, Database, Bell, Upload, Camera } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,12 +28,17 @@ const Profile = () => {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
+  
+  // Avatar state
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   
   // Notification preferences
   const [emailReminders, setEmailReminders] = useState(true);
@@ -46,6 +52,36 @@ const Profile = () => {
       navigate('/auth');
     }
   }, [user, loading, navigate]);
+
+  // Load profile data including avatar
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+        
+        if (data?.avatar_url) {
+          setAvatarUrl(data.avatar_url);
+        } else if (user.user_metadata?.avatar_url) {
+          // Fallback to OAuth avatar
+          setAvatarUrl(user.user_metadata.avatar_url);
+        }
+      } catch (error: any) {
+        console.error('Error loading profile:', error);
+      }
+    };
+
+    if (user) {
+      loadProfile();
+    }
+  }, [user]);
 
   // Load notification preferences
   useEffect(() => {
@@ -77,6 +113,76 @@ const Profile = () => {
       loadPreferences();
     }
   }, [user]);
+
+  const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({ title: 'Грешка', description: 'Моля, изберете изображение.', variant: 'destructive' });
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({ title: 'Грешка', description: 'Максималният размер е 2MB.', variant: 'destructive' });
+      return;
+    }
+
+    setUploadingAvatar(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
+
+      // Upload file to storage
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      // Check if profile exists
+      const { data: existingProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (existingProfile) {
+        // Update existing profile
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      } else {
+        // Create new profile
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert({ user_id: user.id, avatar_url: publicUrl });
+
+        if (insertError) throw insertError;
+      }
+
+      setAvatarUrl(publicUrl);
+      toast({ title: 'Успех!', description: 'Профилната снимка е обновена.' });
+    } catch (error: any) {
+      console.error('Error uploading avatar:', error);
+      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+    } finally {
+      setUploadingAvatar(false);
+      event.target.value = '';
+    }
+  };
 
   const saveNotificationPreferences = async (updates: {
     emailBirthday?: boolean;
@@ -398,6 +504,55 @@ const Profile = () => {
             <p className="text-sm text-muted-foreground">Управление на акаунта</p>
           </div>
         </div>
+
+        {/* Profile Picture */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Camera className="h-5 w-5" />
+              Профилна снимка
+            </CardTitle>
+            <CardDescription>Качете снимка за вашия профил</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center gap-6">
+            <div className="relative">
+              <Avatar className="h-24 w-24 border-2 border-border">
+                <AvatarImage src={avatarUrl || undefined} alt="Профилна снимка" />
+                <AvatarFallback className="bg-primary/10 text-primary text-2xl">
+                  {user.email?.charAt(0).toUpperCase() || 'U'}
+                </AvatarFallback>
+              </Avatar>
+              <Button
+                size="icon"
+                variant="secondary"
+                className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full shadow-md"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+              >
+                <Camera className="h-4 w-4" />
+              </Button>
+            </div>
+            <div className="space-y-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingAvatar}
+              >
+                {uploadingAvatar ? 'Качване...' : 'Избери снимка'}
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                JPG, PNG или GIF. Максимум 2MB.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Account Info */}
         <Card>
