@@ -82,7 +82,7 @@ const Index = () => {
                       <User className="mr-2 h-4 w-4" />
                       <span>Профил</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
                       <Settings className="mr-2 h-4 w-4" />
                       <span>Настройки</span>
                     </DropdownMenuItem>
