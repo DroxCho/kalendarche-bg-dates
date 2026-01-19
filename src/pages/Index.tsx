@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BulgarianCalendar } from '@/components/BulgarianCalendar';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogIn, LogOut, User } from 'lucide-react';
@@ -8,6 +10,34 @@ import { LogIn, LogOut, User } from 'lucide-react';
 const Index = () => {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadAvatar = async () => {
+      if (!user) {
+        setAvatarUrl(null);
+        return;
+      }
+      
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('avatar_url')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        
+        if (data?.avatar_url) {
+          setAvatarUrl(data.avatar_url);
+        } else if (user.user_metadata?.avatar_url) {
+          setAvatarUrl(user.user_metadata.avatar_url);
+        }
+      } catch (error) {
+        console.error('Error loading avatar:', error);
+      }
+    };
+
+    loadAvatar();
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -24,7 +54,7 @@ const Index = () => {
                     onClick={() => navigate('/profile')}
                   >
                     <AvatarImage 
-                      src={user.user_metadata?.avatar_url} 
+                      src={avatarUrl || user.user_metadata?.avatar_url} 
                       alt="Профилна снимка" 
                     />
                     <AvatarFallback className="bg-primary/10 text-primary text-xs">
