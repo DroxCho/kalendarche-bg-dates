@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { BulgarianCalendar } from '@/components/BulgarianCalendar';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { LogIn, LogOut, User } from 'lucide-react';
 
 const Index = () => {
@@ -18,6 +19,18 @@ const Index = () => {
             {!loading && (
               user ? (
                 <>
+                  <Avatar 
+                    className="h-8 w-8 cursor-pointer border border-border"
+                    onClick={() => navigate('/profile')}
+                  >
+                    <AvatarImage 
+                      src={user.user_metadata?.avatar_url} 
+                      alt="Профилна снимка" 
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary text-xs">
+                      {user.email?.charAt(0).toUpperCase() || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
                   <Button
                     variant="outline"
                     size="sm"
