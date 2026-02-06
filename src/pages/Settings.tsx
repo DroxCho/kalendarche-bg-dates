@@ -1,14 +1,53 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Palette, Globe, Monitor, Sun, Moon } from 'lucide-react';
+import { ArrowLeft, Palette, Globe, Monitor, Sun, Moon, Calendar, Clock } from 'lucide-react';
+
+const SETTINGS_STORAGE_KEY = 'bulgarian-calendar-app-settings';
+
+interface AppSettings {
+  calendarStartDay: 'monday' | 'sunday';
+  dateFormat: 'dd.mm.yyyy' | 'dd/mm/yyyy' | 'yyyy-mm-dd' | 'mm/dd/yyyy';
+}
+
+const defaultSettings: AppSettings = {
+  calendarStartDay: 'monday',
+  dateFormat: 'dd.mm.yyyy'
+};
 
 const Settings = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+
+  // Load settings from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (stored) {
+        setSettings({ ...defaultSettings, ...JSON.parse(stored) });
+      }
+    } catch (e) {
+      console.error('Failed to load app settings:', e);
+    }
+  }, []);
+
+  // Save settings to localStorage
+  const updateSetting = <K extends keyof AppSettings>(key: K, value: AppSettings[K]) => {
+    setSettings(prev => {
+      const newSettings = { ...prev, [key]: value };
+      try {
+        localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(newSettings));
+      } catch (e) {
+        console.error('Failed to save app settings:', e);
+      }
+      return newSettings;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
@@ -23,6 +62,86 @@ const Settings = () => {
             <p className="text-sm text-muted-foreground">Предпочитания на приложението</p>
           </div>
         </div>
+
+        {/* Calendar Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Календар
+            </CardTitle>
+            <CardDescription>Настройки за показване на календара</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="startDay">Начален ден на седмицата</Label>
+              <Select 
+                value={settings.calendarStartDay} 
+                onValueChange={(value: 'monday' | 'sunday') => updateSetting('calendarStartDay', value)}
+              >
+                <SelectTrigger id="startDay" className="w-full">
+                  <SelectValue placeholder="Изберете ден" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border">
+                  <SelectItem value="monday">
+                    <div className="flex items-center gap-2">
+                      <span>Понеделник</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="sunday">
+                    <div className="flex items-center gap-2">
+                      <span>Неделя</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Изберете кой ден да бъде първи в седмичния изглед.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dateFormat">Формат на датата</Label>
+              <Select 
+                value={settings.dateFormat} 
+                onValueChange={(value: AppSettings['dateFormat']) => updateSetting('dateFormat', value)}
+              >
+                <SelectTrigger id="dateFormat" className="w-full">
+                  <SelectValue placeholder="Изберете формат" />
+                </SelectTrigger>
+                <SelectContent className="bg-popover border border-border">
+                  <SelectItem value="dd.mm.yyyy">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>31.12.2024 (БГ стандарт)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="dd/mm/yyyy">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>31/12/2024</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="yyyy-mm-dd">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>2024-12-31 (ISO)</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="mm/dd/yyyy">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>12/31/2024 (US)</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Форматът ще се използва при показване на дати в приложението.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Theme Settings */}
         <Card>
