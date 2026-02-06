@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download, FileText, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
@@ -14,6 +15,12 @@ import { generateICSFile, generateICSForYear } from '@/lib/icsExport';
 import { exportMonthToPDF, exportYearToPDF, exportAllToPDF } from '@/lib/pdfExport';
 import { toast } from '@/hooks/use-toast';
 
+// English month names for translation
+const ENGLISH_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 interface MonthPaginatorProps {
   currentIndex: number;
   onIndexChange: (index: number) => void;
@@ -25,8 +32,14 @@ interface MonthPaginatorProps {
 }
 
 export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll, onPrintPreview, activeFilters = [] }: MonthPaginatorProps) {
+  const { t, i18n } = useTranslation();
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
+  const isEnglish = i18n.language === 'en';
+
+  const getMonthName = (monthIndex: number) => {
+    return isEnglish ? ENGLISH_MONTHS[monthIndex] : BULGARIAN_MONTHS[monthIndex];
+  };
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
@@ -67,21 +80,21 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
 
   const handleExportMonthPDF = async () => {
     const { dismiss } = toast({
-      title: "Генериране на PDF...",
-      description: "Моля, изчакайте докато се създава файлът.",
+      title: t('calendar.generatingPDF'),
+      description: t('calendar.pleaseWait'),
     });
     try {
       await exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
       dismiss();
       toast({
-        title: "PDF е готов!",
-        description: "Файлът беше успешно изтеглен.",
+        title: t('calendar.pdfReady'),
+        description: t('calendar.pdfSuccess'),
       });
     } catch (error) {
       dismiss();
       toast({
-        title: "Грешка",
-        description: "Възникна проблем при генерирането на PDF.",
+        title: t('common.error'),
+        description: t('calendar.pdfError'),
         variant: "destructive",
       });
     }
@@ -89,21 +102,21 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
 
   const handleExportYearPDF = async () => {
     const { dismiss } = toast({
-      title: "Генериране на PDF...",
-      description: "Създаване на календар за цялата година. Моля, изчакайте.",
+      title: t('calendar.generatingPDF'),
+      description: t('calendar.creatingYear'),
     });
     try {
       await exportYearToPDF(currentMonth.year, activeFilters);
       dismiss();
       toast({
-        title: "PDF е готов!",
-        description: "Файлът беше успешно изтеглен.",
+        title: t('calendar.pdfReady'),
+        description: t('calendar.pdfSuccess'),
       });
     } catch (error) {
       dismiss();
       toast({
-        title: "Грешка",
-        description: "Възникна проблем при генерирането на PDF.",
+        title: t('common.error'),
+        description: t('calendar.pdfError'),
         variant: "destructive",
       });
     }
@@ -111,21 +124,21 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
 
   const handleExportAllPDF = async () => {
     const { dismiss } = toast({
-      title: "Генериране на PDF...",
-      description: "Създаване на пълен календар. Това може да отнеме малко време.",
+      title: t('calendar.generatingPDF'),
+      description: t('calendar.creatingAll'),
     });
     try {
       await exportAllToPDF(activeFilters);
       dismiss();
       toast({
-        title: "PDF е готов!",
-        description: "Файлът беше успешно изтеглен.",
+        title: t('calendar.pdfReady'),
+        description: t('calendar.pdfSuccess'),
       });
     } catch (error) {
       dismiss();
       toast({
-        title: "Грешка",
-        description: "Възникна проблем при генерирането на PDF.",
+        title: t('common.error'),
+        description: t('calendar.pdfError'),
         variant: "destructive",
       });
     }
@@ -154,13 +167,13 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
               className="gap-1.5"
             >
               <CalendarCheck className="h-4 w-4" />
-              Днес
+              {t('calendar.today')}
             </Button>
           )}
         </div>
 
         <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground print:text-black">
-          {BULGARIAN_MONTHS[currentMonth.month]} {currentMonth.year}
+          {getMonthName(currentMonth.month)} {currentMonth.year}
         </h2>
 
         <div className="flex items-center gap-2 print:hidden">
@@ -172,31 +185,31 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
                 className="gap-1.5"
               >
                 <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">Експорт</span>
+                <span className="hidden sm:inline">{t('calendar.export')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={handleExportMonth}>
-                Месец (.ics)
+                {t('calendar.exportMonth')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportYear}>
-                Година (.ics)
+                {t('calendar.exportYear')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportAll}>
-                Всичко (.ics)
+                {t('calendar.exportAll')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleExportMonthPDF}>
                 <FileText className="h-4 w-4 mr-2" />
-                Месец (PDF)
+                {t('calendar.exportMonthPDF')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportYearPDF}>
                 <FileText className="h-4 w-4 mr-2" />
-                Година (PDF)
+                {t('calendar.exportYearPDF')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportAllPDF}>
                 <FileText className="h-4 w-4 mr-2" />
-                Всичко (PDF)
+                {t('calendar.exportAllPDF')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -209,7 +222,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
                 className="gap-1.5"
               >
                 <Printer className="h-4 w-4" />
-                <span className="hidden sm:inline">Печат</span>
+                <span className="hidden sm:inline">{t('calendar.print')}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -217,20 +230,20 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
                 <>
                   <DropdownMenuItem onClick={() => onPrintPreview('month')}>
                     <Eye className="h-4 w-4 mr-2" />
-                    Преглед на месец
+                    {t('calendar.previewMonth')}
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onPrintPreview('year')}>
                     <Eye className="h-4 w-4 mr-2" />
-                    Преглед на година
+                    {t('calendar.previewYear')}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                 </>
               )}
               <DropdownMenuItem onClick={handlePrintMonth}>
-                Печат на месец
+                {t('calendar.printMonth')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handlePrintAll}>
-                Печат на цял календар
+                {t('calendar.printAll')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -261,7 +274,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
                 : "bg-muted text-muted-foreground"
             )}
           >
-            {BULGARIAN_MONTHS[month.month].slice(0, 3)} {month.year.toString().slice(2)}
+            {getMonthName(month.month).slice(0, 3)} {month.year.toString().slice(2)}
           </button>
         ))}
       </div>

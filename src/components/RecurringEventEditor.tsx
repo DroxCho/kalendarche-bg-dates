@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,12 +16,6 @@ interface RecurringEventEditorProps {
   currentYear: number;
   calculateYears: (event: RecurringEvent, currentYear: number) => number | null;
 }
-
-const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  anniversary: 'Годишнина',
-  memorial: 'Възпоменание',
-  custom: 'Друго'
-};
 
 const EVENT_ICONS: Record<EventIcon, typeof Heart> = {
   heart: Heart,
@@ -72,6 +67,7 @@ export function RecurringEventEditor({
   currentYear,
   calculateYears
 }: RecurringEventEditorProps) {
+  const { t } = useTranslation();
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newYear, setNewYear] = useState('');
@@ -89,6 +85,14 @@ export function RecurringEventEditor({
   const [, monthStr, dayStr] = date.split('-');
   const month = parseInt(monthStr, 10);
   const day = parseInt(dayStr, 10);
+
+  const getEventTypeLabel = (type: EventType) => {
+    return t(`events.${type}`);
+  };
+
+  const getColorLabel = (color: EventColor) => {
+    return t(`events.color${color.charAt(0).toUpperCase() + color.slice(1)}`);
+  };
 
   const handleAdd = () => {
     if (newName.trim()) {
@@ -138,7 +142,7 @@ export function RecurringEventEditor({
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium flex items-center gap-2 text-foreground">
           <Heart className="h-4 w-4 text-purple-500" />
-          Годишнини и събития
+          {t('events.title')}
         </h4>
         {!isAdding && (
           <Button
@@ -148,7 +152,7 @@ export function RecurringEventEditor({
             className="gap-1 text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-950"
           >
             <Plus className="h-3 w-3" />
-            Добави
+            {t('events.add')}
           </Button>
         )}
       </div>
@@ -168,14 +172,14 @@ export function RecurringEventEditor({
                     <Input
                       value={editName}
                       onChange={(e) => setEditName(e.target.value)}
-                      placeholder="Име"
+                      placeholder={t('common.name')}
                       className="flex-1 h-8 text-sm"
                       autoFocus
                     />
                     <Input
                       value={editYear}
                       onChange={(e) => setEditYear(e.target.value)}
-                      placeholder="Година"
+                      placeholder={t('common.year')}
                       className="w-20 h-8 text-sm"
                       type="number"
                       min="1900"
@@ -188,9 +192,9 @@ export function RecurringEventEditor({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {Object.entries(EVENT_TYPE_LABELS).map(([key, label]) => (
-                          <SelectItem key={key} value={key}>{label}</SelectItem>
-                        ))}
+                        <SelectItem value="anniversary">{t('events.anniversary')}</SelectItem>
+                        <SelectItem value="memorial">{t('events.memorial')}</SelectItem>
+                        <SelectItem value="custom">{t('events.custom')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Select value={editColor} onValueChange={(v) => setEditColor(v as EventColor)}>
@@ -198,11 +202,11 @@ export function RecurringEventEditor({
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="purple">Лилаво</SelectItem>
-                        <SelectItem value="blue">Синьо</SelectItem>
-                        <SelectItem value="green">Зелено</SelectItem>
-                        <SelectItem value="orange">Оранжево</SelectItem>
-                        <SelectItem value="red">Червено</SelectItem>
+                        <SelectItem value="purple">{t('events.colorPurple')}</SelectItem>
+                        <SelectItem value="blue">{t('events.colorBlue')}</SelectItem>
+                        <SelectItem value="green">{t('events.colorGreen')}</SelectItem>
+                        <SelectItem value="orange">{t('events.colorOrange')}</SelectItem>
+                        <SelectItem value="red">{t('events.colorRed')}</SelectItem>
                       </SelectContent>
                     </Select>
                     <Button
@@ -242,11 +246,11 @@ export function RecurringEventEditor({
                   <span className="font-medium text-sm">{event.name}</span>
                   {years !== null && (
                     <span className={cn("text-xs text-muted-foreground px-1.5 py-0.5 rounded", colorStyles.badge)}>
-                      {years} г.
+                      {years} {t('events.years')}
                     </span>
                   )}
                   <span className="text-xs text-muted-foreground">
-                    ({EVENT_TYPE_LABELS[event.eventType]})
+                    ({getEventTypeLabel(event.eventType)})
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -280,7 +284,7 @@ export function RecurringEventEditor({
             <Input
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              placeholder="Име на събитието"
+              placeholder={t('events.namePlaceholder')}
               className="flex-1 h-8 text-sm"
               autoFocus
               onKeyDown={(e) => {
@@ -291,7 +295,7 @@ export function RecurringEventEditor({
             <Input
               value={newYear}
               onChange={(e) => setNewYear(e.target.value)}
-              placeholder="Година"
+              placeholder={t('events.yearPlaceholder')}
               className="w-20 h-8 text-sm"
               type="number"
               min="1900"
@@ -308,9 +312,9 @@ export function RecurringEventEditor({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {Object.entries(EVENT_TYPE_LABELS).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>{label}</SelectItem>
-                ))}
+                <SelectItem value="anniversary">{t('events.anniversary')}</SelectItem>
+                <SelectItem value="memorial">{t('events.memorial')}</SelectItem>
+                <SelectItem value="custom">{t('events.custom')}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={newColor} onValueChange={(v) => setNewColor(v as EventColor)}>
@@ -318,11 +322,11 @@ export function RecurringEventEditor({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="purple">Лилаво</SelectItem>
-                <SelectItem value="blue">Синьо</SelectItem>
-                <SelectItem value="green">Зелено</SelectItem>
-                <SelectItem value="orange">Оранжево</SelectItem>
-                <SelectItem value="red">Червено</SelectItem>
+                <SelectItem value="purple">{t('events.colorPurple')}</SelectItem>
+                <SelectItem value="blue">{t('events.colorBlue')}</SelectItem>
+                <SelectItem value="green">{t('events.colorGreen')}</SelectItem>
+                <SelectItem value="orange">{t('events.colorOrange')}</SelectItem>
+                <SelectItem value="red">{t('events.colorRed')}</SelectItem>
               </SelectContent>
             </Select>
             <Button
@@ -348,7 +352,7 @@ export function RecurringEventEditor({
 
       {events.length === 0 && !isAdding && (
         <p className="text-sm text-muted-foreground text-center py-2">
-          Няма добавени годишнини или събития
+          {t('events.noEvents')}
         </p>
       )}
     </div>
