@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,7 @@ import { Calendar, ArrowLeft } from 'lucide-react';
 type AuthMode = 'login' | 'register' | 'forgot' | 'reset';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -42,7 +44,7 @@ const Auth = () => {
           password,
         });
         if (error) throw error;
-        toast({ title: 'Успешен вход!', description: 'Добре дошли обратно.' });
+        toast({ title: t('auth.successLogin'), description: t('auth.welcomeBack') });
         navigate('/');
       } else if (mode === 'register') {
         const { error } = await supabase.auth.signUp({
@@ -53,19 +55,19 @@ const Auth = () => {
           },
         });
         if (error) throw error;
-        toast({ title: 'Регистрацията е успешна!', description: 'Вече можете да използвате профила си.' });
+        toast({ title: t('auth.successRegister'), description: t('auth.canUseProfile') });
         navigate('/');
       }
     } catch (error: any) {
       let message = error.message;
       if (error.message?.includes('User already registered')) {
-        message = 'Потребител с този имейл вече съществува.';
+        message = t('auth.userExists');
       } else if (error.message?.includes('Invalid login credentials')) {
-        message = 'Грешен имейл или парола.';
+        message = t('auth.invalidCredentials');
       } else if (error.message?.includes('Password should be')) {
-        message = 'Паролата трябва да е поне 6 символа.';
+        message = t('auth.passwordMinLength');
       }
-      toast({ title: 'Грешка', description: message, variant: 'destructive' });
+      toast({ title: t('auth.error'), description: message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -81,12 +83,12 @@ const Auth = () => {
       });
       if (error) throw error;
       toast({
-        title: 'Имейл изпратен!',
-        description: 'Проверете пощата си за линк за възстановяване на паролата.',
+        title: t('auth.emailSent'),
+        description: t('auth.checkEmail'),
       });
       setMode('login');
     } catch (error: any) {
-      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -96,7 +98,7 @@ const Auth = () => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
-      toast({ title: 'Грешка', description: 'Паролите не съвпадат.', variant: 'destructive' });
+      toast({ title: t('auth.error'), description: t('auth.passwordsNoMatch'), variant: 'destructive' });
       return;
     }
 
@@ -106,16 +108,16 @@ const Auth = () => {
       const { error } = await supabase.auth.updateUser({ password });
       if (error) throw error;
       toast({
-        title: 'Паролата е променена!',
-        description: 'Вече можете да влезете с новата си парола.',
+        title: t('auth.passwordChanged'),
+        description: t('auth.canLoginNewPassword'),
       });
       navigate('/');
     } catch (error: any) {
       let message = error.message;
       if (error.message?.includes('Password should be')) {
-        message = 'Паролата трябва да е поне 6 символа.';
+        message = t('auth.passwordMinLength');
       }
-      toast({ title: 'Грешка', description: message, variant: 'destructive' });
+      toast({ title: t('auth.error'), description: message, variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -132,26 +134,26 @@ const Auth = () => {
       });
       if (error) throw error;
     } catch (error: any) {
-      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
       setGoogleLoading(false);
     }
   };
 
   const getTitle = () => {
     switch (mode) {
-      case 'login': return 'Вход';
-      case 'register': return 'Регистрация';
-      case 'forgot': return 'Забравена парола';
-      case 'reset': return 'Нова парола';
+      case 'login': return t('auth.login');
+      case 'register': return t('auth.register');
+      case 'forgot': return t('auth.forgotPassword');
+      case 'reset': return t('auth.resetPassword');
     }
   };
 
   const getDescription = () => {
     switch (mode) {
-      case 'login': return 'Влезте в профила си за достъп до календара';
-      case 'register': return 'Създайте нов профил за достъп до календара';
-      case 'forgot': return 'Въведете имейла си за възстановяване на паролата';
-      case 'reset': return 'Въведете новата си парола';
+      case 'login': return t('auth.loginDescription');
+      case 'register': return t('auth.registerDescription');
+      case 'forgot': return t('auth.forgotDescription');
+      case 'reset': return t('auth.resetDescription');
     }
   };
 
@@ -170,11 +172,11 @@ const Auth = () => {
           {mode === 'reset' && (
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">Нова парола</Label>
+                <Label htmlFor="password">{t('auth.newPassword')}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.passwordPlaceholder')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -182,11 +184,11 @@ const Auth = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Потвърдете паролата</Label>
+                <Label htmlFor="confirmPassword">{t('auth.confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
-                  placeholder="••••••••"
+                  placeholder={t('auth.passwordPlaceholder')}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
@@ -194,7 +196,7 @@ const Auth = () => {
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? 'Зареждане...' : 'Запази нова парола'}
+                {loading ? t('app.loading') : t('auth.saveNewPassword')}
               </Button>
             </form>
           )}
@@ -204,18 +206,18 @@ const Auth = () => {
             <>
               <form onSubmit={handleForgotPassword} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Имейл</Label>
+                  <Label htmlFor="email">{t('auth.email')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="вашият@имейл.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Зареждане...' : 'Изпрати линк за възстановяване'}
+                  {loading ? t('app.loading') : t('auth.sendResetLink')}
                 </Button>
               </form>
               <button
@@ -224,7 +226,7 @@ const Auth = () => {
                 className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mx-auto"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Обратно към вход
+                {t('auth.backToLogin')}
               </button>
             </>
           )}
@@ -258,7 +260,7 @@ const Auth = () => {
                     fill="#EA4335"
                   />
                 </svg>
-                {googleLoading ? 'Зареждане...' : 'Продължи с Google'}
+                {googleLoading ? t('app.loading') : t('auth.continueWithGoogle')}
               </Button>
 
               <div className="relative">
@@ -266,18 +268,18 @@ const Auth = () => {
                   <Separator className="w-full" />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground">или</span>
+                  <span className="bg-card px-2 text-muted-foreground">{t('auth.or')}</span>
                 </div>
               </div>
 
               {/* Email/Password Form */}
               <form onSubmit={handleAuth} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Имейл</Label>
+                  <Label htmlFor="email">{t('auth.email')}</Label>
                   <Input
                     id="email"
                     type="email"
-                    placeholder="вашият@имейл.com"
+                    placeholder={t('auth.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -285,21 +287,21 @@ const Auth = () => {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Парола</Label>
+                    <Label htmlFor="password">{t('auth.password')}</Label>
                     {mode === 'login' && (
                       <button
                         type="button"
                         onClick={() => setMode('forgot')}
                         className="text-xs text-muted-foreground hover:text-primary"
                       >
-                        Забравена парола?
+                        {t('auth.forgotPasswordLink')}
                       </button>
                     )}
                   </div>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="••••••••"
+                    placeholder={t('auth.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -307,30 +309,30 @@ const Auth = () => {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? 'Зареждане...' : mode === 'login' ? 'Вход' : 'Регистрация'}
+                  {loading ? t('app.loading') : mode === 'login' ? t('auth.login') : t('auth.register')}
                 </Button>
               </form>
               <div className="text-center text-sm text-muted-foreground">
                 {mode === 'login' ? (
                   <>
-                    Нямате профил?{' '}
+                    {t('auth.noAccount')}{' '}
                     <button
                       type="button"
                       onClick={() => setMode('register')}
                       className="text-primary hover:underline font-medium"
                     >
-                      Регистрирайте се
+                      {t('auth.registerLink')}
                     </button>
                   </>
                 ) : (
                   <>
-                    Вече имате профил?{' '}
+                    {t('auth.hasAccount')}{' '}
                     <button
                       type="button"
                       onClick={() => setMode('login')}
                       className="text-primary hover:underline font-medium"
                     >
-                      Влезте
+                      {t('auth.loginLink')}
                     </button>
                   </>
                 )}

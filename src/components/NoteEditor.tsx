@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { StickyNote, Trash2, Save, X, Plus, Pencil } from 'lucide-react';
@@ -14,6 +15,7 @@ interface NoteEditorProps {
 }
 
 export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEditorProps) {
+  const { t } = useTranslation();
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newNoteText, setNewNoteText] = useState('');
@@ -58,7 +60,7 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <StickyNote className="w-4 h-4 text-amber-500" />
-          <span className="text-sm font-medium">Бележки ({notes.length})</span>
+          <span className="text-sm font-medium">{t('notes.title')} ({notes.length})</span>
         </div>
         {!isAdding && (
           <Button 
@@ -68,7 +70,7 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
             className="gap-1 h-7 text-xs"
           >
             <Plus className="w-3 h-3" />
-            Добави
+            {t('notes.add')}
           </Button>
         )}
       </div>
@@ -79,14 +81,14 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
           <Textarea
             value={newNoteText}
             onChange={(e) => setNewNoteText(e.target.value)}
-            placeholder="Добавете нова бележка..."
+            placeholder={t('notes.placeholder')}
             className="min-h-[60px] text-sm resize-none"
             autoFocus
           />
           <div className="flex gap-2">
             <Button size="sm" onClick={handleAddSave} className="gap-1 h-7">
               <Save className="w-3 h-3" />
-              Запази
+              {t('common.save')}
             </Button>
             <Button 
               size="sm" 
@@ -106,7 +108,7 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
       {/* Existing notes */}
       {notes.length === 0 && !isAdding ? (
         <p className="text-sm text-muted-foreground text-center py-2">
-          Няма бележки за този ден
+          {t('notes.noNotes')}
         </p>
       ) : (
         <div className="space-y-2">
@@ -131,7 +133,7 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
                   <div className="flex gap-2">
                     <Button size="sm" onClick={handleEditSave} className="gap-1 h-7">
                       <Save className="w-3 h-3" />
-                      Запази
+                      {t('common.save')}
                     </Button>
                     <Button size="sm" variant="ghost" onClick={handleEditCancel} className="h-7">
                       <X className="w-3 h-3" />
@@ -151,7 +153,7 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
                       className="h-6 px-2 text-xs gap-1"
                     >
                       <Pencil className="w-3 h-3" />
-                      Редактирай
+                      {t('common.edit')}
                     </Button>
                     <Button 
                       size="sm" 
@@ -160,7 +162,7 @@ export function NoteEditor({ date, notes, onAdd, onUpdate, onDelete }: NoteEdito
                       onClick={() => handleDelete(note.id)}
                     >
                       <Trash2 className="w-3 h-3" />
-                      Изтрий
+                      {t('common.delete')}
                     </Button>
                   </div>
                 </>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Cake, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
@@ -24,6 +25,7 @@ export function BirthdayEditor({
   currentYear,
   calculateAge
 }: BirthdayEditorProps) {
+  const { t } = useTranslation();
   const [isAdding, setIsAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newYear, setNewYear] = useState('');
@@ -72,7 +74,7 @@ export function BirthdayEditor({
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium flex items-center gap-2 text-foreground">
           <Cake className="h-4 w-4 text-pink-500" />
-          Рождени дни
+          {t('birthdays.title')}
         </h4>
         {!isAdding && (
           <Button
@@ -82,7 +84,7 @@ export function BirthdayEditor({
             className="gap-1 text-pink-600 hover:text-pink-700 hover:bg-pink-50 dark:hover:bg-pink-950"
           >
             <Plus className="h-3 w-3" />
-            Добави
+            {t('birthdays.add')}
           </Button>
         )}
       </div>
@@ -99,14 +101,14 @@ export function BirthdayEditor({
                   <Input
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    placeholder="Име"
+                    placeholder={t('common.name')}
                     className="flex-1 h-8 text-sm"
                     autoFocus
                   />
                   <Input
                     value={editYear}
                     onChange={(e) => setEditYear(e.target.value)}
-                    placeholder="Година"
+                    placeholder={t('common.year')}
                     className="w-20 h-8 text-sm"
                     type="number"
                     min="1900"
@@ -146,7 +148,7 @@ export function BirthdayEditor({
                   <span className="font-medium text-sm">{birthday.name}</span>
                   {age !== null && (
                     <span className="text-xs text-muted-foreground bg-pink-100 dark:bg-pink-900 px-1.5 py-0.5 rounded">
-                      {age} г.
+                      {age} {t('birthdays.years')}
                     </span>
                   )}
                 </div>
@@ -180,7 +182,7 @@ export function BirthdayEditor({
           <Input
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            placeholder="Име на човека"
+            placeholder={t('birthdays.namePlaceholder')}
             className="flex-1 h-8 text-sm"
             autoFocus
             onKeyDown={(e) => {
@@ -191,7 +193,7 @@ export function BirthdayEditor({
           <Input
             value={newYear}
             onChange={(e) => setNewYear(e.target.value)}
-            placeholder="Година"
+            placeholder={t('birthdays.yearPlaceholder')}
             className="w-20 h-8 text-sm"
             type="number"
             min="1900"
@@ -227,7 +229,7 @@ export function BirthdayEditor({
 
       {birthdays.length === 0 && !isAdding && (
         <p className="text-sm text-muted-foreground text-center py-2">
-          Няма добавени рождени дни
+          {t('birthdays.noBirthdays')}
         </p>
       )}
     </div>

@@ -1,18 +1,18 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
 import { Calendar, Cross, Flag, Star, Leaf, Flower2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+// English month names
+const ENGLISH_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 interface HolidaySidebarProps {
   year: number;
   month: number;
-}
-
-function formatDayMonth(dateString: string): string {
-  const [, monthStr, dayStr] = dateString.split('-');
-  const day = parseInt(dayStr, 10);
-  const month = parseInt(monthStr, 10) - 1;
-  return `${day} ${BULGARIAN_MONTHS[month]}`;
 }
 
 function getHolidayIcon(type: Holiday['type']) {
@@ -32,23 +32,21 @@ function getHolidayIcon(type: Holiday['type']) {
   }
 }
 
-function getHolidayColorClass(type: Holiday['type'], variant: 'bg' | 'border' | 'text') {
-  const colorMap: Record<Holiday['type'], string> = {
-    national: 'holiday-national',
-    orthodox: 'holiday-orthodox',
-    nonworking: 'holiday-nonworking',
-    nameday: 'holiday-nameday',
-    folk: 'holiday-folk',
-    fasting: 'holiday-fasting',
-  };
-  
-  const base = colorMap[type];
-  if (variant === 'bg') return `bg-[hsl(var(--${base}))]/10`;
-  if (variant === 'border') return `border-[hsl(var(--${base}))]/30`;
-  return `text-[hsl(var(--${base}))]`;
-}
-
 export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
+  const { t, i18n } = useTranslation();
+  const isEnglish = i18n.language === 'en';
+
+  const getMonthName = (monthIndex: number) => {
+    return isEnglish ? ENGLISH_MONTHS[monthIndex] : BULGARIAN_MONTHS[monthIndex];
+  };
+
+  const formatDayMonth = (dateString: string): string => {
+    const [, monthStr, dayStr] = dateString.split('-');
+    const day = parseInt(dayStr, 10);
+    const monthIdx = parseInt(monthStr, 10) - 1;
+    return `${day} ${getMonthName(monthIdx)}`;
+  };
+
   const monthHolidays = useMemo(() => {
     const allHolidays = getAllHolidays();
     const monthStr = String(month + 1).padStart(2, '0');
@@ -63,12 +61,12 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
     <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto">
       <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2">
         <Calendar className="w-5 h-5 text-primary" />
-        Празници през {BULGARIAN_MONTHS[month]}
+        {t('sidebar.upcomingHolidays')} - {getMonthName(month)}
       </h2>
       
       {monthHolidays.length === 0 ? (
         <p className="text-muted-foreground text-sm">
-          Няма празници този месец.
+          {t('sidebar.noUpcoming')}
         </p>
       ) : (
         <ul className="space-y-3">
@@ -116,7 +114,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
       
       <div className="mt-4 pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground">
-          Общо: <span className="font-medium text-foreground">{monthHolidays.length}</span> празника
+          {t('holidays.all')}: <span className="font-medium text-foreground">{monthHolidays.length}</span>
         </p>
       </div>
     </aside>

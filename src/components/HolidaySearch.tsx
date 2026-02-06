@@ -1,19 +1,18 @@
 import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, Calendar, Church, Flag, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
 
+// English month names
+const ENGLISH_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
 interface HolidaySearchProps {
   onNavigateToMonth: (year: number, month: number) => void;
-}
-
-function formatFullDate(dateString: string): string {
-  const [yearStr, monthStr, dayStr] = dateString.split('-');
-  const day = parseInt(dayStr, 10);
-  const month = parseInt(monthStr, 10) - 1;
-  const year = parseInt(yearStr, 10);
-  return `${day} ${BULGARIAN_MONTHS[month]} ${year}`;
 }
 
 function getHolidayIcon(type: Holiday['type']) {
@@ -28,8 +27,22 @@ function getHolidayIcon(type: Holiday['type']) {
 }
 
 export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
+  const { t, i18n } = useTranslation();
   const [query, setQuery] = useState('');
   const allHolidays = useMemo(() => getAllHolidays(), []);
+  const isEnglish = i18n.language === 'en';
+
+  const getMonthName = (monthIndex: number) => {
+    return isEnglish ? ENGLISH_MONTHS[monthIndex] : BULGARIAN_MONTHS[monthIndex];
+  };
+
+  const formatFullDate = (dateString: string): string => {
+    const [yearStr, monthStr, dayStr] = dateString.split('-');
+    const day = parseInt(dayStr, 10);
+    const month = parseInt(monthStr, 10) - 1;
+    const year = parseInt(yearStr, 10);
+    return `${day} ${getMonthName(month)} ${year}`;
+  };
 
   const searchResults = useMemo(() => {
     if (query.trim().length < 2) return [];
@@ -54,7 +67,7 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="Търсене на празник..."
+          placeholder={t('search.placeholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           className="pl-10 pr-10"
@@ -108,7 +121,7 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
 
       {query.trim().length >= 2 && searchResults.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-card border border-border rounded-lg shadow-lg z-50 p-4 text-center text-sm text-muted-foreground">
-          Няма намерени празници
+          {t('search.noResults')}
         </div>
       )}
     </div>

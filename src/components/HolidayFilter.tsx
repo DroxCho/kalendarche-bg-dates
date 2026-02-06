@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Holiday } from '@/data/bulgarianHolidays';
 import { Flag, Cross, Star, Leaf, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -9,15 +10,17 @@ interface HolidayFilterProps {
   onFilterChange: (filters: HolidayType[]) => void;
 }
 
-const filterOptions: { type: HolidayType; label: string; icon: React.ReactNode }[] = [
-  { type: 'national', label: 'Национален', icon: <Flag className="w-3 h-3" /> },
-  { type: 'orthodox', label: 'Православен', icon: <Cross className="w-3 h-3" /> },
-  { type: 'nameday', label: 'Имен ден', icon: <Star className="w-3 h-3" /> },
-  { type: 'folk', label: 'Народен', icon: <Flag className="w-3 h-3" /> },
-  { type: 'fasting', label: 'Постен', icon: <Leaf className="w-3 h-3" /> },
-];
-
 export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterProps) {
+  const { t } = useTranslation();
+
+  const filterOptions: { type: HolidayType; labelKey: string; icon: React.ReactNode }[] = [
+    { type: 'national', labelKey: 'holidays.national', icon: <Flag className="w-3 h-3" /> },
+    { type: 'orthodox', labelKey: 'holidays.orthodox', icon: <Cross className="w-3 h-3" /> },
+    { type: 'nameday', labelKey: 'holidays.nameday', icon: <Star className="w-3 h-3" /> },
+    { type: 'folk', labelKey: 'holidays.folk', icon: <Flag className="w-3 h-3" /> },
+    { type: 'fasting', labelKey: 'holidays.fasting', icon: <Leaf className="w-3 h-3" /> },
+  ];
+
   const toggleFilter = (type: HolidayType) => {
     if (activeFilters.includes(type)) {
       onFilterChange(activeFilters.filter(f => f !== type));
@@ -38,7 +41,7 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
 
   return (
     <div className="flex flex-wrap items-center gap-2 print:hidden">
-      <span className="text-sm text-muted-foreground mr-1">Филтър:</span>
+      <span className="text-sm text-muted-foreground mr-1">{t('holidays.filter')}</span>
       <button
         onClick={toggleAll}
         className={cn(
@@ -49,9 +52,9 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
         )}
       >
         <Calendar className="w-3 h-3" />
-        Всички
+        {t('holidays.all')}
       </button>
-      {filterOptions.map(({ type, label, icon }) => (
+      {filterOptions.map(({ type, labelKey, icon }) => (
         <button
           key={type}
           onClick={() => toggleFilter(type)}
@@ -63,7 +66,7 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
           )}
         >
           {icon}
-          {label}
+          {t(labelKey)}
         </button>
       ))}
     </div>
