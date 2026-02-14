@@ -123,31 +123,105 @@ function getHolidaysForYear(year: number): Holiday[] {
 
   // Name days (Имени дни)
   holidays.push(
-    { date: `${year}-01-01`, name: 'Васильовден', type: 'nameday' },
-    { date: `${year}-01-07`, name: 'Ивановден', type: 'nameday' },
-    { date: `${year}-01-17`, name: 'Антоновден', type: 'nameday' },
-    { date: `${year}-01-18`, name: 'Атанасовден', type: 'nameday' },
-    { date: `${year}-02-01`, name: 'Трифоновден (Имен ден)', type: 'nameday' },
-    { date: `${year}-02-03`, name: 'Симеоновден', type: 'nameday' },
-    { date: `${year}-03-09`, name: 'Младенци', type: 'nameday' },
-    { date: `${year}-03-19`, name: 'Тодоровден', type: 'nameday' },
-    { date: `${year}-04-23`, name: 'Гергьовден', type: 'nameday' },
-    { date: `${year}-05-02`, name: 'Борисовден', type: 'nameday' },
-    { date: `${year}-05-11`, name: 'Св. Методий', type: 'nameday' },
-    { date: `${year}-05-18`, name: 'Александровден', type: 'nameday' },
-    { date: `${year}-06-30`, name: 'Павловден', type: 'nameday' },
-    { date: `${year}-07-07`, name: 'Недельо', type: 'nameday' },
-    { date: `${year}-07-25`, name: 'Анна', type: 'nameday' },
-    { date: `${year}-08-09`, name: 'Панталеймоновден', type: 'nameday' },
-    { date: `${year}-09-17`, name: 'Вяра, Надежда, Любов', type: 'nameday' },
-    { date: `${year}-10-01`, name: 'Покров Богородичен', type: 'nameday' },
-    { date: `${year}-10-27`, name: 'Прокопиевден', type: 'nameday' },
-    { date: `${year}-11-11`, name: 'Мина', type: 'nameday' },
-    { date: `${year}-11-30`, name: 'Андреевден', type: 'nameday' },
-    { date: `${year}-12-04`, name: 'Варвара', type: 'nameday' },
-    { date: `${year}-12-05`, name: 'Сава', type: 'nameday' },
-    { date: `${year}-12-20`, name: 'Игнажден', type: 'nameday' },
-    { date: `${year}-12-27`, name: 'Стефановден', type: 'nameday' },
+    // Януари
+    { date: `${year}-01-01`, name: 'Васильовден – Василка, Васил, Васко', type: 'nameday' },
+    { date: `${year}-01-02`, name: 'Силвестър, Силвия, Силвана', type: 'nameday' },
+    { date: `${year}-01-04`, name: 'Тереза, Терезия', type: 'nameday' },
+    { date: `${year}-01-06`, name: 'Йордановден – Йордан, Йорданка, Данчо, Богдан', type: 'nameday' },
+    { date: `${year}-01-07`, name: 'Ивановден – Иван, Ивайло, Ивана, Йоан, Яна, Янко', type: 'nameday' },
+    { date: `${year}-01-17`, name: 'Антоновден – Антон, Антоний, Антония, Тони', type: 'nameday' },
+    { date: `${year}-01-18`, name: 'Атанасовден – Атанас, Наско, Насе, Танас', type: 'nameday' },
+    { date: `${year}-01-20`, name: 'Емилиановден – Емил, Емилия, Емилиян', type: 'nameday' },
+    { date: `${year}-01-21`, name: 'Максим, Максимилиян, Нина', type: 'nameday' },
+    { date: `${year}-01-25`, name: 'Григоровден – Григор, Григорий, Гриша', type: 'nameday' },
+
+    // Февруари
+    { date: `${year}-02-01`, name: 'Трифоновден – Трифон, Трифонка', type: 'nameday' },
+    { date: `${year}-02-03`, name: 'Симеоновден – Симеон, Симо, Симона', type: 'nameday' },
+    { date: `${year}-02-05`, name: 'Агата, Агатия, Добринка', type: 'nameday' },
+    { date: `${year}-02-06`, name: 'Фотинов ден – Фотин, Светла, Светлин, Светлана', type: 'nameday' },
+    { date: `${year}-02-10`, name: 'Валентин, Валентина', type: 'nameday' },
+    { date: `${year}-02-11`, name: 'Влас, Власи, Власий', type: 'nameday' },
+    { date: `${year}-02-14`, name: 'Валентин, Валентина (Западна традиция)', type: 'nameday' },
+
+    // Март
+    { date: `${year}-03-01`, name: 'Марта, Мартин, Мартина', type: 'nameday' },
+    { date: `${year}-03-09`, name: 'Младенци – Младен, Младенка', type: 'nameday' },
+    { date: `${year}-03-17`, name: 'Алексий, Алексей, Алекси', type: 'nameday' },
+    { date: `${year}-03-19`, name: 'Тодоровден – Тодор, Тодорка, Теодор, Теодора', type: 'nameday' },
+    { date: `${year}-03-25`, name: 'Благовещение – Благой, Блага, Благовеста, Бона', type: 'nameday' },
+    { date: `${year}-03-26`, name: 'Гаврил, Габриел, Габриела', type: 'nameday' },
+
+    // Април
+    { date: `${year}-04-04`, name: 'Дарин, Дарина, Дария', type: 'nameday' },
+    { date: `${year}-04-14`, name: 'Мартин, Мартина (пролетен)', type: 'nameday' },
+    { date: `${year}-04-23`, name: 'Гергьовден – Георги, Гергана, Ганка, Галин', type: 'nameday' },
+    { date: `${year}-04-25`, name: 'Маркoвден – Марко, Марк', type: 'nameday' },
+    { date: `${year}-04-30`, name: 'Яковден – Яков, Якоб', type: 'nameday' },
+
+    // Май
+    { date: `${year}-05-01`, name: 'Еремия, Йеремия', type: 'nameday' },
+    { date: `${year}-05-02`, name: 'Борисовден – Борис, Борислав, Борислава, Борянка', type: 'nameday' },
+    { date: `${year}-05-05`, name: 'Ирина, Ирена, Мирена', type: 'nameday' },
+    { date: `${year}-05-06`, name: 'Гергьовден – Георги, Гергана (за армията)', type: 'nameday' },
+    { date: `${year}-05-11`, name: 'Кирил, Методий, Методи, Кирилка', type: 'nameday' },
+    { date: `${year}-05-18`, name: 'Александровден – Александър, Александра, Сашо, Сашка', type: 'nameday' },
+    { date: `${year}-05-21`, name: 'Константин, Елена, Костадин, Костадинка', type: 'nameday' },
+
+    // Юни
+    { date: `${year}-06-15`, name: 'Лазар, Лазарина (за юнски Лазар)', type: 'nameday' },
+    { date: `${year}-06-24`, name: 'Еньовден – Еню, Янка, Билян, Билянa', type: 'nameday' },
+    { date: `${year}-06-29`, name: 'Петровден – Петър, Петра, Петко, Петкана, Камен', type: 'nameday' },
+    { date: `${year}-06-30`, name: 'Павловден – Павел, Павлина, Паулина', type: 'nameday' },
+
+    // Юли
+    { date: `${year}-07-01`, name: 'Козма, Дамян, Дамяна', type: 'nameday' },
+    { date: `${year}-07-07`, name: 'Неделя, Недялко, Недялка, Кирил', type: 'nameday' },
+    { date: `${year}-07-17`, name: 'Марина, Маринела, Маринчо', type: 'nameday' },
+    { date: `${year}-07-20`, name: 'Илинден – Илия, Илиян, Илиянa, Илко', type: 'nameday' },
+    { date: `${year}-07-25`, name: 'Анна, Анка, Ани, Яна', type: 'nameday' },
+    { date: `${year}-07-27`, name: 'Пантелеймон, Пантелей', type: 'nameday' },
+
+    // Август
+    { date: `${year}-08-01`, name: 'Соломон, Маргарита (Макавей)', type: 'nameday' },
+    { date: `${year}-08-07`, name: 'Донка, Донко, Доника', type: 'nameday' },
+    { date: `${year}-08-09`, name: 'Панталеймоновден – Панталей, Пламен', type: 'nameday' },
+    { date: `${year}-08-15`, name: 'Мария, Марийка, Мариета, Мариана, Маня', type: 'nameday' },
+    { date: `${year}-08-26`, name: 'Наталия, Адриан, Адриана', type: 'nameday' },
+
+    // Септември
+    { date: `${year}-09-01`, name: 'Симеоновден (есенен) – Симеон, Симона', type: 'nameday' },
+    { date: `${year}-09-08`, name: 'Малка Богородица – Мария, Марийка', type: 'nameday' },
+    { date: `${year}-09-17`, name: 'Вяра, Надежда, Любов – Вера, Надя, Любка, Софка, София', type: 'nameday' },
+    { date: `${year}-09-22`, name: 'Тома, Томислав', type: 'nameday' },
+
+    // Октомври
+    { date: `${year}-10-01`, name: 'Покров Богородичен – Закрила', type: 'nameday' },
+    { date: `${year}-10-14`, name: 'Петковден – Петка, Параскева, Петкана', type: 'nameday' },
+    { date: `${year}-10-18`, name: 'Лукановден – Лука, Лукан', type: 'nameday' },
+    { date: `${year}-10-26`, name: 'Димитровден – Димитър, Димитрина, Митко, Митка', type: 'nameday' },
+    { date: `${year}-10-27`, name: 'Прокопиевден – Прокопий, Прокопи', type: 'nameday' },
+
+    // Ноември
+    { date: `${year}-11-01`, name: 'Ден на будителите – Иван, Ивайло (за учителите)', type: 'nameday' },
+    { date: `${year}-11-08`, name: 'Архангеловден – Ангел, Ангелина, Архангел, Михаил, Михаела, Гавраил', type: 'nameday' },
+    { date: `${year}-11-11`, name: 'Мина, Минка, Минчо', type: 'nameday' },
+    { date: `${year}-11-21`, name: 'Въведение – Мария, Марийка (за въведение)', type: 'nameday' },
+    { date: `${year}-11-24`, name: 'Катеринден – Катерина, Екатерина, Катя', type: 'nameday' },
+    { date: `${year}-11-25`, name: 'Климентовден – Климент, Клементина', type: 'nameday' },
+    { date: `${year}-11-30`, name: 'Андреевден – Андрей, Андрея, Андриан', type: 'nameday' },
+
+    // Декември
+    { date: `${year}-12-04`, name: 'Варваринден – Варвара, Барбара', type: 'nameday' },
+    { date: `${year}-12-05`, name: 'Савинден – Сава, Савка, Савчо', type: 'nameday' },
+    { date: `${year}-12-06`, name: 'Никулден – Никола, Николай, Николина, Nico, Колю', type: 'nameday' },
+    { date: `${year}-12-09`, name: 'Аненден – Ана, Анна (зимна)', type: 'nameday' },
+    { date: `${year}-12-17`, name: 'Даниел, Данаил, Даниела', type: 'nameday' },
+    { date: `${year}-12-20`, name: 'Игнажден – Игнат, Огнян, Огняна, Пламен', type: 'nameday' },
+    { date: `${year}-12-22`, name: 'Анастасия, Анастас, Стоян, Стояна, Стоянка', type: 'nameday' },
+    { date: `${year}-12-25`, name: 'Коледа – Христо, Христина, Кристиян, Кристина, Божидар, Божана', type: 'nameday' },
+    { date: `${year}-12-26`, name: 'Йосиф, Жозеф, Жозефина', type: 'nameday' },
+    { date: `${year}-12-27`, name: 'Стефановден – Стефан, Стефка, Стефания', type: 'nameday' },
   );
 
   // Bulgarian folk feasts (Народни празници)
