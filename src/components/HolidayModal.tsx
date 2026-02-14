@@ -5,6 +5,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Holiday, BULGARIAN_DAYS_FULL, BULGARIAN_MONTHS } from '@/data/bulgarianHolidays';
+import { translateHolidayName, translateHolidayDescription } from '@/data/holidayTranslations';
 import { cn } from '@/lib/utils';
 import { Calendar, Cross, Flag, Star, Leaf, Flower2 } from 'lucide-react';
 import { NoteEditor } from './NoteEditor';
@@ -14,6 +15,7 @@ import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
 import { ShareButtons } from './ShareButtons';
+import { useTranslation } from 'react-i18next';
 
 interface HolidayModalProps {
   open: boolean;
@@ -131,24 +133,20 @@ function getHolidayIcon(type: Holiday['type']) {
   }
 }
 
-function getHolidayTypeName(type: Holiday['type']): string {
+function getHolidayTypeName(type: Holiday['type'], t: (key: string) => string): string {
   switch (type) {
-    case 'national':
-      return 'Национален празник';
-    case 'orthodox':
-      return 'Православен празник';
-    case 'nonworking':
-      return 'Неработен ден';
-    case 'nameday':
-      return 'Имен ден';
-    case 'folk':
-      return 'Народен празник';
-    case 'fasting':
-      return 'Постен ден';
-    default:
-      return 'Празник';
+    case 'national': return t('holidays.national');
+    case 'orthodox': return t('holidays.orthodox');
+    case 'nonworking': return t('holidays.nonworking');
+    case 'nameday': return t('holidays.nameday');
+    case 'folk': return t('holidays.folk');
+    case 'fasting': return t('holidays.fasting');
+    default: return t('holidays.holiday');
   }
 }
+
+const ENGLISH_DAYS_FULL = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const ENGLISH_MONTHS_FULL = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export function HolidayModal({ 
   open, 
@@ -170,11 +168,16 @@ export function HolidayModal({
   onDeleteRecurringEvent,
   calculateYears
 }: HolidayModalProps) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language;
+  const isEnglish = lang === 'en';
+
   if (!date) return null;
 
   const dayOfWeek = date.getDay();
-  const dayName = BULGARIAN_DAYS_FULL[dayOfWeek === 0 ? 6 : dayOfWeek - 1];
-  const monthName = BULGARIAN_MONTHS[date.getMonth()];
+  const dayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  const dayName = isEnglish ? ENGLISH_DAYS_FULL[dayIdx] : BULGARIAN_DAYS_FULL[dayIdx];
+  const monthName = isEnglish ? ENGLISH_MONTHS_FULL[date.getMonth()] : BULGARIAN_MONTHS[date.getMonth()];
   const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
   return (
@@ -191,7 +194,7 @@ export function HolidayModal({
         <div className="space-y-4 mt-4">
           {holidays.length === 0 ? (
             <p className="text-muted-foreground text-center py-4">
-              Няма регистрирани празници за този ден.
+              {t('holidays.noHolidays')}
             </p>
           ) : (
             holidays.map((holiday, index) => (
@@ -220,7 +223,7 @@ export function HolidayModal({
                     {getHolidayIcon(holiday.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground">{holiday.name}</h3>
+                    <h3 className="font-semibold text-foreground">{translateHolidayName(holiday.name, lang)}</h3>
                     <span className={cn(
                       "inline-block text-xs px-2 py-0.5 rounded-full mt-1",
                       holiday.type === 'national' && "bg-primary/20 text-primary",
@@ -230,13 +233,16 @@ export function HolidayModal({
                       holiday.type === 'folk' && "bg-orange-500/20 text-orange-700",
                       holiday.type === 'fasting' && "bg-purple-500/20 text-purple-700"
                     )}>
-                      {getHolidayTypeName(holiday.type)}
+                      {getHolidayTypeName(holiday.type, t)}
                     </span>
-                    {holidayDescriptions[holiday.name] && (
-                      <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                        {holidayDescriptions[holiday.name]}
-                      </p>
-                    )}
+                    {(() => {
+                      const desc = translateHolidayDescription(holiday.name, lang, holidayDescriptions);
+                      return desc ? (
+                        <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                          {desc}
+                        </p>
+                      ) : null;
+                    })()}
                   </div>
                 </div>
               </div>

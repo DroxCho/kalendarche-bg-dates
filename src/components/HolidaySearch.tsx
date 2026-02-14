@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Search, Calendar, Church, Flag, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
+import { translateHolidayName } from '@/data/holidayTranslations';
 import { cn } from '@/lib/utils';
 
 // English month names
@@ -49,9 +50,12 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
     
     const lowerQuery = query.toLowerCase();
     return allHolidays
-      .filter(h => h.name.toLowerCase().includes(lowerQuery))
+      .filter(h => {
+        const translatedName = translateHolidayName(h.name, i18n.language);
+        return h.name.toLowerCase().includes(lowerQuery) || translatedName.toLowerCase().includes(lowerQuery);
+      })
       .slice(0, 10);
-  }, [query, allHolidays]);
+  }, [query, allHolidays, i18n.language]);
 
   const handleResultClick = (holiday: Holiday) => {
     const [yearStr, monthStr] = holiday.date.split('-');
@@ -105,7 +109,7 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-foreground text-sm">
-                        {holiday.name}
+                        {translateHolidayName(holiday.name, i18n.language)}
                       </p>
                       <p className="text-xs text-muted-foreground mt-0.5">
                         {formatFullDate(holiday.date)}
