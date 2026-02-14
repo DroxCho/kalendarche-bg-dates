@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
+import { translateHolidayName } from '@/data/holidayTranslations';
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
 import { HolidayType } from './HolidayFilter';
@@ -77,6 +79,7 @@ export function CalendarGrid({
   onDeleteRecurringEvent,
   calculateYears
 }: CalendarGridProps) {
+  const { i18n, t } = useTranslation();
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
@@ -292,7 +295,7 @@ export function CalendarGrid({
                         {day.holidays
                           .filter(h => h.type === 'fasting')
                           .map((h, i) => (
-                            <div key={i}>{h.name}</div>
+                            <div key={i}>{translateHolidayName(h.name, i18n.language)}</div>
                           ))}
                       </div>
                     </TooltipContent>
@@ -324,7 +327,7 @@ export function CalendarGrid({
                     </TooltipTrigger>
                     <TooltipContent side="bottom" className="max-w-xs">
                       <div className="text-xs space-y-1">
-                        <p className="text-muted-foreground italic mb-1">Плъзнете за преместване</p>
+                        <p className="text-muted-foreground italic mb-1">{t('notes.dragToMove')}</p>
                         {dateNotes.slice(0, 3).map((note) => (
                           <div key={note.id} className="truncate max-w-[200px]">
                             {note.text.length > 50 ? `${note.text.slice(0, 50)}...` : note.text}
@@ -436,17 +439,17 @@ export function CalendarGrid({
                         holiday.type === 'folk' && "holiday-folk",
                         holiday.type === 'fasting' && "holiday-fasting"
                       )}
-                      title={holiday.name}
+                      title={translateHolidayName(holiday.name, i18n.language)}
                     >
                       {icon}
-                      <span className="truncate">{holiday.name}</span>
+                      <span className="truncate">{translateHolidayName(holiday.name, i18n.language)}</span>
                     </div>
                   );
                 })}
               
               {filteredHolidays.length > 2 && (
                 <div className="text-[10px] text-muted-foreground mt-0.5 font-medium">
-                  +{filteredHolidays.length - 2} още
+                  +{filteredHolidays.length - 2} {t('notes.more')}
                 </div>
               )}
             </div>

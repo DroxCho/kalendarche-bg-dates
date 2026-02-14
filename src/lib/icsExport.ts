@@ -1,6 +1,19 @@
 import { Holiday, HolidayType } from '@/data/bulgarianHolidays';
+import { translateHolidayName } from '@/data/holidayTranslations';
+import i18n from '@/i18n';
 
 function getHolidayDescription(type: HolidayType): string {
+  const lang = i18n.language;
+  if (lang === 'en') {
+    switch (type) {
+      case 'national': return 'National Holiday';
+      case 'orthodox': return 'Orthodox Holiday';
+      case 'nameday': return 'Name Day';
+      case 'folk': return 'Folk Holiday';
+      case 'fasting': return 'Fasting Day';
+      default: return 'Holiday';
+    }
+  }
   switch (type) {
     case 'national': return 'Национален празник';
     case 'orthodox': return 'Православен празник';
@@ -44,7 +57,7 @@ export function generateICSFile(holidays: Holiday[], filename: string = 'bulgari
       `UID:${uid}`,
       `DTSTART;VALUE=DATE:${formatICSDate(holiday.date)}`,
       `DTEND;VALUE=DATE:${formatICSDate(holiday.date)}`,
-      `SUMMARY:${escapeICSText(holiday.name)}`,
+      `SUMMARY:${escapeICSText(translateHolidayName(holiday.name, i18n.language))}`,
       `DESCRIPTION:${escapeICSText(description)}`,
       `CATEGORIES:${escapeICSText(description)}`,
       'TRANSP:TRANSPARENT',

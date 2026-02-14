@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getAllHolidays, BULGARIAN_MONTHS, Holiday } from '@/data/bulgarianHolidays';
+import { translateHolidayName } from '@/data/holidayTranslations';
 import { Calendar, Cross, Flag, Star, Leaf, Flower2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -99,7 +100,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-foreground text-sm leading-tight">
-                      {holiday.name}
+                      {translateHolidayName(holiday.name, i18n.language)}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
                       {formatDayMonth(holiday.date)}
