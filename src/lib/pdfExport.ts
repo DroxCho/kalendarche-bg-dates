@@ -1,6 +1,8 @@
 import jsPDF from 'jspdf';
 import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
 import { loadDejaVuFont, loadDejaVuFontBold } from './fonts/dejaVuSans';
+import { translateHolidayName } from '@/data/holidayTranslations';
+import i18n from '@/i18n';
 
 interface PDFExportOptions {
   year: number;
@@ -9,6 +11,27 @@ interface PDFExportOptions {
 }
 
 const DAYS_OF_WEEK_BG = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Нд'];
+const DAYS_OF_WEEK_EN = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const ENGLISH_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+function isEnglish() {
+  return i18n.language === 'en';
+}
+
+function getLocalizedDays() {
+  return isEnglish() ? DAYS_OF_WEEK_EN : DAYS_OF_WEEK_BG;
+}
+
+function getLocalizedMonth(month: number) {
+  return isEnglish() ? ENGLISH_MONTHS[month] : BULGARIAN_MONTHS[month];
+}
+
+function localizeHolidayName(name: string) {
+  return translateHolidayName(name, i18n.language);
+}
 
 function getDaysInMonth(year: number, month: number) {
   return new Date(year, month + 1, 0).getDate();
@@ -51,10 +74,10 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
   const cellWidth = (pageWidth - marginLeft * 2) / 7;
   const cellHeight = 24;
 
-  // Day headers - use Bulgarian days
+  const daysOfWeek = getLocalizedDays();
   pdf.setFontSize(10);
   pdf.setFont('DejaVuSans', 'bold');
-  DAYS_OF_WEEK_BG.forEach((day, i) => {
+  daysOfWeek.forEach((day, i) => {
     const x = marginLeft + i * cellWidth;
     pdf.setFillColor(245, 245, 245);
     pdf.rect(x, marginTop, cellWidth, 8, 'F');
@@ -149,8 +172,8 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
             textStartX = x + 6;
           }
 
-          // Use original Bulgarian text (Cyrillic font is embedded)
-          let text = holiday.name;
+          // Translate holiday name if in English
+          let text = localizeHolidayName(holiday.name);
           const maxWidth = cellWidth - (iconType ? 8 : 4);
           while (pdf.getTextWidth(text) > maxWidth && text.length > 3) {
             text = text.slice(0, -4) + '...';
@@ -281,12 +304,13 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   pdf.setFont('DejaVuSans', 'normal');
 
   // Legend items with icon types matching CalendarLegend.tsx
+  const lang = i18n.language;
   const items = [
-    { label: 'Национални', icon: 'flag', color: [180, 50, 80] as const },
-    { label: 'Православни', icon: 'cross', color: [180, 140, 40] as const },
-    { label: 'Имени дни', icon: 'star', color: [140, 70, 170] as const },
-    { label: 'Народни', icon: 'flower', color: [200, 110, 40] as const },
-    { label: 'Пости', icon: 'leaf', color: [120, 80, 160] as const },
+    { label: lang === 'en' ? 'National' : 'Национални', icon: 'flag', color: [180, 50, 80] as const },
+    { label: lang === 'en' ? 'Orthodox' : 'Православни', icon: 'cross', color: [180, 140, 40] as const },
+    { label: lang === 'en' ? 'Name days' : 'Имени дни', icon: 'star', color: [140, 70, 170] as const },
+    { label: lang === 'en' ? 'Folk' : 'Народни', icon: 'flower', color: [200, 110, 40] as const },
+    { label: lang === 'en' ? 'Fasting' : 'Пости', icon: 'leaf', color: [120, 80, 160] as const },
   ];
 
   let x = startX;
@@ -313,18 +337,18 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'S');
   pdf.setLineWidth(0.2);
   pdf.setTextColor(60, 60, 60);
-  pdf.text('Днес', x + markerSize + 2, legendY + 1);
+  pdf.text(isEnglish() ? 'Today' : 'Днес', x + markerSize + 2, legendY + 1);
 }
 
 function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
 
-  // Title - use Bulgarian month name
+  // Title
   pdf.setFontSize(24);
   pdf.setFont('DejaVuSans', 'bold');
   pdf.setTextColor(0, 0, 0);
-  const title = `${BULGARIAN_MONTHS[month]} ${year}`;
+  const title = `${getLocalizedMonth(month)} ${year}`;
   pdf.text(title, (pageWidth - pdf.getTextWidth(title)) / 2, 15);
 
   drawCalendarGrid(pdf, year, month, activeFilters);
