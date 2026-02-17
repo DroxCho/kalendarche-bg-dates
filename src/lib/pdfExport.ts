@@ -344,7 +344,6 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
 }
 
 function drawLegend(pdf: jsPDF, legendY: number) {
-  const startX = 20;
   const markerSize = 5;
 
   pdf.setFontSize(7);
@@ -359,7 +358,17 @@ function drawLegend(pdf: jsPDF, legendY: number) {
     { label: lang === 'en' ? 'Fasting' : 'Пости', icon: 'leaf', color: [120, 80, 160] as const },
   ];
 
-  let x = startX;
+  // Calculate total width to center
+  const itemSpacing = 12;
+  let totalWidth = 0;
+  items.forEach((item, i) => {
+    totalWidth += markerSize + 2 + pdf.getTextWidth(item.label);
+    if (i < items.length - 1) totalWidth += itemSpacing;
+  });
+
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  let x = (pageWidth - totalWidth) / 2;
+
   items.forEach(item => {
     pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
     pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'F');
@@ -368,7 +377,7 @@ function drawLegend(pdf: jsPDF, legendY: number) {
     pdf.setFontSize(7);
     pdf.setTextColor(60, 60, 60);
     pdf.text(item.label, x + markerSize + 2, legendY + 1);
-    x += markerSize + 2 + pdf.getTextWidth(item.label) + 12;
+    x += markerSize + 2 + pdf.getTextWidth(item.label) + itemSpacing;
   });
 }
 
