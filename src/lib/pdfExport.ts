@@ -70,7 +70,7 @@ async function initPdfWithCyrillicFont(): Promise<jsPDF> {
 function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
   const pageWidth = pdf.internal.pageSize.getWidth();
   const marginLeft = 10;
-  const marginTop = 25;
+  const marginTop = 33;
   const cellWidth = (pageWidth - marginLeft * 2) / 7;
   const cellHeight = 24;
 
@@ -343,8 +343,7 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
   });
 }
 
-function drawLegend(pdf: jsPDF, pageHeight: number) {
-  const legendY = pageHeight - 12;
+function drawLegend(pdf: jsPDF, legendY: number) {
   const startX = 20;
   const markerSize = 5;
 
@@ -375,7 +374,6 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
 
 function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const pageHeight = pdf.internal.pageSize.getHeight();
 
   // Title
   pdf.setFontSize(24);
@@ -384,6 +382,9 @@ function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: st
   const title = `${getLocalizedMonth(month)} ${year}`;
   pdf.text(title, (pageWidth - pdf.getTextWidth(title)) / 2, 15);
 
+  // Legend above grid
+  drawLegend(pdf, 22);
+
   drawCalendarGrid(pdf, year, month, activeFilters);
 
   // Holiday list below grid - estimate grid bottom
@@ -391,10 +392,8 @@ function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: st
   const firstDay = getFirstDayOfMonth(year, month);
   const totalCells = firstDay + daysInMonth;
   const rows = Math.ceil(totalCells / 7);
-  const gridBottom = 25 + 8 + rows * 24 + 4;
+  const gridBottom = 33 + 8 + rows * 24 + 4;
   drawHolidayList(pdf, year, month, activeFilters, gridBottom);
-
-  drawLegend(pdf, pageHeight);
 }
 
 export async function exportMonthToPDF({ year, month, activeFilters }: PDFExportOptions) {
