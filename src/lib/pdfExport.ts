@@ -44,7 +44,7 @@ function getFirstDayOfMonth(year: number, month: number) {
 
 // Initialize PDF with Cyrillic font support
 async function initPdfWithCyrillicFont(): Promise<jsPDF> {
-  const pdf = new jsPDF('landscape', 'mm', 'a4');
+  const pdf = new jsPDF('portrait', 'mm', 'a4');
   
   try {
     const [normalFont, boldFont] = await Promise.all([
@@ -69,10 +69,10 @@ async function initPdfWithCyrillicFont(): Promise<jsPDF> {
 
 function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const marginLeft = 10;
+  const marginLeft = 8;
   const marginTop = 33;
   const cellWidth = (pageWidth - marginLeft * 2) / 7;
-  const cellHeight = 24;
+  const cellHeight = 28;
 
   const daysOfWeek = getLocalizedDays();
   pdf.setFontSize(10);

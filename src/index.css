@@ -181,6 +181,11 @@
 }
 
 /* Print styles */
+@page {
+  size: A4 portrait;
+  margin: 10mm;
+}
+
 @media print {
   :root {
     /* High contrast print-friendly colors */
