@@ -452,6 +452,25 @@ export function CalendarGrid({
                   +{filteredHolidays.length - 2} {t('notes.more')}
                 </div>
               )}
+
+              {/* Birthday names in cell */}
+              {day.isCurrentMonth && dateBirthdays.slice(0, 1).map((b) => {
+                const age = calculateAge?.(b, day.date.getFullYear());
+                return (
+                  <div
+                    key={b.id}
+                    className="holiday-badge bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-300"
+                  >
+                    <Cake className="w-2.5 h-2.5 flex-shrink-0" />
+                    <span className="truncate">{b.name}{age !== null ? ` (${age})` : ''}</span>
+                  </div>
+                );
+              })}
+              {dateBirthdays.length > 1 && day.isCurrentMonth && (
+                <div className="text-[10px] text-pink-500 mt-0.5 font-medium">
+                  +{dateBirthdays.length - 1} 🎂
+                </div>
+              )}
             </div>
           );
         })}
