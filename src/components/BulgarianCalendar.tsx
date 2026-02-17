@@ -19,10 +19,14 @@ import { PrintPreview } from './PrintPreview';
 
 const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
 
-export function BulgarianCalendar() {
+interface BulgarianCalendarProps {
+  viewMode: 'month' | 'year';
+  setViewMode: (mode: 'month' | 'year') => void;
+}
+
+export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
-  const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
   const [printAll, setPrintAll] = useState(false);
   const [sharedDate, setSharedDate] = useState<Date | null>(null);
   const [sharedModalOpen, setSharedModalOpen] = useState(false);
