@@ -286,6 +286,63 @@ function getIconForHolidayType(type: string): string | null {
   }
 }
 
+function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters: string[], startY: number) {
+  const allHolidays = getAllHolidays();
+  const monthStr = String(month + 1).padStart(2, '0');
+  const prefix = `${year}-${monthStr}`;
+  const holidays = allHolidays
+    .filter(h => h.date.startsWith(prefix) && activeFilters.includes(h.type))
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  if (holidays.length === 0) return;
+
+  const marginLeft = 10;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const colWidth = (pageWidth - marginLeft * 2) / 2;
+  const lang = i18n.language;
+
+  pdf.setFont('DejaVuSans', 'bold');
+  pdf.setFontSize(8);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(lang === 'en' ? 'Holidays' : 'Празници', marginLeft, startY);
+
+  pdf.setFont('DejaVuSans', 'normal');
+  pdf.setFontSize(6.5);
+
+  let y = startY + 4;
+  holidays.forEach((h, i) => {
+    const col = i % 2;
+    const x = marginLeft + col * colWidth;
+    if (col === 0 && i > 0) y += 4;
+
+    const day = parseInt(h.date.split('-')[2], 10);
+    let textColor: [number, number, number];
+    switch (h.type) {
+      case 'national': textColor = [180, 50, 80]; break;
+      case 'orthodox': textColor = [180, 140, 40]; break;
+      case 'nameday': textColor = [140, 70, 170]; break;
+      case 'folk': textColor = [200, 110, 40]; break;
+      case 'fasting': textColor = [120, 80, 160]; break;
+      default: textColor = [100, 100, 100];
+    }
+
+    const iconType = getIconForHolidayType(h.type) || (h.type === 'fasting' ? 'leaf' : null);
+    if (iconType) {
+      drawIcon(pdf, iconType, x + 1.5, y - 1, 2, textColor);
+    }
+
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(`${day}.`, x + 4, y);
+    pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
+    let name = localizeHolidayName(h.name);
+    const maxW = colWidth - 14;
+    while (pdf.getTextWidth(name) > maxW && name.length > 3) {
+      name = name.slice(0, -4) + '...';
+    }
+    pdf.text(name, x + 10, y);
+  });
+}
+
 function drawLegend(pdf: jsPDF, pageHeight: number) {
   const legendY = pageHeight - 12;
   const startX = 20;
@@ -294,7 +351,6 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
   pdf.setFontSize(7);
   pdf.setFont('DejaVuSans', 'normal');
 
-  // Legend items with icon types matching CalendarLegend.tsx
   const lang = i18n.language;
   const items = [
     { label: lang === 'en' ? 'National' : 'Национални', icon: 'flag', color: [180, 50, 80] as const },
@@ -306,22 +362,15 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
 
   let x = startX;
   items.forEach(item => {
-    // Marker background
     pdf.setFillColor(item.color[0], item.color[1], item.color[2]);
     pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'F');
-
-    // Draw icon inside marker
     drawIcon(pdf, item.icon, x + markerSize / 2, legendY, markerSize);
-
-    // Label
     pdf.setFont('DejaVuSans', 'normal');
     pdf.setFontSize(7);
     pdf.setTextColor(60, 60, 60);
     pdf.text(item.label, x + markerSize + 2, legendY + 1);
-
     x += markerSize + 2 + pdf.getTextWidth(item.label) + 12;
   });
-
 }
 
 function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
@@ -336,6 +385,15 @@ function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: st
   pdf.text(title, (pageWidth - pdf.getTextWidth(title)) / 2, 15);
 
   drawCalendarGrid(pdf, year, month, activeFilters);
+
+  // Holiday list below grid - estimate grid bottom
+  const daysInMonth = getDaysInMonth(year, month);
+  const firstDay = getFirstDayOfMonth(year, month);
+  const totalCells = firstDay + daysInMonth;
+  const rows = Math.ceil(totalCells / 7);
+  const gridBottom = 25 + 8 + rows * 24 + 4;
+  drawHolidayList(pdf, year, month, activeFilters, gridBottom);
+
   drawLegend(pdf, pageHeight);
 }
 

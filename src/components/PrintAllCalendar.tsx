@@ -1,6 +1,7 @@
 import { getMonthRange, BULGARIAN_MONTHS } from '@/data/bulgarianHolidays';
 import { CalendarGrid } from './CalendarGrid';
 import { CalendarLegend } from './CalendarLegend';
+import { MonthHolidayList } from './MonthHolidayList';
 import { HolidayType } from './HolidayFilter';
 
 interface PrintAllCalendarProps {
@@ -24,6 +25,7 @@ export function PrintAllCalendar({ activeFilters, notes }: PrintAllCalendarProps
             activeFilters={activeFilters}
             notes={notes}
           />
+          <MonthHolidayList year={month.year} month={month.month} activeFilters={activeFilters} />
           {index === months.length - 1 && (
             <div className="mt-4">
               <CalendarLegend />
