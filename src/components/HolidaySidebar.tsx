@@ -100,11 +100,11 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
                     )}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-foreground text-sm leading-tight">
-                      {translateHolidayName(holiday.name, i18n.language)}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground">
                       {formatDayMonth(holiday.date)}
+                    </p>
+                    <p className="font-medium text-foreground text-sm leading-tight mt-0.5">
+                      {translateHolidayName(holiday.name, i18n.language)}
                     </p>
                   </div>
                 </div>
