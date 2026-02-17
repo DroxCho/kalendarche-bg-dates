@@ -24,6 +24,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
 
   useEffect(() => {
     const loadAvatar = async () => {
@@ -58,9 +59,31 @@ const Index = () => {
         {/* Header */}
         <header className="relative text-center mb-8 animate-fade-in">
           {/* Utility buttons - top left */}
-          <div className="absolute left-0 top-0 flex items-center gap-1 print:hidden">
-            <ThemeToggle />
-            <NotificationToggle />
+          <div className="absolute left-0 top-0 flex flex-col items-start gap-1 print:hidden">
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <NotificationToggle />
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant={viewMode === 'month' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('month')}
+                className="gap-1.5 h-8 text-xs"
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{t('calendar.month', 'Месец')}</span>
+              </Button>
+              <Button
+                variant={viewMode === 'year' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setViewMode('year')}
+                className="gap-1.5 h-8 text-xs"
+              >
+                <Grid3X3 className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">{t('calendar.year', 'Година')}</span>
+              </Button>
+            </div>
           </div>
 
           {/* Profile buttons - top right */}
@@ -132,7 +155,7 @@ const Index = () => {
 
         {/* Calendar */}
         <main>
-          <BulgarianCalendar />
+          <BulgarianCalendar viewMode={viewMode} setViewMode={setViewMode} />
         </main>
 
         {/* Footer */}
