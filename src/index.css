@@ -243,8 +243,14 @@
   }
 
   .calendar-day-today {
-    outline: 3px solid black !important;
-    outline-offset: -3px;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+
+  .calendar-day-today .calendar-day-number {
+    background: none !important;
+    color: inherit !important;
+    border-radius: 0 !important;
   }
   
   .holiday-badge {

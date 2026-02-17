@@ -93,8 +93,6 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
 
   const daysInMonth = getDaysInMonth(year, month);
   const firstDay = getFirstDayOfMonth(year, month);
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
   const allHolidays = getAllHolidays();
 
   let currentDay = 1;
@@ -114,13 +112,6 @@ function drawCalendarGrid(pdf: jsPDF, year: number, month: number, activeFilters
       else pdf.setFillColor(255, 255, 255);
       pdf.rect(x, y, cellWidth, cellHeight, 'F');
 
-      // Today highlight
-      if (isCurrentMonth && currentDay === today.getDate()) {
-        pdf.setDrawColor(180, 50, 80);
-        pdf.setLineWidth(1);
-        pdf.rect(x + 0.5, y + 0.5, cellWidth - 1, cellHeight - 1, 'S');
-        pdf.setLineWidth(0.2);
-      }
 
       // Border
       pdf.setDrawColor(220, 220, 220);
@@ -331,13 +322,6 @@ function drawLegend(pdf: jsPDF, pageHeight: number) {
     x += markerSize + 2 + pdf.getTextWidth(item.label) + 12;
   });
 
-  // "Today" indicator - outlined rectangle
-  pdf.setDrawColor(180, 50, 80);
-  pdf.setLineWidth(0.8);
-  pdf.roundedRect(x, legendY - markerSize / 2, markerSize, markerSize, 0.8, 0.8, 'S');
-  pdf.setLineWidth(0.2);
-  pdf.setTextColor(60, 60, 60);
-  pdf.text(isEnglish() ? 'Today' : 'Днес', x + markerSize + 2, legendY + 1);
 }
 
 function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: string[]) {
