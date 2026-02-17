@@ -310,37 +310,59 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
   pdf.setFont('DejaVuSans', 'normal');
   pdf.setFontSize(5.5);
 
-  let y = startY + 3.5;
-  holidays.forEach((h, i) => {
-    const col = i % numCols;
-    const x = marginLeft + col * colWidth;
-    if (col === 0 && i > 0) y += 3.5;
+  // Group holidays by date
+  const grouped: { date: string; items: typeof holidays }[] = [];
+  holidays.forEach(h => {
+    const last = grouped[grouped.length - 1];
+    if (last && last.date === h.date) {
+      last.items.push(h);
+    } else {
+      grouped.push({ date: h.date, items: [h] });
+    }
+  });
 
-    const day = parseInt(h.date.split('-')[2], 10);
-    let textColor: [number, number, number];
-    switch (h.type) {
-      case 'national': textColor = [180, 50, 80]; break;
-      case 'orthodox': textColor = [180, 140, 40]; break;
-      case 'nameday': textColor = [140, 70, 170]; break;
-      case 'folk': textColor = [200, 110, 40]; break;
-      case 'fasting': textColor = [120, 80, 160]; break;
-      default: textColor = [100, 100, 100];
+  // Distribute date groups across 4 columns, stacking same-date items vertically
+  const lineH = 3.5;
+  const colHeights = [0, 0, 0, 0]; // track height used in each column
+
+  grouped.forEach(group => {
+    // Find the column with the least height
+    let minCol = 0;
+    for (let c = 1; c < numCols; c++) {
+      if (colHeights[c] < colHeights[minCol]) minCol = c;
     }
 
-    const iconType = getIconForHolidayType(h.type) || (h.type === 'fasting' ? 'leaf' : null);
-    if (iconType) {
-      drawIcon(pdf, iconType, x + 1.5, y - 1, 1.8, textColor);
-    }
+    const x = marginLeft + minCol * colWidth;
+    const day = parseInt(group.date.split('-')[2], 10);
 
-    pdf.setTextColor(100, 100, 100);
-    pdf.text(`${day}.`, x + 3.5, y);
-    pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
-    let name = localizeHolidayName(h.name);
-    const maxW = colWidth - 12;
-    while (pdf.getTextWidth(name) > maxW && name.length > 3) {
-      name = name.slice(0, -4) + '...';
-    }
-    pdf.text(name, x + 8, y);
+    group.items.forEach(h => {
+      const y = startY + 3.5 + colHeights[minCol];
+      let textColor: [number, number, number];
+      switch (h.type) {
+        case 'national': textColor = [180, 50, 80]; break;
+        case 'orthodox': textColor = [180, 140, 40]; break;
+        case 'nameday': textColor = [140, 70, 170]; break;
+        case 'folk': textColor = [200, 110, 40]; break;
+        case 'fasting': textColor = [120, 80, 160]; break;
+        default: textColor = [100, 100, 100];
+      }
+
+      const iconType = getIconForHolidayType(h.type) || (h.type === 'fasting' ? 'leaf' : null);
+      if (iconType) {
+        drawIcon(pdf, iconType, x + 1.5, y - 1, 1.8, textColor);
+      }
+
+      pdf.setTextColor(100, 100, 100);
+      pdf.text(`${day}.`, x + 3.5, y);
+      pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
+      let name = localizeHolidayName(h.name);
+      const maxW = colWidth - 12;
+      while (pdf.getTextWidth(name) > maxW && name.length > 3) {
+        name = name.slice(0, -4) + '...';
+      }
+      pdf.text(name, x + 8, y);
+      colHeights[minCol] += lineH;
+    });
   });
 }
 
