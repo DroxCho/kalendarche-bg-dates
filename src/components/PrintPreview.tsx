@@ -164,7 +164,7 @@ export function PrintPreview({
               />
               <MonthHolidayList year={year} month={month} activeFilters={activeFilters} />
               <div className="mt-6">
-                <CalendarLegend />
+                <CalendarLegend printMode />
               </div>
             </>
           ) : (
@@ -175,7 +175,7 @@ export function PrintPreview({
                 onMonthClick={() => {}}
               />
               <div className="mt-6">
-                <CalendarLegend />
+                <CalendarLegend printMode />
               </div>
             </>
           )}
