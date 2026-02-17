@@ -2,6 +2,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Printer } from 'lucide-react';
 import { CalendarGrid } from './CalendarGrid';
+import { MonthHolidayList } from './MonthHolidayList';
 import { CalendarLegend } from './CalendarLegend';
 import { YearView } from './YearView';
 import { HolidayType } from './HolidayFilter';
@@ -161,6 +162,7 @@ export function PrintPreview({
                 onUpdateNote={() => {}}
                 onDeleteNote={() => {}}
               />
+              <MonthHolidayList year={year} month={month} activeFilters={activeFilters} />
               <div className="mt-6">
                 <CalendarLegend />
               </div>
