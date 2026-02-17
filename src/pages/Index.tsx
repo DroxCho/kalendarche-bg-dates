@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { LogIn, LogOut, User, Settings } from 'lucide-react';
+import { LanguageToggle } from '@/components/LanguageToggle';
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -56,6 +57,7 @@ const Index = () => {
         <header className="relative text-center mb-8 animate-fade-in">
           {/* Profile buttons - top right */}
           <div className="absolute right-0 top-0 flex items-center gap-2 print:hidden">
+            <LanguageToggle />
             {!loading && (
               user ? (
                 <DropdownMenu>
