@@ -54,72 +54,77 @@ const Index = () => {
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <header className="relative text-center mb-8 animate-fade-in">
-          {/* Profile buttons - top right */}
-          <div className="absolute right-0 top-0 flex items-center gap-2 print:hidden">
-            <LanguageToggle />
-            {!loading && (
-              user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Avatar className="h-9 w-9 cursor-pointer border-2 border-border hover:border-primary transition-colors">
-                      <AvatarImage 
-                        src={avatarUrl || user.user_metadata?.avatar_url} 
-                        alt={t('profile.avatar')} 
-                      />
-                      <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
-                        {user.email?.charAt(0).toUpperCase() || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56 bg-popover border border-border shadow-lg">
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">{t('nav.myAccount')}</p>
-                        <p className="text-xs leading-none text-muted-foreground truncate">
-                          {user.email}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
-                      <User className="mr-2 h-4 w-4" />
-                      <span>{t('nav.profile')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
-                      <Settings className="mr-2 h-4 w-4" />
-                      <span>{t('nav.settings')}</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={signOut} className="cursor-pointer text-destructive focus:text-destructive">
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>{t('nav.logout')}</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              ) : (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/auth')}
-                  className="gap-1.5"
-                >
-                  <LogIn className="h-4 w-4" />
-                  <span className="hidden sm:inline">{t('nav.login')}</span>
-                </Button>
-              )
-            )}
-          </div>
+        <header className="relative mb-8 animate-fade-in">
+          {/* Top row: title left, controls right */}
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-1">
+                {t('app.title')}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {t('app.subtitle')}
+              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {t('app.description')}
+              </p>
+            </div>
 
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-2">
-            {t('app.title')}
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            {t('app.subtitle')}
-          </p>
-          <p className="text-sm text-muted-foreground mt-1">
-            {t('app.description')}
-          </p>
+            {/* Right side: language + auth */}
+            <div className="flex items-center gap-2 print:hidden shrink-0">
+              <LanguageToggle />
+              {!loading && (
+                user ? (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Avatar className="h-9 w-9 cursor-pointer border-2 border-border hover:border-primary transition-colors">
+                        <AvatarImage 
+                          src={avatarUrl || user.user_metadata?.avatar_url} 
+                          alt={t('profile.avatar')} 
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
+                          {user.email?.charAt(0).toUpperCase() || 'U'}
+                        </AvatarFallback>
+                      </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-popover border border-border shadow-lg">
+                      <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                          <p className="text-sm font-medium leading-none">{t('nav.myAccount')}</p>
+                          <p className="text-xs leading-none text-muted-foreground truncate">
+                            {user.email}
+                          </p>
+                        </div>
+                      </DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/profile')} className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>{t('nav.profile')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>{t('nav.settings')}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={signOut} className="cursor-pointer text-destructive focus:text-destructive">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>{t('nav.logout')}</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ) : (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate('/auth')}
+                    className="gap-1.5"
+                  >
+                    <LogIn className="h-4 w-4" />
+                    <span className="hidden sm:inline">{t('nav.login')}</span>
+                  </Button>
+                )
+              )}
+            </div>
+          </div>
         </header>
 
         {/* Calendar */}
