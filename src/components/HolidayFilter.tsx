@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Holiday } from '@/data/bulgarianHolidays';
-import { Flag, Cross, Star, Leaf, Calendar } from 'lucide-react';
+import { Flag, Cross, Star, Leaf, Calendar, Flower2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type HolidayType = Holiday['type'];
@@ -17,7 +17,7 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
     { type: 'national', labelKey: 'holidays.national', icon: <Flag className="w-3 h-3" /> },
     { type: 'orthodox', labelKey: 'holidays.orthodox', icon: <Cross className="w-3 h-3" /> },
     { type: 'nameday', labelKey: 'holidays.nameday', icon: <Star className="w-3 h-3" /> },
-    { type: 'folk', labelKey: 'holidays.folk', icon: <Flag className="w-3 h-3" /> },
+    { type: 'folk', labelKey: 'holidays.folk', icon: <Flower2 className="w-3 h-3" /> },
     { type: 'fasting', labelKey: 'holidays.fasting', icon: <Leaf className="w-3 h-3" /> },
   ];
 
