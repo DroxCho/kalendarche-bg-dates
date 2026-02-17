@@ -59,11 +59,12 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
   }, [year, month]);
 
   return (
-    <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8 max-h-[400px] overflow-y-auto">
-      <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2">
+    <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8 max-h-[min(calc(100vh-8rem),600px)] flex flex-col overflow-hidden">
+      <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2 sticky top-0 bg-card z-10 pb-2">
         <Calendar className="w-5 h-5 text-primary" />
         {t('sidebar.upcomingHolidays')} - {getMonthName(month)}
       </h2>
+      <div className="overflow-y-auto flex-1 min-h-0">
       
       {monthHolidays.length === 0 ? (
         <p className="text-muted-foreground text-sm">
@@ -112,7 +113,8 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
           })}
         </ul>
       )}
-      
+      </div>
+
       <div className="mt-4 pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground">
           {t('holidays.all')}: <span className="font-medium text-foreground">{monthHolidays.length}</span>
