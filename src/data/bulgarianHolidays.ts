@@ -82,21 +82,28 @@ function getHolidaysForYear(year: number): Holiday[] {
   const greatLentEnd = addDays(easter, -1);
   const meatfareSunday = addDays(easter, -56);
   const cheesefareDay = addDays(easter, -49);
+  const todorovden = addDays(easter, -43); // 1st Saturday of Great Lent
+  const midPentecost = addDays(easter, 24); // Преполовение
+  const rusalskaNedelya = addDays(easter, 50); // starts on Holy Spirit Monday
   
   // Easter-related Orthodox holidays
   holidays.push(
     { date: formatDate(greatLentStart), name: 'Начало на Великия пост', type: 'fasting' },
     { date: formatDate(greatLentEnd), name: 'Край на Великия пост', type: 'fasting' },
+    { date: formatDate(meatfareSunday), name: 'Месни Заговезни', type: 'folk' },
     { date: formatDate(cheesefareDay), name: 'Сирни Заговезни', type: 'folk' },
+    { date: formatDate(todorovden), name: 'Тодоровден - празник на конете', type: 'folk' },
     { date: formatDate(lazarusSaturday), name: 'Лазаровден', type: 'folk' },
     { date: formatDate(palmSunday), name: 'Цветница', type: 'orthodox' },
     { date: formatDate(goodFriday), name: 'Разпети петък', type: 'orthodox' },
     { date: formatDate(holySaturday), name: 'Велика събота', type: 'orthodox' },
     { date: formatDate(easter), name: 'Великден', type: 'orthodox' },
     { date: formatDate(easterMonday), name: 'Великден (втори ден)', type: 'orthodox' },
+    { date: formatDate(midPentecost), name: 'Преполовение', type: 'orthodox' },
     { date: formatDate(ascension), name: 'Спасовден', type: 'orthodox' },
     { date: formatDate(pentecost), name: 'Петдесетница', type: 'orthodox' },
     { date: formatDate(holySpirit), name: 'Духовден', type: 'orthodox' },
+    { date: formatDate(rusalskaNedelya), name: 'Русалска неделя', type: 'folk' },
   );
 
   // Major Orthodox holidays (fixed dates)
@@ -237,6 +244,7 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-03-09`, name: 'Младенци - 40 мъченици', type: 'folk' },
     { date: `${year}-03-20`, name: 'Ден на пролетното равноденствие', type: 'folk' },
     { date: `${year}-03-25`, name: 'Благовещение - празник на майчинството', type: 'folk' },
+    { date: `${year}-04-23`, name: 'Гергьовден - народни обичаи', type: 'folk' },
     { date: `${year}-05-02`, name: 'Борисовден - празник на градинарите', type: 'folk' },
     { date: `${year}-05-06`, name: 'Гергьовден - празник на овчарите', type: 'folk' },
     { date: `${year}-05-21`, name: 'Константин и Елена - нестинарски игри', type: 'folk' },
