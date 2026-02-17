@@ -13,10 +13,6 @@ import { useBirthdays, ImportResult as BirthdaysImportResult } from '@/hooks/use
 import { useRecurringEvents, ImportResult as EventsImportResult } from '@/hooks/useRecurringEvents';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { NotificationToggle } from './NotificationToggle';
-import { ThemeToggle } from './ThemeToggle';
-import { Button } from '@/components/ui/button';
-import { CalendarDays, Grid3X3 } from 'lucide-react';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
 import { PrintPreview } from './PrintPreview';
@@ -143,7 +139,7 @@ export function BulgarianCalendar() {
         <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
       </div>
       
-      <div className={`flex items-center justify-between flex-wrap gap-3 print:justify-center ${printAll ? 'print:hidden' : ''}`}>
+      <div className={`${printAll ? 'print:hidden' : ''}`}>
         <MonthPaginator
           currentIndex={currentIndex}
           onIndexChange={setCurrentIndex}
@@ -153,29 +149,6 @@ export function BulgarianCalendar() {
           onPrintPreview={handlePrintPreview}
           activeFilters={activeFilters}
         />
-        
-        <div className="flex items-center gap-1 print:hidden">
-          <ThemeToggle />
-          <NotificationToggle />
-          <Button
-            variant={viewMode === 'month' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('month')}
-            className="gap-1.5"
-          >
-            <CalendarDays className="h-4 w-4" />
-            <span className="hidden sm:inline">Месец</span>
-          </Button>
-          <Button
-            variant={viewMode === 'year' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setViewMode('year')}
-            className="gap-1.5"
-          >
-            <Grid3X3 className="h-4 w-4" />
-            <span className="hidden sm:inline">Година</span>
-          </Button>
-        </div>
       </div>
       
       <HolidayFilter
