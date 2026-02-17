@@ -53,23 +53,24 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
-          
+        </div>
+
+        <div className="flex items-center gap-2">
+          <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground print:text-black">
+            {getMonthName(currentMonth.month)} {currentMonth.year}
+          </h2>
           {showTodayButton && onGoToToday && (
             <Button
               variant="secondary"
               size="sm"
               onClick={onGoToToday}
-              className="gap-1.5"
+              className="gap-1.5 print:hidden"
             >
               <CalendarCheck className="h-4 w-4" />
               {t('calendar.today')}
             </Button>
           )}
         </div>
-
-        <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground print:text-black">
-          {getMonthName(currentMonth.month)} {currentMonth.year}
-        </h2>
 
         <div className="flex items-center gap-2 print:hidden">
           <Button
