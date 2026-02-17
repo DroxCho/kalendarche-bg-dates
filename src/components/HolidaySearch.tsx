@@ -49,10 +49,41 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
     if (query.trim().length < 2) return [];
     
     const lowerQuery = query.toLowerCase();
+    
+    // Normalize query: replace dots/slashes with dashes for date matching
+    const normalizedQuery = query.trim().replace(/[.\/]/g, '-');
+    
+    // Try to parse as date in formats: DD-MM-YYYY, DD-MM, DD
+    const dateParts = normalizedQuery.split('-').map(p => parseInt(p, 10));
+    const hasDateQuery = dateParts.length >= 1 && !isNaN(dateParts[0]);
+    
     return allHolidays
       .filter(h => {
         const translatedName = translateHolidayName(h.name, i18n.language);
-        return h.name.toLowerCase().includes(lowerQuery) || translatedName.toLowerCase().includes(lowerQuery);
+        const nameMatch = h.name.toLowerCase().includes(lowerQuery) || translatedName.toLowerCase().includes(lowerQuery);
+        
+        if (nameMatch) return true;
+        
+        // Date matching
+        if (hasDateQuery) {
+          const [yearStr, monthStr, dayStr] = h.date.split('-');
+          const hDay = parseInt(dayStr, 10);
+          const hMonth = parseInt(monthStr, 10);
+          const hYear = parseInt(yearStr, 10);
+          
+          if (dateParts.length === 1) {
+            // Match day
+            return hDay === dateParts[0];
+          } else if (dateParts.length === 2) {
+            // DD-MM
+            return hDay === dateParts[0] && hMonth === dateParts[1];
+          } else if (dateParts.length >= 3) {
+            // DD-MM-YYYY
+            return hDay === dateParts[0] && hMonth === dateParts[1] && hYear === dateParts[2];
+          }
+        }
+        
+        return false;
       })
       .slice(0, 10);
   }, [query, allHolidays, i18n.language]);
