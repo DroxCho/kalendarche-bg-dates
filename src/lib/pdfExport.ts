@@ -296,22 +296,22 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
 
   if (holidays.length === 0) return;
 
-  const marginLeft = 10;
+  const marginLeft = 8;
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const numCols = 4;
+  const numCols = 3;
   const colWidth = (pageWidth - marginLeft * 2) / numCols;
   const lang = i18n.language;
 
   pdf.setFont('DejaVuSans', 'bold');
-  pdf.setFontSize(7);
+  pdf.setFontSize(8);
   pdf.setTextColor(0, 0, 0);
   pdf.text(lang === 'en' ? 'Holidays' : 'Празници', marginLeft, startY);
 
   pdf.setFont('DejaVuSans', 'normal');
-  pdf.setFontSize(5.5);
+  pdf.setFontSize(6.5);
 
   // Fill columns sequentially: fill one column top-to-bottom sorted by date, then move to next
-  const lineH = 3.5;
+  const lineH = 4;
   const totalLines = holidays.length;
   const linesPerCol = Math.ceil(totalLines / numCols);
 
@@ -414,7 +414,7 @@ function addMonthPage(pdf: jsPDF, year: number, month: number, activeFilters: st
   const firstDay = getFirstDayOfMonth(year, month);
   const totalCells = firstDay + daysInMonth;
   const rows = Math.ceil(totalCells / 7);
-  const gridBottom = 33 + 8 + rows * 24 + 4;
+  const gridBottom = 33 + 8 + rows * 28 + 4;
   drawHolidayList(pdf, year, month, activeFilters, gridBottom);
 }
 
