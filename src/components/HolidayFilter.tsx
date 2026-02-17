@@ -40,7 +40,7 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 print:hidden">
+    <div className="flex flex-wrap items-center justify-center gap-2 print:hidden">
       <span className="text-sm text-muted-foreground mr-1">{t('holidays.filter')}</span>
       <button
         onClick={toggleAll}
