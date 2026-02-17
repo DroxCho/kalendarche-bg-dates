@@ -298,22 +298,23 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
 
   const marginLeft = 10;
   const pageWidth = pdf.internal.pageSize.getWidth();
-  const colWidth = (pageWidth - marginLeft * 2) / 2;
+  const numCols = 4;
+  const colWidth = (pageWidth - marginLeft * 2) / numCols;
   const lang = i18n.language;
 
   pdf.setFont('DejaVuSans', 'bold');
-  pdf.setFontSize(8);
+  pdf.setFontSize(7);
   pdf.setTextColor(0, 0, 0);
   pdf.text(lang === 'en' ? 'Holidays' : 'Празници', marginLeft, startY);
 
   pdf.setFont('DejaVuSans', 'normal');
-  pdf.setFontSize(6.5);
+  pdf.setFontSize(5.5);
 
-  let y = startY + 4;
+  let y = startY + 3.5;
   holidays.forEach((h, i) => {
-    const col = i % 2;
+    const col = i % numCols;
     const x = marginLeft + col * colWidth;
-    if (col === 0 && i > 0) y += 4;
+    if (col === 0 && i > 0) y += 3.5;
 
     const day = parseInt(h.date.split('-')[2], 10);
     let textColor: [number, number, number];
@@ -328,18 +329,18 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
 
     const iconType = getIconForHolidayType(h.type) || (h.type === 'fasting' ? 'leaf' : null);
     if (iconType) {
-      drawIcon(pdf, iconType, x + 1.5, y - 1, 2, textColor);
+      drawIcon(pdf, iconType, x + 1.5, y - 1, 1.8, textColor);
     }
 
     pdf.setTextColor(100, 100, 100);
-    pdf.text(`${day}.`, x + 4, y);
+    pdf.text(`${day}.`, x + 3.5, y);
     pdf.setTextColor(textColor[0], textColor[1], textColor[2]);
     let name = localizeHolidayName(h.name);
-    const maxW = colWidth - 14;
+    const maxW = colWidth - 12;
     while (pdf.getTextWidth(name) > maxW && name.length > 3) {
       name = name.slice(0, -4) + '...';
     }
-    pdf.text(name, x + 10, y);
+    pdf.text(name, x + 8, y);
   });
 }
 
