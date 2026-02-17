@@ -1,19 +1,8 @@
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, CalendarCheck, Printer, Download, FileText, Eye } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { BULGARIAN_MONTHS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
+import { BULGARIAN_MONTHS, getMonthRange } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
-import { generateICSForMonth } from '@/lib/icsExport';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
-import { generateICSFile, generateICSForYear } from '@/lib/icsExport';
-import { exportMonthToPDF, exportYearToPDF, exportAllToPDF } from '@/lib/pdfExport';
-import { toast } from '@/hooks/use-toast';
 
 // English month names for translation
 const ENGLISH_MONTHS = [
@@ -26,12 +15,9 @@ interface MonthPaginatorProps {
   onIndexChange: (index: number) => void;
   onGoToToday?: () => void;
   showTodayButton?: boolean;
-  onPrintAll?: () => void;
-  onPrintPreview?: (mode: 'month' | 'year') => void;
-  activeFilters?: string[];
 }
 
-export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton, onPrintAll, onPrintPreview, activeFilters = [] }: MonthPaginatorProps) {
+export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showTodayButton }: MonthPaginatorProps) {
   const { t, i18n } = useTranslation();
   const months = getMonthRange();
   const currentMonth = months[currentIndex];
@@ -50,97 +36,6 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
   const handleNext = () => {
     if (currentIndex < months.length - 1) {
       onIndexChange(currentIndex + 1);
-    }
-  };
-
-  const handlePrintMonth = () => {
-    window.print();
-  };
-
-  const handlePrintAll = () => {
-    if (onPrintAll) {
-      onPrintAll();
-    }
-  };
-
-  const handleExportMonth = () => {
-    const holidays = getAllHolidays();
-    generateICSForMonth(holidays, currentMonth.year, currentMonth.month);
-  };
-
-  const handleExportYear = () => {
-    const holidays = getAllHolidays();
-    generateICSForYear(holidays, currentMonth.year);
-  };
-
-  const handleExportAll = () => {
-    const holidays = getAllHolidays();
-    generateICSFile(holidays, 'bulgarian-calendar-all');
-  };
-
-  const handleExportMonthPDF = async () => {
-    const { dismiss } = toast({
-      title: t('calendar.generatingPDF'),
-      description: t('calendar.pleaseWait'),
-    });
-    try {
-      await exportMonthToPDF({ year: currentMonth.year, month: currentMonth.month, activeFilters });
-      dismiss();
-      toast({
-        title: t('calendar.pdfReady'),
-        description: t('calendar.pdfSuccess'),
-      });
-    } catch (error) {
-      dismiss();
-      toast({
-        title: t('common.error'),
-        description: t('calendar.pdfError'),
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleExportYearPDF = async () => {
-    const { dismiss } = toast({
-      title: t('calendar.generatingPDF'),
-      description: t('calendar.creatingYear'),
-    });
-    try {
-      await exportYearToPDF(currentMonth.year, activeFilters);
-      dismiss();
-      toast({
-        title: t('calendar.pdfReady'),
-        description: t('calendar.pdfSuccess'),
-      });
-    } catch (error) {
-      dismiss();
-      toast({
-        title: t('common.error'),
-        description: t('calendar.pdfError'),
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleExportAllPDF = async () => {
-    const { dismiss } = toast({
-      title: t('calendar.generatingPDF'),
-      description: t('calendar.creatingAll'),
-    });
-    try {
-      await exportAllToPDF(activeFilters);
-      dismiss();
-      toast({
-        title: t('calendar.pdfReady'),
-        description: t('calendar.pdfSuccess'),
-      });
-    } catch (error) {
-      dismiss();
-      toast({
-        title: t('common.error'),
-        description: t('calendar.pdfError'),
-        variant: "destructive",
-      });
     }
   };
 
@@ -177,77 +72,6 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
         </h2>
 
         <div className="flex items-center gap-2 print:hidden">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5"
-              >
-                <Download className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('calendar.export')}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={handleExportMonth}>
-                {t('calendar.exportMonth')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportYear}>
-                {t('calendar.exportYear')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportAll}>
-                {t('calendar.exportAll')}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleExportMonthPDF}>
-                <FileText className="h-4 w-4 mr-2" />
-                {t('calendar.exportMonthPDF')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportYearPDF}>
-                <FileText className="h-4 w-4 mr-2" />
-                {t('calendar.exportYearPDF')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleExportAllPDF}>
-                <FileText className="h-4 w-4 mr-2" />
-                {t('calendar.exportAllPDF')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-1.5"
-              >
-                <Printer className="h-4 w-4" />
-                <span className="hidden sm:inline">{t('calendar.print')}</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {onPrintPreview && (
-                <>
-                  <DropdownMenuItem onClick={() => onPrintPreview('month')}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    {t('calendar.previewMonth')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onPrintPreview('year')}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    {t('calendar.previewYear')}
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              <DropdownMenuItem onClick={handlePrintMonth}>
-                {t('calendar.printMonth')}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handlePrintAll}>
-                {t('calendar.printAll')}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          
           <Button
             variant="outline"
             size="icon"

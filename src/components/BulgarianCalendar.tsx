@@ -1,4 +1,5 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
@@ -15,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
+import { ExportPrintButtons } from './ExportPrintButtons';
 import { PrintPreview } from './PrintPreview';
 
 const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
@@ -137,8 +139,20 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
     }
   }, [printAll]);
 
+  const portalTarget = document.getElementById('export-print-portal');
+
   return (
     <div className="w-full max-w-6xl mx-auto space-y-6">
+      {portalTarget && createPortal(
+        <ExportPrintButtons
+          year={currentMonth.year}
+          month={currentMonth.month}
+          activeFilters={activeFilters}
+          onPrintAll={handlePrintAll}
+          onPrintPreview={handlePrintPreview}
+        />,
+        portalTarget
+      )}
       <div className="print:hidden">
         <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
       </div>
@@ -149,9 +163,6 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
           onIndexChange={setCurrentIndex}
           onGoToToday={handleGoToToday}
           showTodayButton={(!isViewingCurrentMonth || viewMode === 'year') && todayMonthIndex !== -1}
-          onPrintAll={handlePrintAll}
-          onPrintPreview={handlePrintPreview}
-          activeFilters={activeFilters}
         />
       </div>
       
