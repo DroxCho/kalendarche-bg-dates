@@ -261,7 +261,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
       </div>
 
       {/* Month pills */}
-      <div className="flex flex-wrap gap-1.5 justify-center print:hidden">
+      <div className="flex flex-wrap gap-1.5 justify-center w-full print:hidden">
         {months.map((month, index) => (
           <button
             key={`${month.year}-${month.month}`}
