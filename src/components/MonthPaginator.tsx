@@ -145,7 +145,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 w-full">
       {/* Main navigation */}
       <div className="flex items-center justify-between print:justify-center">
         <div className="flex items-center gap-2 print:hidden">
