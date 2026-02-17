@@ -14,8 +14,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogIn, LogOut, User, Settings } from 'lucide-react';
+import { LogIn, LogOut, User, Settings, CalendarDays, Grid3X3 } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { NotificationToggle } from '@/components/NotificationToggle';
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -55,6 +57,12 @@ const Index = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <header className="relative text-center mb-8 animate-fade-in">
+          {/* Utility buttons - top left */}
+          <div className="absolute left-0 top-0 flex items-center gap-1 print:hidden">
+            <ThemeToggle />
+            <NotificationToggle />
+          </div>
+
           {/* Profile buttons - top right */}
           <div className="absolute right-0 top-0 flex items-center gap-2 print:hidden">
             <LanguageToggle />
