@@ -59,7 +59,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
   }, [year, month]);
 
   return (
-    <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8 max-h-[calc(100vh-4rem)] overflow-y-auto">
+    <aside className="bg-card border border-border rounded-xl p-5 h-fit sticky top-8 max-h-[400px] overflow-y-auto">
       <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2">
         <Calendar className="w-5 h-5 text-primary" />
         {t('sidebar.upcomingHolidays')} - {getMonthName(month)}
