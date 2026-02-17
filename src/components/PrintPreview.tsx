@@ -108,6 +108,14 @@ export function PrintPreview({
               outline: none !important;
               box-shadow: none !important;
             }
+            .print-preview-container .calendar-day-today .calendar-day-number {
+              background: none !important;
+              color: black !important;
+              border-radius: 0 !important;
+            }
+            .print-preview-container .flex.items-center.gap-2:has(.border-primary) {
+              display: none !important;
+            }
             .print-preview-container .holiday-badge {
               font-weight: 500 !important;
             }
