@@ -87,8 +87,9 @@ const Index = () => {
           </div>
 
           {/* Profile buttons - top right */}
-          <div className="absolute right-0 top-0 flex items-center gap-2 print:hidden">
-            <LanguageToggle />
+          <div className="absolute right-0 top-0 flex flex-col items-end gap-1 print:hidden">
+            <div className="flex items-center gap-2">
+              <LanguageToggle />
             {!loading && (
               user ? (
                 <DropdownMenu>
@@ -140,6 +141,8 @@ const Index = () => {
                 </Button>
               )
             )}
+            </div>
+            <div id="export-print-portal" />
           </div>
 
           <h1 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-2">
