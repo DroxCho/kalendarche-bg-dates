@@ -201,7 +201,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
                 onDeleteRecurringEvent={removeEvent}
                 calculateYears={calculateYears}
               />
-              <div className="mt-6">
+              <div className="mt-6 hidden print:block">
                 <CalendarLegend />
               </div>
             </div>
@@ -219,7 +219,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
               year={currentMonth.year} 
               onMonthClick={handleYearMonthClick}
             />
-            <div className="mt-6">
+            <div className="mt-6 hidden print:block">
               <CalendarLegend />
             </div>
           </div>
