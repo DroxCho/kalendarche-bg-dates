@@ -28,6 +28,10 @@ const holidayNameTranslations: Record<string, string> = {
   'Спасовден': 'Ascension Day (Spasovden)',
   'Петдесетница': 'Pentecost',
   'Духовден': 'Whit Monday (Duhovden)',
+  'Преполовение': 'Mid-Pentecost',
+  'Месни Заговезни': 'Meatfare Sunday',
+  'Тодоровден - празник на конете': 'Todorovden – Festival of Horses',
+  'Русалска неделя': 'Rusalska Week (Mermaid Week)',
 
   // === Orthodox Holidays (fixed) ===
   'Богоявление (Йордановден)': 'Epiphany (Yordanovden)',
@@ -140,6 +144,7 @@ const holidayNameTranslations: Record<string, string> = {
   'Младенци - 40 мъченици': 'Mladentsi – 40 Martyrs',
   'Ден на пролетното равноденствие': 'Spring Equinox Day',
   'Благовещение - празник на майчинството': "Annunciation – celebration of motherhood",
+  'Гергьовден - народни обичаи': "St. George's Day – folk customs",
   'Ден на виното (Св. Мартин)': 'Wine Day (St. Martin)',
   'Борисовден - празник на градинарите': "Borisovden – festival of gardeners",
   'Гергьовден - празник на овчарите': "St. George's Day – festival of shepherds",
@@ -171,7 +176,7 @@ const holidayNameTranslations: Record<string, string> = {
   'Коледа - народни обичаи': 'Christmas – folk customs',
   'Стефановден - празник на дърводелците': "Stefanovden – carpenters' festival",
   'Силвестрова нощ - Нова година': "New Year's Eve",
-  'Русалска неделя': 'Rusalka Week (Mermaid Week)',
+  
   'Гергьовден': "St. George's Day",
 
   // === Fasting ===
@@ -226,8 +231,11 @@ export const holidayDescriptionTranslations: Record<string, string> = {
   'Сурва (Сурвакане)': 'New Year ritual – children go from house to house blessing for health and prosperity.',
   'Бабинден': 'Festival of midwife grandmothers and new mothers. Elderly women gather for celebration.',
   'Сирни Заговезни': 'Last day before Great Lent, when cheese and dairy products are eaten.',
+  'Месни Заговезни': 'Last day before the Cheese Week – the final day when meat can be eaten before Great Lent.',
+  'Тодоровден - празник на конете': 'Todorovden – festival of horses. Horse races and rituals for animal health.',
   'Лазаровден': 'Saturday before Palm Sunday. Girls go lazaruvane singing songs.',
   'Русалска неделя': 'Week after Pentecost. According to beliefs, rusalki (mermaids) come out.',
+  'Преполовение': 'Mid-Pentecost – the midpoint between Easter and Pentecost.',
   'Св. Седмочисленици': 'Feast of the Holy Seven – disciples of Cyril and Methodius.',
   'Зимен Свети Никола': 'Winter Nikulden – veneration of St. Nicholas of Myra.',
   'Коледуване': 'Traditional custom of Christmas caroling groups.',
