@@ -105,8 +105,8 @@ export function PrintPreview({
               background-color: hsl(0, 0%, 95%) !important;
             }
             .print-preview-container .calendar-day-today {
-              outline: 3px solid black !important;
-              outline-offset: -3px;
+              outline: none !important;
+              box-shadow: none !important;
             }
             .print-preview-container .holiday-badge {
               font-weight: 500 !important;

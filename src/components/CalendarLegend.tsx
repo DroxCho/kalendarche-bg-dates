@@ -36,9 +36,9 @@ export function CalendarLegend() {
         </div>
         <span className="text-muted-foreground print:text-black">{t('holidays.fasting')}</span>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="w-4 h-4 rounded border-2 border-primary print:border-black" />
-        <span className="text-muted-foreground print:text-black">{t('legend.today')}</span>
+      <div className="flex items-center gap-2 print:hidden">
+        <div className="w-4 h-4 rounded border-2 border-primary" />
+        <span className="text-muted-foreground">{t('legend.today')}</span>
       </div>
     </div>
   );
