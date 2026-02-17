@@ -409,7 +409,7 @@ export function CalendarGrid({
               
               {filteredHolidays
                 .filter(holiday => shouldShowHolidayBadge(holiday))
-                .slice(0, 2)
+                .slice(0, 3)
                 .map((holiday, hIndex) => {
                   const getHolidayIcon = () => {
                     switch (holiday.type) {
@@ -447,9 +447,9 @@ export function CalendarGrid({
                   );
                 })}
               
-              {filteredHolidays.length > 2 && (
+              {filteredHolidays.length > 3 && (
                 <div className="text-[10px] text-muted-foreground mt-0.5 font-medium">
-                  +{filteredHolidays.length - 2} {t('notes.more')}
+                  +{filteredHolidays.length - 3} {t('notes.more')}
                 </div>
               )}
 

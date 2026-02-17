@@ -128,7 +128,7 @@
 
 @layer components {
   .calendar-day {
-    @apply relative flex flex-col items-center justify-start p-1 min-h-[60px] md:min-h-[80px] border border-border/50 transition-all duration-200;
+    @apply relative flex flex-col items-center justify-start p-1 min-h-[70px] md:min-h-[100px] border border-border/50 transition-all duration-200;
   }
 
   .calendar-day:hover {
