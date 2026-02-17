@@ -335,25 +335,8 @@ function getHolidaysForYear(year: number): Holiday[] {
     }
   }
 
-  // Weekly fasting days (Wednesday and Friday)
-  const startOfYear = new Date(year, 0, 1);
-  const endOfYear = new Date(year, 11, 31);
-  for (let d = new Date(startOfYear); d <= endOfYear; d = addDays(d, 1)) {
-    const dayOfWeek = d.getDay();
-    // Wednesday (3) and Friday (5) are traditional fasting days
-    if (dayOfWeek === 3 || dayOfWeek === 5) {
-      const dateStr = formatDate(d);
-      // Check if it's not already covered by a major fast
-      const existingFast = holidays.find(h => h.date === dateStr && h.type === 'fasting');
-      if (!existingFast) {
-        holidays.push({ 
-          date: dateStr, 
-          name: dayOfWeek === 3 ? 'Сряда - постен ден' : 'Петък - постен ден', 
-          type: 'fasting' 
-        });
-      }
-    }
-  }
+
+
 
   // Special single-day fasts
   holidays.push(
