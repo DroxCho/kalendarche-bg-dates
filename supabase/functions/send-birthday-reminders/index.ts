@@ -49,6 +49,16 @@ const eventTypeEmojis: Record<string, string> = {
   custom: "📅",
 };
 
+// Sanitize user-provided text before embedding in HTML emails
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 serve(async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
@@ -113,7 +123,8 @@ serve(async (req: Request): Promise<Response> => {
           console.log(`Found ${birthdays.length} birthdays for user ${pref.user_id}`);
           birthdayNames = (birthdays as Birthday[]).map(b => {
             const age = b.year ? targetDate.getFullYear() - b.year : null;
-            return age ? `${b.name} (навършва ${age} години)` : b.name;
+            const safeName = escapeHtml(b.name);
+            return age ? `${safeName} (навършва ${age} години)` : safeName;
           });
         }
       }
@@ -132,7 +143,7 @@ serve(async (req: Request): Promise<Response> => {
         } else if (events && events.length > 0) {
           console.log(`Found ${events.length} recurring events for user ${pref.user_id}`);
           recurringEventDetails = (events as RecurringEvent[]).map(e => ({
-            name: e.name,
+            name: escapeHtml(e.name),
             type: e.event_type,
             years: e.year ? targetDate.getFullYear() - e.year : null,
           }));
