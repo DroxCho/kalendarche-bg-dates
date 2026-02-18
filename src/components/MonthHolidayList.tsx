@@ -48,11 +48,11 @@ export function MonthHolidayList({ year, month, activeFilters }: MonthHolidayLis
   };
 
   return (
-    <div className="mt-4 text-[11px] leading-tight">
-      <h4 className="font-bold text-xs mb-1.5" style={{ color: 'black' }}>
+    <div className="mt-4 text-[11px] print:text-[6.5pt] leading-tight print:leading-snug">
+      <h4 className="font-bold text-xs print:text-[8pt] mb-1.5" style={{ color: 'black' }}>
         {isEnglish ? 'Holidays' : 'Празници'} – {isEnglish ? ENGLISH_MONTHS[month] : BULGARIAN_MONTHS[month]}
       </h4>
-      <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+      <div className="grid grid-cols-2 print:grid-cols-3 gap-x-4 gap-y-0.5 print:gap-y-1">
         {holidays.map((h, i) => {
           const Icon = getHolidayIcon(h.type);
           return (
