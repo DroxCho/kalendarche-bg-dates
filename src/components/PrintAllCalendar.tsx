@@ -25,12 +25,10 @@ export function PrintAllCalendar({ activeFilters, notes }: PrintAllCalendarProps
             activeFilters={activeFilters}
             notes={notes}
           />
+          <div className="mt-4">
+            <CalendarLegend />
+          </div>
           <MonthHolidayList year={month.year} month={month.month} activeFilters={activeFilters} />
-          {index === months.length - 1 && (
-            <div className="mt-4">
-              <CalendarLegend />
-            </div>
-          )}
         </div>
       ))}
     </div>
