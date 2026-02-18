@@ -162,10 +162,10 @@ export function PrintPreview({
                 onUpdateNote={() => {}}
                 onDeleteNote={() => {}}
               />
-              <MonthHolidayList year={year} month={month} activeFilters={activeFilters} />
-              <div className="mt-6">
+              <div className="mt-4">
                 <CalendarLegend printMode />
               </div>
+              <MonthHolidayList year={year} month={month} activeFilters={activeFilters} />
             </>
           ) : (
             <>
