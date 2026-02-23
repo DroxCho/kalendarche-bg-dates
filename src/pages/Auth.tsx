@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { Calendar, ArrowLeft } from 'lucide-react';
 
-type AuthMode = 'login' | 'register' | 'forgot' | 'reset';
+type AuthMode = 'login' | 'register' | 'forgot' | 'reset' | 'magic-link';
 
 const Auth = () => {
   const { t } = useTranslation();
@@ -22,6 +22,8 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [appleLoading, setAppleLoading] = useState(false);
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const [magicLinkSent, setMagicLinkSent] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -151,12 +153,37 @@ const Auth = () => {
     }
   };
 
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMagicLinkLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        },
+      });
+      if (error) throw error;
+      setMagicLinkSent(true);
+      toast({
+        title: t('auth.magicLinkSent'),
+        description: t('auth.magicLinkCheck'),
+      });
+    } catch (error: any) {
+      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
+    } finally {
+      setMagicLinkLoading(false);
+    }
+  };
+
   const getTitle = () => {
     switch (mode) {
       case 'login': return t('auth.login');
       case 'register': return t('auth.register');
       case 'forgot': return t('auth.forgotPassword');
       case 'reset': return t('auth.resetPassword');
+      case 'magic-link': return t('auth.magicLink');
     }
   };
 
@@ -166,6 +193,7 @@ const Auth = () => {
       case 'register': return t('auth.registerDescription');
       case 'forgot': return t('auth.forgotDescription');
       case 'reset': return t('auth.resetDescription');
+      case 'magic-link': return t('auth.magicLinkDescription');
     }
   };
 
@@ -240,6 +268,57 @@ const Auth = () => {
                 <ArrowLeft className="h-4 w-4" />
                 {t('auth.backToLogin')}
               </button>
+            </>
+          )}
+
+          {/* Magic Link Form */}
+          {mode === 'magic-link' && (
+            <>
+              {magicLinkSent ? (
+                <div className="text-center space-y-4">
+                  <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <svg className="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{t('auth.magicLinkCheck')}</p>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => { setMagicLinkSent(false); setMode('login'); }}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    {t('auth.backToLogin')}
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <form onSubmit={handleMagicLink} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="magic-email">{t('auth.email')}</Label>
+                      <Input
+                        id="magic-email"
+                        type="email"
+                        placeholder={t('auth.emailPlaceholder')}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <Button type="submit" className="w-full" disabled={magicLinkLoading}>
+                      {magicLinkLoading ? t('app.loading') : t('auth.sendMagicLink')}
+                    </Button>
+                  </form>
+                  <button
+                    type="button"
+                    onClick={() => setMode('login')}
+                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mx-auto"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    {t('auth.backToLogin')}
+                  </button>
+                </>
+              )}
             </>
           )}
 
@@ -337,6 +416,14 @@ const Auth = () => {
                   {loading ? t('app.loading') : mode === 'login' ? t('auth.login') : t('auth.register')}
                 </Button>
               </form>
+              <button
+                type="button"
+                onClick={() => setMode('magic-link')}
+                className="text-sm text-muted-foreground hover:text-primary mx-auto block"
+              >
+                {t('auth.useMagicLink')}
+              </button>
+
               <div className="text-center text-sm text-muted-foreground">
                 {mode === 'login' ? (
                   <>
