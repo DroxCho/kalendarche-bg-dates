@@ -44,6 +44,7 @@ const bg = {
     registerLink: 'Регистрирайте се',
     loginLink: 'Влезте',
     continueWithGoogle: 'Продължи с Google',
+    continueWithApple: 'Продължи с Apple',
     or: 'или',
     successLogin: 'Успешен вход!',
     welcomeBack: 'Добре дошли обратно.',
