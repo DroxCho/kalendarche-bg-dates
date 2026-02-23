@@ -44,6 +44,7 @@ const en = {
     registerLink: 'Register',
     loginLink: 'Login',
     continueWithGoogle: 'Continue with Google',
+    continueWithApple: 'Continue with Apple',
     or: 'or',
     successLogin: 'Login successful!',
     welcomeBack: 'Welcome back.',
