@@ -203,7 +203,6 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-10-14`, name: 'Петковден – Петка, Параскева, Петкана', type: 'nameday' },
     { date: `${year}-10-18`, name: 'Лукановден – Лука, Лукан', type: 'nameday' },
     { date: `${year}-10-26`, name: 'Димитровден – Димитър, Димитрина, Митко, Митка', type: 'nameday' },
-    { date: `${year}-10-27`, name: 'Прокопиевден – Прокопий, Прокопи', type: 'nameday' },
 
     // Ноември
     { date: `${year}-11-01`, name: 'Ден на будителите – Иван, Ивайло (за учителите)', type: 'nameday' },
