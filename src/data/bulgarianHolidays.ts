@@ -201,6 +201,7 @@ function getHolidaysForYear(year: number): Holiday[] {
 
     // Октомври
     { date: `${year}-10-01`, name: 'Покров Богородичен – Закрила', type: 'nameday' },
+    { date: `${year}-10-06`, name: 'Тома, Томислав, Томислава', type: 'nameday' },
     { date: `${year}-10-14`, name: 'Петковден – Петка, Параскева, Петкана', type: 'nameday' },
     { date: `${year}-10-18`, name: 'Лукановден – Лука, Лукан', type: 'nameday' },
     { date: `${year}-10-26`, name: 'Димитровден – Димитър, Димитрина, Митко, Митка', type: 'nameday' },
