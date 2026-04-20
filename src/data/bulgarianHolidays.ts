@@ -162,7 +162,6 @@ function getHolidaysForYear(year: number): Holiday[] {
     // Април
     { date: `${year}-04-04`, name: 'Дарин, Дарина, Дария', type: 'nameday' },
     { date: `${year}-04-14`, name: 'Мартин, Мартина (пролетен)', type: 'nameday' },
-    { date: `${year}-04-23`, name: 'Гергьовден – Георги, Гергана, Ганка, Галин', type: 'nameday' },
     { date: `${year}-04-25`, name: 'Маркoвден – Марко, Марк', type: 'nameday' },
     { date: `${year}-04-30`, name: 'Яковден – Яков, Якоб', type: 'nameday' },
 
@@ -170,7 +169,7 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-05-01`, name: 'Еремия, Йеремия', type: 'nameday' },
     { date: `${year}-05-02`, name: 'Борисовден – Борис, Борислав, Борислава, Борянка', type: 'nameday' },
     { date: `${year}-05-05`, name: 'Ирина, Ирена, Мирена', type: 'nameday' },
-    { date: `${year}-05-06`, name: 'Гергьовден – Георги, Гергана (за армията)', type: 'nameday' },
+    { date: `${year}-05-06`, name: 'Гергьовден – Георги, Гергана, Ганка, Галин', type: 'nameday' },
     { date: `${year}-05-11`, name: 'Кирил, Методий, Методи, Кирилка', type: 'nameday' },
     { date: `${year}-05-18`, name: 'Александровден – Александър, Александра, Сашо, Сашка', type: 'nameday' },
     { date: `${year}-05-21`, name: 'Константин, Елена, Костадин, Костадинка', type: 'nameday' },
@@ -244,7 +243,6 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-03-09`, name: 'Младенци - 40 мъченици', type: 'folk' },
     { date: `${year}-03-20`, name: 'Ден на пролетното равноденствие', type: 'folk' },
     { date: `${year}-03-25`, name: 'Благовещение - празник на майчинството', type: 'folk' },
-    { date: `${year}-04-23`, name: 'Гергьовден - народни обичаи', type: 'folk' },
     { date: `${year}-05-02`, name: 'Борисовден - празник на градинарите', type: 'folk' },
     { date: `${year}-05-06`, name: 'Гергьовден - празник на овчарите', type: 'folk' },
     { date: `${year}-05-21`, name: 'Константин и Елена - нестинарски игри', type: 'folk' },
