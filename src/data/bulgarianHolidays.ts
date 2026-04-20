@@ -187,7 +187,7 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-07-27`, name: 'Пантелеймон, Пантелей', type: 'nameday' },
 
     // Август
-    { date: `${year}-08-01`, name: 'Соломон, Маргарита (Макавей)', type: 'nameday' },
+    { date: `${year}-08-01`, name: 'Макавей – Макавей, Маца', type: 'nameday' },
     { date: `${year}-08-07`, name: 'Донка, Донко, Доника', type: 'nameday' },
     { date: `${year}-08-09`, name: 'Панталеймоновден – Панталей, Пламен', type: 'nameday' },
     { date: `${year}-08-15`, name: 'Мария, Марийка, Мариета, Мариана, Маня', type: 'nameday' },
