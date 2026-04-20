@@ -174,8 +174,7 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-05-21`, name: 'Константин, Елена, Костадин, Костадинка', type: 'nameday' },
 
     // Юни
-    { date: `${year}-06-15`, name: 'Лазар, Лазарина (за юнски Лазар)', type: 'nameday' },
-    { date: `${year}-06-24`, name: 'Еньовден – Еню, Янка, Билян, Билянa', type: 'nameday' },
+    { date: `${year}-06-24`, name: 'Еньовден – Еню, Янка, Билян, Биляна', type: 'nameday' },
     { date: `${year}-06-29`, name: 'Петровден – Петър, Петра, Петко, Петкана, Камен', type: 'nameday' },
     { date: `${year}-06-30`, name: 'Павловден – Павел, Павлина, Паулина', type: 'nameday' },
 
