@@ -65,12 +65,17 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Require shared cron secret to prevent unauthenticated mass-mail abuse
-  const expectedSecret = Deno.env.get("CRON_SECRET");
-  const providedSecret =
-    req.headers.get("x-cron-secret") ||
-    req.headers.get("authorization")?.replace("Bearer ", "");
-  if (!expectedSecret || providedSecret !== expectedSecret) {
+  // Only allow callers presenting the service role key (cron / trusted backend)
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  const cronSecret = Deno.env.get("CRON_SECRET");
+  const provided =
+    req.headers.get("authorization")?.replace("Bearer ", "") ||
+    req.headers.get("x-cron-secret");
+  const authorized =
+    !!provided &&
+    ((serviceRoleKey && provided === serviceRoleKey) ||
+      (cronSecret && provided === cronSecret));
+  if (!authorized) {
     console.warn("Unauthorized reminder call");
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
