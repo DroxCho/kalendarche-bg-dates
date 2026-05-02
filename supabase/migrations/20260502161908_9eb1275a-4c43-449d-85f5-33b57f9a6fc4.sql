@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS private.app_secrets;
+DROP SCHEMA IF EXISTS private CASCADE;
