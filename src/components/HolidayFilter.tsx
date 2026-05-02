@@ -54,21 +54,31 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
         <Calendar className="w-3 h-3" />
         {t('holidays.all')}
       </button>
-      {filterOptions.map(({ type, labelKey, icon }) => (
-        <button
-          key={type}
-          onClick={() => toggleFilter(type)}
-          className={cn(
-            "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full transition-all duration-200 border",
-            activeFilters.includes(type)
-              ? `bg-[hsl(var(--holiday-${type}))] text-primary-foreground border-[hsl(var(--holiday-${type}))]`
-              : "bg-muted text-muted-foreground border-border hover:bg-secondary"
-          )}
-        >
-          {icon}
-          {t(labelKey)}
-        </button>
-      ))}
+      {filterOptions.map(({ type, labelKey, icon }) => {
+        const isActive = activeFilters.includes(type);
+        const activeClasses: Partial<Record<HolidayType, string>> = {
+          national: "bg-[hsl(var(--holiday-national))] text-white border-[hsl(var(--holiday-national))]",
+          orthodox: "bg-[hsl(var(--holiday-orthodox))] text-white border-[hsl(var(--holiday-orthodox))]",
+          nameday: "bg-[hsl(var(--holiday-nameday))] text-white border-[hsl(var(--holiday-nameday))]",
+          folk: "bg-[hsl(var(--holiday-folk))] text-white border-[hsl(var(--holiday-folk))]",
+          fasting: "bg-[hsl(var(--holiday-fasting))] text-white border-[hsl(var(--holiday-fasting))]",
+        };
+        return (
+          <button
+            key={type}
+            onClick={() => toggleFilter(type)}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full transition-all duration-200 border",
+              isActive
+                ? activeClasses[type]
+                : "bg-muted text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
+            )}
+          >
+            {icon}
+            {t(labelKey)}
+          </button>
+        );
+      })}
     </div>
   );
 }
