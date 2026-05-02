@@ -85,11 +85,17 @@ function getHolidaysForYear(year: number): Holiday[] {
   const todorovden = addDays(easter, -43); // 1st Saturday of Great Lent
   const midPentecost = addDays(easter, 24); // Преполовение
   const rusalskaNedelya = addDays(easter, 50); // starts on Holy Spirit Monday
-  
+  const meatfareSaturday = addDays(easter, -57); // Месопустна задушница
+  const pentecostSaturday = addDays(easter, 48); // Черешова (Духовска) задушница
+  // Архангелова задушница — събота преди Архангеловден (8 ноември)
+  const archangelDay = new Date(year, 10, 8);
+  const archangelSaturday = addDays(archangelDay, -((archangelDay.getDay() + 1) % 7 || 7));
+
   // Easter-related Orthodox holidays
   holidays.push(
     { date: formatDate(greatLentStart), name: 'Начало на Великия пост', type: 'fasting' },
     { date: formatDate(greatLentEnd), name: 'Край на Великия пост', type: 'fasting' },
+    { date: formatDate(meatfareSaturday), name: 'Месопустна задушница', type: 'orthodox' },
     { date: formatDate(meatfareSunday), name: 'Месни Заговезни', type: 'folk' },
     { date: formatDate(cheesefareDay), name: 'Сирни Заговезни', type: 'folk' },
     { date: formatDate(todorovden), name: 'Тодоровден - празник на конете', type: 'folk' },
@@ -101,9 +107,11 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: formatDate(easterMonday), name: 'Великден (втори ден)', type: 'orthodox' },
     { date: formatDate(midPentecost), name: 'Преполовение', type: 'orthodox' },
     { date: formatDate(ascension), name: 'Спасовден', type: 'orthodox' },
+    { date: formatDate(pentecostSaturday), name: 'Черешова (Духовска) задушница', type: 'orthodox' },
     { date: formatDate(pentecost), name: 'Петдесетница', type: 'orthodox' },
     { date: formatDate(holySpirit), name: 'Духовден', type: 'orthodox' },
     { date: formatDate(rusalskaNedelya), name: 'Русалска неделя', type: 'folk' },
+    { date: formatDate(archangelSaturday), name: 'Архангелова задушница', type: 'orthodox' },
   );
 
   // Major Orthodox holidays (fixed dates)
