@@ -65,12 +65,13 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Require service role bearer token (only Supabase cron / backend should call this)
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+  // Require shared cron secret to prevent unauthenticated mass-mail abuse
+  const expectedSecret = Deno.env.get("CRON_SECRET");
   const providedSecret =
-    req.headers.get("authorization")?.replace("Bearer ", "") ||
-    req.headers.get("x-cron-secret");
-  if (!serviceRoleKey || providedSecret !== serviceRoleKey) {
+    req.headers.get("x-cron-secret") ||
+    req.headers.get("authorization")?.replace("Bearer ", "");
+  if (!expectedSecret || providedSecret !== expectedSecret) {
+    console.warn("Unauthorized reminder call");
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
