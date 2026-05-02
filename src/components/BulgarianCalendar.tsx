@@ -67,7 +67,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
   const { events: recurringEvents, addEvent, updateEvent, removeEvent, getEventsForDate, calculateYears } = useRecurringEvents(handleEventsImport);
   const { user } = useAuth();
   
-  const months = getMonthRange();
+  
   const currentMonth = months[currentIndex];
 
   // Handle shared URL on mount
