@@ -65,16 +65,29 @@ serve(async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Only allow callers presenting the service role key (cron / trusted backend)
-  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-  const cronSecret = Deno.env.get("CRON_SECRET");
+  // Authorize: caller must present the cron secret stored in private.app_secrets,
+  // OR the service role key (for manual admin invocation).
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const provided =
+    req.headers.get("x-cron-secret") ||
     req.headers.get("authorization")?.replace("Bearer ", "") ||
-    req.headers.get("x-cron-secret");
-  const authorized =
-    !!provided &&
-    ((serviceRoleKey && provided === serviceRoleKey) ||
-      (cronSecret && provided === cronSecret));
+    "";
+
+  let authorized = provided.length > 0 && provided === serviceRoleKey;
+  if (!authorized && provided) {
+    try {
+      const adminClient = createClient(Deno.env.get("SUPABASE_URL")!, serviceRoleKey);
+      const { data } = await adminClient
+        .schema("private" as never)
+        .from("app_secrets")
+        .select("value")
+        .eq("key", "cron_secret")
+        .maybeSingle();
+      if (data?.value && data.value === provided) authorized = true;
+    } catch (e) {
+      console.error("auth check error", e);
+    }
+  }
   if (!authorized) {
     console.warn("Unauthorized reminder call");
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
