@@ -56,7 +56,7 @@ export function HolidayFilter({ activeFilters, onFilterChange }: HolidayFilterPr
       </button>
       {filterOptions.map(({ type, labelKey, icon }) => {
         const isActive = activeFilters.includes(type);
-        const activeClasses: Record<HolidayType, string> = {
+        const activeClasses: Partial<Record<HolidayType, string>> = {
           national: "bg-[hsl(var(--holiday-national))] text-white border-[hsl(var(--holiday-national))]",
           orthodox: "bg-[hsl(var(--holiday-orthodox))] text-white border-[hsl(var(--holiday-orthodox))]",
           nameday: "bg-[hsl(var(--holiday-nameday))] text-white border-[hsl(var(--holiday-nameday))]",
