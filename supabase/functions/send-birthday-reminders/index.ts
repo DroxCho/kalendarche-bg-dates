@@ -67,21 +67,79 @@ serve(async (req: Request): Promise<Response> => {
 
   // Authorize: only callers presenting the CRON_SECRET (set in Edge Function secrets) are allowed.
   const cronSecret = Deno.env.get("CRON_SECRET");
-  const provided = req.headers.get("x-cron-secret") || "";
-  if (!cronSecret || provided !== cronSecret) {
-    console.warn("Unauthorized reminder call");
+  const providedHeader = req.headers.get("x-cron-secret");
+  const provided = providedHeader || "";
+  const ip =
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("cf-connecting-ip") ||
+    "unknown";
+  const userAgent = req.headers.get("user-agent") || "unknown";
+
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const auditClient = createClient(supabaseUrl, supabaseServiceKey, {
+    db: { schema: "private" },
+  });
+
+  async function logAudit(success: boolean, reason: string | null) {
+    const entry = {
+      function_name: "send-birthday-reminders",
+      success,
+      reason,
+      ip,
+      user_agent: userAgent,
+      has_secret_header: providedHeader !== null,
+      secret_length: providedHeader ? providedHeader.length : null,
+    };
+    if (success) {
+      console.log("[cron-audit] success", entry);
+    } else {
+      console.warn("[cron-audit] failure", entry);
+    }
+    try {
+      const { error } = await auditClient
+        .from("cron_audit_log")
+        .insert(entry);
+      if (error) {
+        console.error("[cron-audit] failed to write audit row:", error);
+      }
+    } catch (e) {
+      console.error("[cron-audit] exception writing audit row:", e);
+    }
+  }
+
+  if (!cronSecret) {
+    await logAudit(false, "CRON_SECRET env var is not configured");
+    return new Response(JSON.stringify({ error: "Server misconfigured" }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  if (providedHeader === null) {
+    await logAudit(false, "Missing x-cron-secret header");
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
+  if (provided !== cronSecret) {
+    await logAudit(
+      false,
+      `Invalid x-cron-secret (got length ${provided.length}, expected ${cronSecret.length})`,
+    );
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
+  await logAudit(true, "Authorized cron call");
+
   try {
     console.log("Starting reminder check...");
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Get all users with any reminders enabled
