@@ -27,7 +27,12 @@ interface BulgarianCalendarProps {
 }
 
 export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const months = useMemo(() => getMonthRange(), []);
+  const [currentIndex, setCurrentIndex] = useState(() => {
+    const now = new Date();
+    const idx = months.findIndex(m => m.year === now.getFullYear() && m.month === now.getMonth());
+    return idx >= 0 ? idx : 0;
+  });
   const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
   const [printAll, setPrintAll] = useState(false);
   const [sharedDate, setSharedDate] = useState<Date | null>(null);
