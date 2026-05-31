@@ -7,6 +7,8 @@ import { HolidaySidebar } from './HolidaySidebar';
 import { HolidaySearch } from './HolidaySearch';
 import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { YearView } from './YearView';
+import { WeekView } from './WeekView';
+import { DayView } from './DayView';
 import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
 import { useCalendarNotes, ImportResult as NotesImportResult } from '@/hooks/useCalendarNotes';
@@ -21,10 +23,13 @@ import { PrintPreview } from './PrintPreview';
 
 const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
 
+export type CalendarViewMode = 'day' | 'week' | 'month' | 'year';
+
 interface BulgarianCalendarProps {
-  viewMode: 'month' | 'year';
-  setViewMode: (mode: 'month' | 'year') => void;
+  viewMode: CalendarViewMode;
+  setViewMode: (mode: CalendarViewMode) => void;
 }
+
 
 export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarProps) {
   const months = useMemo(() => getMonthRange(), []);
