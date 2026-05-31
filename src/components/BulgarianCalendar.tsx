@@ -173,28 +173,30 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
         <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
       </div>
       
-      <div className={`${printAll ? 'print:hidden' : ''}`}>
-        <MonthPaginator
-          currentIndex={currentIndex}
-          onIndexChange={setCurrentIndex}
-          onGoToToday={handleGoToToday}
-          showTodayButton={(!isViewingCurrentMonth || viewMode === 'year') && todayMonthIndex !== -1}
-        />
-      </div>
-      
+      {(viewMode === 'month' || viewMode === 'year') && (
+        <div className={`${printAll ? 'print:hidden' : ''}`}>
+          <MonthPaginator
+            currentIndex={currentIndex}
+            onIndexChange={setCurrentIndex}
+            onGoToToday={handleGoToToday}
+            showTodayButton={(!isViewingCurrentMonth || viewMode === 'year') && todayMonthIndex !== -1}
+          />
+        </div>
+      )}
+
       <HolidayFilter
         activeFilters={activeFilters}
         onFilterChange={setActiveFilters}
       />
-      
+
       {/* Print all calendar - only visible when printing all */}
       {printAll && (
         <PrintAllCalendar activeFilters={activeFilters} notes={notes} />
       )}
-      
+
       {/* Regular view - hidden when printing all */}
       <div className={printAll ? 'print:hidden' : ''}>
-        {viewMode === 'month' ? (
+        {viewMode === 'month' && (
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 min-w-0">
               <CalendarGrid
@@ -221,7 +223,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
                 <CalendarLegend />
               </div>
             </div>
-            
+
             <div className="lg:w-72 shrink-0 print:hidden">
               <HolidaySidebar
                 year={currentMonth.year}
@@ -229,10 +231,12 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
               />
             </div>
           </div>
-        ) : (
+        )}
+
+        {viewMode === 'year' && (
           <div>
-            <YearView 
-              year={currentMonth.year} 
+            <YearView
+              year={currentMonth.year}
               onMonthClick={handleYearMonthClick}
             />
             <div className="mt-6 hidden print:block">
@@ -240,7 +244,52 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
             </div>
           </div>
         )}
+
+        {viewMode === 'week' && (
+          <WeekView
+            focusDate={focusDate}
+            onDateChange={setFocusDate}
+            activeFilters={activeFilters}
+            notes={notes}
+            birthdays={birthdays}
+            recurringEvents={recurringEvents}
+            onAddNote={addNote}
+            onUpdateNote={updateNote}
+            onDeleteNote={removeNote}
+            onAddBirthday={addBirthday}
+            onUpdateBirthday={updateBirthday}
+            onDeleteBirthday={removeBirthday}
+            calculateAge={calculateAge}
+            onAddRecurringEvent={addEvent}
+            onUpdateRecurringEvent={updateEvent}
+            onDeleteRecurringEvent={removeEvent}
+            calculateYears={calculateYears}
+          />
+        )}
+
+        {viewMode === 'day' && (
+          <DayView
+            focusDate={focusDate}
+            onDateChange={setFocusDate}
+            activeFilters={activeFilters}
+            notes={notes}
+            birthdays={birthdays}
+            recurringEvents={recurringEvents}
+            onAddNote={addNote}
+            onUpdateNote={updateNote}
+            onDeleteNote={removeNote}
+            onAddBirthday={addBirthday}
+            onUpdateBirthday={updateBirthday}
+            onDeleteBirthday={removeBirthday}
+            calculateAge={calculateAge}
+            onAddRecurringEvent={addEvent}
+            onUpdateRecurringEvent={updateEvent}
+            onDeleteRecurringEvent={removeEvent}
+            calculateYears={calculateYears}
+          />
+        )}
       </div>
+
 
       {/* Shared date modal */}
       <HolidayModal
