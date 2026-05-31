@@ -155,8 +155,11 @@ const bg = {
   // Calendar
   calendar: {
     today: 'Днес',
+    day: 'Ден',
+    week: 'Седмица',
     month: 'Месец',
     year: 'Година',
+
     export: 'Експорт',
     print: 'Печат',
     printMonth: 'Печат на месец',
