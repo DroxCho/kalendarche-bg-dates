@@ -39,6 +39,12 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
     return idx >= 0 ? idx : 0;
   });
   const [activeFilters, setActiveFilters] = useState<HolidayType[]>(ALL_HOLIDAY_TYPES);
+  const [focusDate, setFocusDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+
   const [printAll, setPrintAll] = useState(false);
   const [sharedDate, setSharedDate] = useState<Date | null>(null);
   const [sharedModalOpen, setSharedModalOpen] = useState(false);
