@@ -155,8 +155,11 @@ const en = {
   // Calendar
   calendar: {
     today: 'Today',
+    day: 'Day',
+    week: 'Week',
     month: 'Month',
     year: 'Year',
+
     export: 'Export',
     print: 'Print',
     printMonth: 'Print month',
