@@ -128,7 +128,7 @@
 
 @layer components {
   .calendar-day {
-    @apply relative flex flex-col items-center justify-start p-1 min-h-[70px] md:min-h-[100px] border border-border/50 transition-all duration-200;
+    @apply relative flex flex-col items-center justify-start p-0.5 sm:p-1 min-h-[58px] sm:min-h-[80px] md:min-h-[100px] border border-border/50 transition-all duration-200;
   }
 
   .calendar-day:hover {
@@ -136,7 +136,7 @@
   }
 
   .calendar-day-number {
-    @apply text-sm md:text-base font-medium;
+    @apply text-xs sm:text-sm md:text-base font-medium;
   }
 
   .calendar-day-saturday {
@@ -152,8 +152,9 @@
   }
 
   .holiday-badge {
-    @apply text-[10px] md:text-xs px-1 py-0.5 rounded-sm mt-1 leading-tight w-full flex items-center gap-0.5 overflow-hidden;
+    @apply text-[9px] sm:text-[10px] md:text-xs px-0.5 sm:px-1 py-0.5 rounded-sm mt-0.5 sm:mt-1 leading-tight w-full flex items-center gap-0.5 overflow-hidden;
   }
+
 
   .holiday-national {
     @apply bg-[hsl(var(--holiday-national))] text-primary-foreground;
