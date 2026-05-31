@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BulgarianCalendar } from '@/components/BulgarianCalendar';
+import { BulgarianCalendar, type CalendarViewMode } from '@/components/BulgarianCalendar';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogIn, LogOut, User, Settings, CalendarDays, Grid3X3 } from 'lucide-react';
+import { LogIn, LogOut, User, Settings, CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationToggle } from '@/components/NotificationToggle';
@@ -24,7 +24,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'month' | 'year'>('month');
+  const [viewMode, setViewMode] = useState<CalendarViewMode>('month');
 
   useEffect(() => {
     const loadAvatar = async () => {
