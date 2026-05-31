@@ -55,10 +55,11 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
-          <h2 className="text-2xl md:text-3xl font-display font-semibold text-foreground print:text-black">
+        <div className="flex items-center gap-2 flex-wrap justify-center min-w-0">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-semibold text-foreground print:text-black text-center">
             {getMonthName(currentMonth.month)} {currentMonth.year}
           </h2>
+
           {showTodayButton && onGoToToday && (
             <Button
               variant="secondary"
