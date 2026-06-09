@@ -35,6 +35,7 @@ interface BulgarianCalendarProps {
 
 
 export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarProps) {
+  const { t } = useTranslation();
   const months = useMemo(() => getMonthRange(), []);
   const [currentIndex, setCurrentIndex] = useState(() => {
     const now = new Date();
