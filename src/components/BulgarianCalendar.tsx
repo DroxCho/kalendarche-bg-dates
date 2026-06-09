@@ -1,5 +1,8 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useTranslation } from 'react-i18next';
+import { CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
@@ -32,6 +35,7 @@ interface BulgarianCalendarProps {
 
 
 export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarProps) {
+  const { t } = useTranslation();
   const months = useMemo(() => getMonthRange(), []);
   const [currentIndex, setCurrentIndex] = useState(() => {
     const now = new Date();
@@ -183,6 +187,45 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
           />
         </div>
       )}
+
+      <div className="flex flex-wrap items-center justify-center gap-2 print:hidden">
+        <Button
+          variant={viewMode === 'day' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('day')}
+          className="gap-1.5 h-8 text-xs px-2"
+        >
+          <Sun className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">{t('calendar.day', 'Ден')}</span>
+        </Button>
+        <Button
+          variant={viewMode === 'week' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('week')}
+          className="gap-1.5 h-8 text-xs px-2"
+        >
+          <CalendarRange className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">{t('calendar.week', 'Седмица')}</span>
+        </Button>
+        <Button
+          variant={viewMode === 'month' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('month')}
+          className="gap-1.5 h-8 text-xs px-2"
+        >
+          <CalendarDays className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">{t('calendar.month', 'Месец')}</span>
+        </Button>
+        <Button
+          variant={viewMode === 'year' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setViewMode('year')}
+          className="gap-1.5 h-8 text-xs px-2"
+        >
+          <Grid3X3 className="h-3.5 w-3.5" />
+          <span className="hidden sm:inline">{t('calendar.year', 'Година')}</span>
+        </Button>
+      </div>
 
       <HolidayFilter
         activeFilters={activeFilters}
