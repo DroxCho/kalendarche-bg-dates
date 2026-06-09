@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
