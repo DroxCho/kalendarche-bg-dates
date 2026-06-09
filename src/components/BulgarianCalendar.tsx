@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { CalendarGrid } from './CalendarGrid';
 import { MonthPaginator } from './MonthPaginator';
 import { CalendarLegend } from './CalendarLegend';
@@ -189,42 +190,26 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       )}
 
       <div className="flex flex-wrap items-center justify-center gap-2 print:hidden">
-        <Button
-          variant={viewMode === 'day' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setViewMode('day')}
-          className="gap-1.5 h-8 text-xs px-2"
-        >
-          <Sun className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">{t('calendar.day', 'Ден')}</span>
-        </Button>
-        <Button
-          variant={viewMode === 'week' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setViewMode('week')}
-          className="gap-1.5 h-8 text-xs px-2"
-        >
-          <CalendarRange className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">{t('calendar.week', 'Седмица')}</span>
-        </Button>
-        <Button
-          variant={viewMode === 'month' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setViewMode('month')}
-          className="gap-1.5 h-8 text-xs px-2"
-        >
-          <CalendarDays className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">{t('calendar.month', 'Месец')}</span>
-        </Button>
-        <Button
-          variant={viewMode === 'year' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setViewMode('year')}
-          className="gap-1.5 h-8 text-xs px-2"
-        >
-          <Grid3X3 className="h-3.5 w-3.5" />
-          <span className="hidden sm:inline">{t('calendar.year', 'Година')}</span>
-        </Button>
+        {([
+          { mode: 'day' as const, icon: <Sun className="w-3 h-3" />, label: t('calendar.day', 'Ден') },
+          { mode: 'week' as const, icon: <CalendarRange className="w-3 h-3" />, label: t('calendar.week', 'Седмица') },
+          { mode: 'month' as const, icon: <CalendarDays className="w-3 h-3" />, label: t('calendar.month', 'Месец') },
+          { mode: 'year' as const, icon: <Grid3X3 className="w-3 h-3" />, label: t('calendar.year', 'Година') },
+        ]).map(({ mode, icon, label }) => (
+          <button
+            key={mode}
+            onClick={() => setViewMode(mode)}
+            className={cn(
+              "flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full transition-all duration-200 border",
+              viewMode === mode
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-muted text-muted-foreground border-border hover:bg-secondary hover:text-foreground"
+            )}
+          >
+            {icon}
+            {label}
+          </button>
+        ))}
       </div>
 
       <HolidayFilter
