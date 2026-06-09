@@ -170,7 +170,7 @@ export function WeekView(props: WeekViewProps) {
               key={ds}
               onClick={() => openDay(date)}
               className={cn(
-                'flex flex-col items-stretch text-left bg-card border border-border rounded-lg p-3 min-h-[160px] hover:bg-secondary/40 transition-colors',
+                'flex flex-col items-stretch text-left bg-card border border-border rounded-lg p-3 min-h-[480px] hover:bg-secondary/40 transition-colors',
                 isToday && 'ring-2 ring-primary ring-inset',
                 idx === 5 && 'bg-[hsl(var(--day-saturday-bg))]',
                 idx === 6 && 'bg-[hsl(var(--day-sunday-bg))]',
