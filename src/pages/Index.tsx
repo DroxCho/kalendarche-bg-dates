@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogIn, LogOut, User, Settings, CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
+import { LogIn, LogOut, User, Settings } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationToggle } from '@/components/NotificationToggle';
