@@ -97,7 +97,7 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
   };
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="relative w-full">
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
@@ -105,7 +105,7 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
           placeholder={t('search.placeholder')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-10 pr-10"
+          className="pl-10 pr-10 h-8 py-1 text-xs"
         />
         {query && (
           <button
