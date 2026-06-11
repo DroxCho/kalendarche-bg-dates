@@ -210,12 +210,12 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
             {label}
           </button>
         ))}
+        <span className="mx-1 h-5 w-px bg-border" aria-hidden="true" />
+        <HolidayFilter
+          activeFilters={activeFilters}
+          onFilterChange={setActiveFilters}
+        />
       </div>
-
-      <HolidayFilter
-        activeFilters={activeFilters}
-        onFilterChange={setActiveFilters}
-      />
 
       {/* Print all calendar - only visible when printing all */}
       {printAll && (
