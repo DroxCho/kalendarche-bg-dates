@@ -174,10 +174,6 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
         />,
         portalTarget
       )}
-      <div className="print:hidden">
-        <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
-      </div>
-      
       {(viewMode === 'month' || viewMode === 'year') && (
         <div className={`${printAll ? 'print:hidden' : ''}`}>
           <MonthPaginator
@@ -190,6 +186,10 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       )}
 
       <div className="flex flex-wrap items-center justify-center gap-2 print:hidden">
+        <div className="relative w-44 shrink-0">
+          <HolidaySearch onNavigateToMonth={handleNavigateToMonth} />
+        </div>
+
         {([
           { mode: 'day' as const, icon: <Sun className="w-3 h-3" />, label: t('calendar.day', 'Ден') },
           { mode: 'week' as const, icon: <CalendarRange className="w-3 h-3" />, label: t('calendar.week', 'Седмица') },
@@ -210,12 +210,12 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
             {label}
           </button>
         ))}
-      </div>
 
-      <HolidayFilter
-        activeFilters={activeFilters}
-        onFilterChange={setActiveFilters}
-      />
+        <HolidayFilter
+          activeFilters={activeFilters}
+          onFilterChange={setActiveFilters}
+        />
+      </div>
 
       {/* Print all calendar - only visible when printing all */}
       {printAll && (
