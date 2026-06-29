@@ -187,7 +187,7 @@ function getHolidaysForYear(year: number): Holiday[] {
 
     // Юли
     { date: `${year}-07-01`, name: 'Козма, Дамян, Дамяна', type: 'nameday' },
-    { date: `${year}-07-07`, name: 'Неделя, Недялко, Недялка, Кирил', type: 'nameday' },
+    { date: `${year}-07-07`, name: 'Св. Неделя – Неделя, Недялко, Недялка', type: 'nameday' },
     { date: `${year}-07-08`, name: 'Прокопиевден – Прокопий, Прокопи', type: 'nameday' },
     { date: `${year}-07-17`, name: 'Марина, Маргарита, Маринела, Маринчо', type: 'nameday' },
     { date: `${year}-07-20`, name: 'Илинден – Илия, Илиян, Илиянa, Илко', type: 'nameday' },
@@ -197,7 +197,7 @@ function getHolidaysForYear(year: number): Holiday[] {
     // Август
     { date: `${year}-08-01`, name: 'Макавей – Макавей, Маца', type: 'nameday' },
     { date: `${year}-08-07`, name: 'Донка, Донко, Доника', type: 'nameday' },
-    { date: `${year}-08-09`, name: 'Панталеймоновден – Панталей, Пламен', type: 'nameday' },
+    { date: `${year}-08-09`, name: 'Св. ап. Матия – Матей, Матея', type: 'nameday' },
     { date: `${year}-08-15`, name: 'Мария, Марийка, Мариета, Мариана, Маня', type: 'nameday' },
     { date: `${year}-08-26`, name: 'Наталия, Адриан, Адриана', type: 'nameday' },
 
