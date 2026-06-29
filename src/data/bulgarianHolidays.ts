@@ -254,7 +254,6 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-06-01`, name: 'Ден на розата', type: 'folk' },
     { date: `${year}-06-24`, name: 'Еньовден - билки и магии', type: 'folk' },
     { date: `${year}-06-29`, name: 'Петровден - празник на рибарите', type: 'folk' },
-    { date: `${year}-07-02`, name: 'Ден на билките', type: 'folk' },
     { date: `${year}-07-20`, name: 'Илинден - празник на жътвата', type: 'folk' },
     { date: `${year}-07-27`, name: 'Св. Седмочисленици', type: 'folk' },
     { date: `${year}-08-01`, name: 'Макавей - празник на пчеларите', type: 'folk' },
