@@ -207,14 +207,12 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: `${year}-09-17`, name: 'Вяра, Надежда, Любов – Вера, Надя, Любка, Софка, София', type: 'nameday' },
 
     // Октомври
-    { date: `${year}-10-01`, name: 'Покров Богородичен – Закрила', type: 'nameday' },
     { date: `${year}-10-06`, name: 'Тома, Томислав, Томислава', type: 'nameday' },
     { date: `${year}-10-14`, name: 'Петковден – Петка, Параскева, Петкана', type: 'nameday' },
     { date: `${year}-10-18`, name: 'Лукановден – Лука, Лукан', type: 'nameday' },
     { date: `${year}-10-26`, name: 'Димитровден – Димитър, Димитрина, Митко, Митка', type: 'nameday' },
 
     // Ноември
-    { date: `${year}-11-01`, name: 'Ден на будителите – Иван, Ивайло (за учителите)', type: 'nameday' },
     { date: `${year}-11-08`, name: 'Архангеловден – Ангел, Ангелина, Архангел, Михаил, Михаела, Гавраил', type: 'nameday' },
     { date: `${year}-11-11`, name: 'Мина, Минка, Минчо', type: 'nameday' },
     { date: `${year}-11-21`, name: 'Въведение – Мария, Марийка (за въведение)', type: 'nameday' },
