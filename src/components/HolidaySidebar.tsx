@@ -58,10 +58,11 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [year, month]);
 
-  const nextUpcomingIndex = useMemo(() => {
+  const nextUpcomingDate = useMemo(() => {
     const now = new Date();
     const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-    return monthHolidays.findIndex(h => h.date >= todayStr);
+    const next = monthHolidays.find(h => h.date >= todayStr);
+    return next?.date ?? null;
   }, [monthHolidays]);
 
   const highlightRef = useRef<HTMLLIElement | null>(null);
@@ -72,7 +73,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
     if (container && el) {
       container.scrollTo({ top: el.offsetTop - container.offsetTop, behavior: 'smooth' });
     }
-  }, [nextUpcomingIndex, year, month]);
+  }, [nextUpcomingDate, year, month]);
 
   return (
     <aside className="bg-card border border-border rounded-xl p-4 sm:p-5 h-fit lg:sticky lg:top-8 lg:max-h-[min(calc(100vh-8rem),600px)] flex flex-col overflow-hidden">
