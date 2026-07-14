@@ -58,6 +58,19 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
       .sort((a, b) => a.date.localeCompare(b.date));
   }, [year, month]);
 
+  const nextUpcomingIndex = useMemo(() => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    return monthHolidays.findIndex(h => h.date >= todayStr);
+  }, [monthHolidays]);
+
+  const highlightRef = useRef<HTMLLIElement | null>(null);
+  useEffect(() => {
+    if (highlightRef.current) {
+      highlightRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  }, [nextUpcomingIndex, year, month]);
+
   return (
     <aside className="bg-card border border-border rounded-xl p-4 sm:p-5 h-fit lg:sticky lg:top-8 lg:max-h-[min(calc(100vh-8rem),600px)] flex flex-col overflow-hidden">
       <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2 sticky top-0 bg-card z-10 pb-2">
@@ -74,17 +87,20 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
         <ul className="space-y-3">
           {monthHolidays.map((holiday, index) => {
             const Icon = getHolidayIcon(holiday.type);
+            const isNextUpcoming = index === nextUpcomingIndex;
             return (
               <li
                 key={`${holiday.date}-${index}`}
+                ref={isNextUpcoming ? highlightRef : undefined}
                 className={cn(
-                  "p-3 rounded-lg border transition-colors",
+                  "p-3 rounded-lg border transition-all",
                   holiday.type === 'national' && "bg-[hsl(var(--holiday-national))]/10 border-[hsl(var(--holiday-national))]/30",
                   holiday.type === 'orthodox' && "bg-[hsl(var(--holiday-orthodox))]/10 border-[hsl(var(--holiday-orthodox))]/30",
                   holiday.type === 'nonworking' && "bg-[hsl(var(--holiday-nonworking))]/10 border-[hsl(var(--holiday-nonworking))]/30",
                   holiday.type === 'nameday' && "bg-[hsl(var(--holiday-nameday))]/10 border-[hsl(var(--holiday-nameday))]/30",
                   holiday.type === 'folk' && "bg-[hsl(var(--holiday-folk))]/10 border-[hsl(var(--holiday-folk))]/30",
-                  holiday.type === 'fasting' && "bg-[hsl(var(--holiday-fasting))]/10 border-[hsl(var(--holiday-fasting))]/30"
+                  holiday.type === 'fasting' && "bg-[hsl(var(--holiday-fasting))]/10 border-[hsl(var(--holiday-fasting))]/30",
+                  isNextUpcoming && "ring-2 ring-primary ring-offset-2 ring-offset-card shadow-md"
                 )}
               >
                 <div className="flex items-start gap-3">
@@ -100,10 +116,15 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
                     )}
                   />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-muted-foreground">
-                      {formatDayMonth(holiday.date)}
+                    <p className={cn("text-xs text-muted-foreground flex items-center gap-2", isNextUpcoming && "text-primary font-semibold")}>
+                      <span>{formatDayMonth(holiday.date)}</span>
+                      {isNextUpcoming && (
+                        <span className="px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] uppercase tracking-wide">
+                          {isEnglish ? 'Next' : 'Следващ'}
+                        </span>
+                      )}
                     </p>
-                    <p className="font-medium text-foreground text-sm leading-tight mt-0.5">
+                    <p className={cn("font-medium text-foreground text-sm leading-tight mt-0.5", isNextUpcoming && "font-semibold")}>
                       {translateHolidayName(holiday.name, i18n.language)}
                     </p>
                   </div>
