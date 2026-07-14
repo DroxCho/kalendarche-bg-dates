@@ -67,7 +67,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
   const highlightRef = useRef<HTMLLIElement | null>(null);
   useEffect(() => {
     if (highlightRef.current) {
-      highlightRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      highlightRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' });
     }
   }, [nextUpcomingIndex, year, month]);
 
