@@ -90,53 +90,58 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
         </p>
       ) : (
         <ul className="space-y-3">
-          {monthHolidays.map((holiday, index) => {
-            const Icon = getHolidayIcon(holiday.type);
-            const isNextUpcoming = index === nextUpcomingIndex;
-            return (
-              <li
-                key={`${holiday.date}-${index}`}
-                ref={isNextUpcoming ? highlightRef : undefined}
-                className={cn(
-                  "p-3 rounded-lg border transition-all",
-                  holiday.type === 'national' && "bg-[hsl(var(--holiday-national))]/10 border-[hsl(var(--holiday-national))]/30",
-                  holiday.type === 'orthodox' && "bg-[hsl(var(--holiday-orthodox))]/10 border-[hsl(var(--holiday-orthodox))]/30",
-                  holiday.type === 'nonworking' && "bg-[hsl(var(--holiday-nonworking))]/10 border-[hsl(var(--holiday-nonworking))]/30",
-                  holiday.type === 'nameday' && "bg-[hsl(var(--holiday-nameday))]/10 border-[hsl(var(--holiday-nameday))]/30",
-                  holiday.type === 'folk' && "bg-[hsl(var(--holiday-folk))]/10 border-[hsl(var(--holiday-folk))]/30",
-                  holiday.type === 'fasting' && "bg-[hsl(var(--holiday-fasting))]/10 border-[hsl(var(--holiday-fasting))]/30",
-                  isNextUpcoming && "ring-2 ring-primary ring-offset-2 ring-offset-card shadow-md"
-                )}
-              >
-                <div className="flex items-start gap-3">
-                  <Icon
-                    className={cn(
-                      "w-4 h-4 mt-0.5 shrink-0",
-                      holiday.type === 'national' && "text-[hsl(var(--holiday-national))]",
-                      holiday.type === 'orthodox' && "text-[hsl(var(--holiday-orthodox))]",
-                      holiday.type === 'nonworking' && "text-[hsl(var(--holiday-nonworking))]",
-                      holiday.type === 'nameday' && "text-[hsl(var(--holiday-nameday))]",
-                      holiday.type === 'folk' && "text-[hsl(var(--holiday-folk))]",
-                      holiday.type === 'fasting' && "text-[hsl(var(--holiday-fasting))]"
-                    )}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p className={cn("text-xs text-muted-foreground flex items-center gap-2", isNextUpcoming && "text-primary font-semibold")}>
-                      <span>{formatDayMonth(holiday.date)}</span>
-                      {isNextUpcoming && (
-                        <span className="px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] uppercase tracking-wide">
-                          {isEnglish ? 'Next' : 'Следващ'}
-                        </span>
+          {(() => {
+            let firstHighlighted = false;
+            return monthHolidays.map((holiday, index) => {
+              const Icon = getHolidayIcon(holiday.type);
+              const isNextUpcoming = holiday.date === nextUpcomingDate;
+              const assignRef = isNextUpcoming && !firstHighlighted;
+              if (assignRef) firstHighlighted = true;
+              return (
+                <li
+                  key={`${holiday.date}-${index}`}
+                  ref={assignRef ? highlightRef : undefined}
+                  className={cn(
+                    "p-3 rounded-lg border transition-all",
+                    holiday.type === 'national' && "bg-[hsl(var(--holiday-national))]/10 border-[hsl(var(--holiday-national))]/30",
+                    holiday.type === 'orthodox' && "bg-[hsl(var(--holiday-orthodox))]/10 border-[hsl(var(--holiday-orthodox))]/30",
+                    holiday.type === 'nonworking' && "bg-[hsl(var(--holiday-nonworking))]/10 border-[hsl(var(--holiday-nonworking))]/30",
+                    holiday.type === 'nameday' && "bg-[hsl(var(--holiday-nameday))]/10 border-[hsl(var(--holiday-nameday))]/30",
+                    holiday.type === 'folk' && "bg-[hsl(var(--holiday-folk))]/10 border-[hsl(var(--holiday-folk))]/30",
+                    holiday.type === 'fasting' && "bg-[hsl(var(--holiday-fasting))]/10 border-[hsl(var(--holiday-fasting))]/30",
+                    isNextUpcoming && "ring-2 ring-primary ring-offset-2 ring-offset-card shadow-md"
+                  )}
+                >
+                  <div className="flex items-start gap-3">
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 mt-0.5 shrink-0",
+                        holiday.type === 'national' && "text-[hsl(var(--holiday-national))]",
+                        holiday.type === 'orthodox' && "text-[hsl(var(--holiday-orthodox))]",
+                        holiday.type === 'nonworking' && "text-[hsl(var(--holiday-nonworking))]",
+                        holiday.type === 'nameday' && "text-[hsl(var(--holiday-nameday))]",
+                        holiday.type === 'folk' && "text-[hsl(var(--holiday-folk))]",
+                        holiday.type === 'fasting' && "text-[hsl(var(--holiday-fasting))]"
                       )}
-                    </p>
-                    <p className={cn("font-medium text-foreground text-sm leading-tight mt-0.5", isNextUpcoming && "font-semibold")}>
-                      {translateHolidayName(holiday.name, i18n.language)}
-                    </p>
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className={cn("text-xs text-muted-foreground flex items-center gap-2", isNextUpcoming && "text-primary font-semibold")}>
+                        <span>{formatDayMonth(holiday.date)}</span>
+                        {isNextUpcoming && (
+                          <span className="px-1.5 py-0.5 rounded bg-primary text-primary-foreground text-[10px] uppercase tracking-wide">
+                            {isEnglish ? 'NEXT' : 'СЛЕДВАЩ'}
+                          </span>
+                        )}
+                      </p>
+                      <p className={cn("font-medium text-foreground text-sm leading-tight mt-0.5", isNextUpcoming && "font-semibold")}>
+                        {translateHolidayName(holiday.name, i18n.language)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              </li>
-            );
-          })}
+                </li>
+              );
+            });
+          })()}
         </ul>
       )}
       </div>
