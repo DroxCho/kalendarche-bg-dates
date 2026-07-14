@@ -65,9 +65,12 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
   }, [monthHolidays]);
 
   const highlightRef = useRef<HTMLLIElement | null>(null);
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    if (highlightRef.current) {
-      highlightRef.current.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    const container = scrollContainerRef.current;
+    const el = highlightRef.current;
+    if (container && el) {
+      container.scrollTo({ top: el.offsetTop - container.offsetTop, behavior: 'smooth' });
     }
   }, [nextUpcomingIndex, year, month]);
 
@@ -77,7 +80,8 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
         <Calendar className="w-5 h-5 text-primary" />
         {t('sidebar.upcomingHolidays')} - {getMonthName(month)}
       </h2>
-      <div className="overflow-y-auto flex-1 min-h-0">
+      <div ref={scrollContainerRef} className="overflow-y-auto flex-1 min-h-0">
+      
       
       {monthHolidays.length === 0 ? (
         <p className="text-muted-foreground text-sm">
