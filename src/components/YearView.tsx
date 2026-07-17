@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
+import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getHolidaysForDate, hasNonWorkingHoliday, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
 import { Leaf, Flag, Cross } from 'lucide-react';
 
