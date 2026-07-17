@@ -372,6 +372,11 @@ export function getHolidaysForDate(dateString: string): Holiday[] {
   return getAllHolidays().filter(h => h.date === dateString);
 }
 
+// Check if a date has an official non-working holiday
+export function hasNonWorkingHoliday(dateString: string): boolean {
+  return getHolidaysForDate(dateString).some(h => h.nonWorking);
+}
+
 // Check if a date is a weekend
 export function isWeekend(date: Date): boolean {
   const day = date.getDay();
