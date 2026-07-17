@@ -85,6 +85,7 @@ export function DayView(props: DayViewProps) {
 
   const allHolidays = getHolidaysForDate(ds);
   const holidays = activeFilters.length === 0 ? [] : allHolidays.filter(h => activeFilters.includes(h.type));
+  const hasNonWorking = hasNonWorkingHoliday(ds);
   const dayNotes = notes[ds] || [];
   const dayBirthdays = birthdays.filter(b => b.month === focusDate.getMonth() + 1 && b.day === focusDate.getDate());
   const dayEvents = recurringEvents.filter(e => e.month === focusDate.getMonth() + 1 && e.day === focusDate.getDate());
