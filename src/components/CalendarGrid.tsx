@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
+import { BULGARIAN_DAYS, getHolidaysForDate, hasNonWorkingHoliday, Holiday } from '@/data/bulgarianHolidays';
 import { translateHolidayName } from '@/data/holidayTranslations';
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
@@ -257,6 +257,7 @@ export function CalendarGrid({
           const filteredHolidays = filterHolidays(day.holidays);
           const hasFastingDay = day.holidays.some(h => h.type === 'fasting');
           const dateString = formatDateString(day.date);
+          const hasNonWorking = hasNonWorkingHoliday(dateString);
           const dateNotes = notes[dateString] || [];
           const notesCount = dateNotes.length;
           const dateBirthdays = getBirthdaysForDate(day.date.getMonth() + 1, day.date.getDate());
@@ -401,6 +402,7 @@ export function CalendarGrid({
                   "calendar-day-number",
                   day.isSaturday && "text-[hsl(var(--day-saturday))]",
                   day.isSunday && "text-[hsl(var(--day-sunday))]",
+                  hasNonWorking && !day.isSaturday && !day.isSunday && !day.isToday && "text-[hsl(var(--holiday-nonworking))] font-semibold",
                   day.isToday && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
                 )}
               >

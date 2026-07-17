@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getHolidaysForDate, Holiday } from '@/data/bulgarianHolidays';
+import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getHolidaysForDate, hasNonWorkingHoliday, Holiday } from '@/data/bulgarianHolidays';
 import { cn } from '@/lib/utils';
 import { Leaf, Flag, Cross } from 'lucide-react';
 
@@ -112,6 +112,7 @@ function MiniMonth({ year, month, onMonthClick }: { year: number; month: number;
           const dayOfWeek = day.date.getDay();
           const isSaturday = dayOfWeek === 6;
           const isSunday = dayOfWeek === 0;
+          const hasNonWorking = day.isCurrentMonth && hasNonWorkingHoliday(formatDateString(day.date));
           const hasNational = day.holidays.some(h => h.type === 'national');
           const hasOrthodox = day.holidays.some(h => h.type === 'orthodox');
           const hasFolk = day.holidays.some(h => h.type === 'folk');
@@ -126,6 +127,7 @@ function MiniMonth({ year, month, onMonthClick }: { year: number; month: number;
                 !day.isCurrentMonth && "opacity-30",
                 day.isCurrentMonth && isSaturday && "text-[hsl(var(--day-saturday))]",
                 day.isCurrentMonth && isSunday && "text-[hsl(var(--day-sunday))]",
+                hasNonWorking && !isSaturday && !isSunday && !isToday && "text-[hsl(var(--holiday-nonworking))] font-bold",
                 isToday && "bg-primary text-primary-foreground rounded-full font-bold",
                 hasNational && day.isCurrentMonth && !isToday && "bg-[hsl(var(--holiday-national)/0.3)] rounded-sm",
                 hasOrthodox && day.isCurrentMonth && !isToday && !hasNational && "bg-[hsl(var(--holiday-orthodox)/0.3)] rounded-sm"

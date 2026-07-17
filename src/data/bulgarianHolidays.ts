@@ -4,6 +4,7 @@ export interface Holiday {
   date: string; // Format: YYYY-MM-DD
   name: string;
   type: HolidayType;
+  nonWorking?: boolean; // Official non-working public holiday
 }
 
 // Bulgarian month names
@@ -53,19 +54,19 @@ function addDays(date: Date, days: number): Date {
 function getHolidaysForYear(year: number): Holiday[] {
   const holidays: Holiday[] = [];
   
-  // Fixed National Holidays
+  // Fixed National Holidays (all are official non-working days)
   holidays.push(
-    { date: `${year}-01-01`, name: 'Нова година', type: 'national' },
-    { date: `${year}-03-03`, name: 'Ден на Освобождението', type: 'national' },
-    { date: `${year}-05-01`, name: 'Ден на труда', type: 'national' },
-    { date: `${year}-05-06`, name: 'Гергьовден - Ден на храбростта', type: 'national' },
-    { date: `${year}-05-24`, name: 'Ден на славянската писменост', type: 'national' },
-    { date: `${year}-09-06`, name: 'Ден на Съединението', type: 'national' },
-    { date: `${year}-09-22`, name: 'Ден на Независимостта', type: 'national' },
-    { date: `${year}-11-01`, name: 'Ден на народните будители', type: 'national' },
-    { date: `${year}-12-24`, name: 'Бъдни вечер', type: 'national' },
-    { date: `${year}-12-25`, name: 'Коледа', type: 'national' },
-    { date: `${year}-12-26`, name: 'Коледа (втори ден)', type: 'national' },
+    { date: `${year}-01-01`, name: 'Нова година', type: 'national', nonWorking: true },
+    { date: `${year}-03-03`, name: 'Ден на Освобождението', type: 'national', nonWorking: true },
+    { date: `${year}-05-01`, name: 'Ден на труда', type: 'national', nonWorking: true },
+    { date: `${year}-05-06`, name: 'Гергьовден - Ден на храбростта', type: 'national', nonWorking: true },
+    { date: `${year}-05-24`, name: 'Ден на славянската писменост', type: 'national', nonWorking: true },
+    { date: `${year}-09-06`, name: 'Ден на Съединението', type: 'national', nonWorking: true },
+    { date: `${year}-09-22`, name: 'Ден на Независимостта', type: 'national', nonWorking: true },
+    { date: `${year}-11-01`, name: 'Ден на народните будители', type: 'national', nonWorking: true },
+    { date: `${year}-12-24`, name: 'Бъдни вечер', type: 'national', nonWorking: true },
+    { date: `${year}-12-25`, name: 'Коледа', type: 'national', nonWorking: true },
+    { date: `${year}-12-26`, name: 'Коледа (втори ден)', type: 'national', nonWorking: true },
   );
 
   // Orthodox Easter and related holidays
@@ -101,15 +102,15 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: formatDate(todorovden), name: 'Тодоровден - празник на конете', type: 'folk' },
     { date: formatDate(lazarusSaturday), name: 'Лазаровден', type: 'folk' },
     { date: formatDate(palmSunday), name: 'Цветница', type: 'orthodox' },
-    { date: formatDate(goodFriday), name: 'Разпети петък', type: 'orthodox' },
-    { date: formatDate(holySaturday), name: 'Велика събота', type: 'orthodox' },
-    { date: formatDate(easter), name: 'Великден', type: 'orthodox' },
-    { date: formatDate(easterMonday), name: 'Великден (втори ден)', type: 'orthodox' },
+    { date: formatDate(goodFriday), name: 'Разпети петък', type: 'orthodox', nonWorking: true },
+    { date: formatDate(holySaturday), name: 'Велика събота', type: 'orthodox', nonWorking: true },
+    { date: formatDate(easter), name: 'Великден', type: 'orthodox', nonWorking: true },
+    { date: formatDate(easterMonday), name: 'Великден (втори ден)', type: 'orthodox', nonWorking: true },
     { date: formatDate(midPentecost), name: 'Преполовение', type: 'orthodox' },
     { date: formatDate(ascension), name: 'Спасовден', type: 'orthodox' },
     { date: formatDate(pentecostSaturday), name: 'Черешова (Духовска) задушница', type: 'orthodox' },
     { date: formatDate(pentecost), name: 'Петдесетница', type: 'orthodox' },
-    { date: formatDate(holySpirit), name: 'Духовден', type: 'orthodox' },
+    { date: formatDate(holySpirit), name: 'Духовден', type: 'orthodox', nonWorking: true },
     { date: formatDate(rusalskaNedelya), name: 'Русалска неделя', type: 'folk' },
     { date: formatDate(archangelSaturday), name: 'Архангелова задушница', type: 'orthodox' },
   );
@@ -369,6 +370,11 @@ export function getAllHolidays(): Holiday[] {
 // Get holidays for a specific date
 export function getHolidaysForDate(dateString: string): Holiday[] {
   return getAllHolidays().filter(h => h.date === dateString);
+}
+
+// Check if a date has an official non-working holiday
+export function hasNonWorkingHoliday(dateString: string): boolean {
+  return getHolidaysForDate(dateString).some(h => h.nonWorking);
 }
 
 // Check if a date is a weekend

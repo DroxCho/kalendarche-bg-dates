@@ -7,6 +7,7 @@ import {
   BULGARIAN_DAYS_FULL,
   BULGARIAN_MONTHS,
   getHolidaysForDate,
+  hasNonWorkingHoliday,
   Holiday,
 } from '@/data/bulgarianHolidays';
 import { translateHolidayName, translateHolidayDescription } from '@/data/holidayTranslations';
@@ -84,6 +85,7 @@ export function DayView(props: DayViewProps) {
 
   const allHolidays = getHolidaysForDate(ds);
   const holidays = activeFilters.length === 0 ? [] : allHolidays.filter(h => activeFilters.includes(h.type));
+  const hasNonWorking = hasNonWorkingHoliday(ds);
   const dayNotes = notes[ds] || [];
   const dayBirthdays = birthdays.filter(b => b.month === focusDate.getMonth() + 1 && b.day === focusDate.getDate());
   const dayEvents = recurringEvents.filter(e => e.month === focusDate.getMonth() + 1 && e.day === focusDate.getDate());
@@ -114,7 +116,8 @@ export function DayView(props: DayViewProps) {
             'text-xl sm:text-2xl md:text-3xl font-display font-semibold text-center',
             dayIdx === 5 && 'text-[hsl(var(--day-saturday))]',
             dayIdx === 6 && 'text-[hsl(var(--day-sunday))]',
-            !isWeekend && 'text-foreground',
+            hasNonWorking && !isWeekend && "text-[hsl(var(--holiday-nonworking))]",
+            !isWeekend && !hasNonWorking && 'text-foreground',
           )}>
             {focusDate.getDate()} {monthName} {focusDate.getFullYear()}
           </h2>

@@ -7,6 +7,7 @@ import {
   BULGARIAN_DAYS_FULL,
   BULGARIAN_MONTHS,
   getHolidaysForDate,
+  hasNonWorkingHoliday,
   Holiday,
 } from '@/data/bulgarianHolidays';
 import { translateHolidayName } from '@/data/holidayTranslations';
@@ -158,6 +159,7 @@ export function WeekView(props: WeekViewProps) {
           const allHolidays = getHolidaysForDate(ds);
           const visibleHolidays = filterHolidays(allHolidays).filter(h => !isOrdinaryFasting(h));
           const hasFasting = allHolidays.some(h => h.type === 'fasting');
+          const hasNonWorking = hasNonWorkingHoliday(ds);
           const dayNotes = notes[ds] || [];
           const dayBirthdays = birthdays.filter(b => b.month === date.getMonth() + 1 && b.day === date.getDate());
           const dayEvents = recurringEvents.filter(e => e.month === date.getMonth() + 1 && e.day === date.getDate());
@@ -190,6 +192,7 @@ export function WeekView(props: WeekViewProps) {
                     'text-2xl font-semibold leading-none mt-1',
                     idx === 5 && 'text-[hsl(var(--day-saturday))]',
                     idx === 6 && 'text-[hsl(var(--day-sunday))]',
+                    hasNonWorking && !isWeekend && "text-[hsl(var(--holiday-nonworking))]",
                   )}>
                     {date.getDate()}
                   </span>
