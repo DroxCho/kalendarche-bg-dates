@@ -82,7 +82,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
         <Calendar className="w-5 h-5 text-primary" />
         {t('sidebar.upcomingHolidays')}
       </h2>
-      <div ref={scrollContainerRef} className="overflow-y-auto flex-1 min-h-0 py-4 px-2">
+      <div ref={scrollContainerRef} className="overflow-y-auto flex-1 min-h-0 pt-8 pb-4 px-2">
       
       
       {monthHolidays.length === 0 ? (
