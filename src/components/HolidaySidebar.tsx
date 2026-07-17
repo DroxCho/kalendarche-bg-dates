@@ -71,7 +71,8 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
     const container = scrollContainerRef.current;
     const el = highlightRef.current;
     if (container && el) {
-      container.scrollTo({ top: el.offsetTop - container.offsetTop, behavior: 'smooth' });
+      const paddingTop = parseFloat(window.getComputedStyle(container).paddingTop);
+      container.scrollTo({ top: el.offsetTop - container.offsetTop - paddingTop, behavior: 'smooth' });
     }
   }, [nextUpcomingDate, year, month]);
 
