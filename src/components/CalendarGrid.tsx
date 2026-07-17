@@ -402,6 +402,7 @@ export function CalendarGrid({
                   "calendar-day-number",
                   day.isSaturday && "text-[hsl(var(--day-saturday))]",
                   day.isSunday && "text-[hsl(var(--day-sunday))]",
+                  hasNonWorking && !day.isSaturday && !day.isSunday && !day.isToday && "text-[hsl(var(--holiday-nonworking))] font-semibold",
                   day.isToday && "bg-primary text-primary-foreground rounded-full w-7 h-7 flex items-center justify-center"
                 )}
               >
