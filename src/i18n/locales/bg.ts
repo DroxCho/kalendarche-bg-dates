@@ -281,7 +281,7 @@ const bg = {
 
   // Sidebar
   sidebar: {
-    upcomingHolidays: 'Предстоящи празници',
+    upcomingHolidays: 'Празници този месец',
     noUpcoming: 'Няма предстоящи празници този месец',
     inDays: 'след {days} дни',
     tomorrow: 'утре',
