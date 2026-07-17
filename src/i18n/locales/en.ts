@@ -281,7 +281,7 @@ const en = {
 
   // Sidebar
   sidebar: {
-    upcomingHolidays: 'Upcoming Holidays',
+    upcomingHolidays: 'Holidays this month',
     noUpcoming: 'No upcoming holidays this month',
     inDays: 'in {days} days',
     tomorrow: 'tomorrow',

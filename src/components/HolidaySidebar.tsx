@@ -79,7 +79,7 @@ export function HolidaySidebar({ year, month }: HolidaySidebarProps) {
     <aside className="bg-card border border-border rounded-xl p-4 sm:p-5 h-fit lg:sticky lg:top-8 lg:max-h-[min(calc(100vh-8rem),600px)] flex flex-col overflow-hidden">
       <h2 className="text-lg font-display font-semibold text-foreground mb-4 flex items-center gap-2 bg-card">
         <Calendar className="w-5 h-5 text-primary" />
-        {t('sidebar.upcomingHolidays')} - {getMonthName(month)}
+        {t('sidebar.upcomingHolidays')}
       </h2>
       <div ref={scrollContainerRef} className="overflow-y-auto flex-1 min-h-0 pt-2 pb-2">
       
