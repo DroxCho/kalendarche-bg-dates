@@ -257,6 +257,7 @@ export function CalendarGrid({
           const filteredHolidays = filterHolidays(day.holidays);
           const hasFastingDay = day.holidays.some(h => h.type === 'fasting');
           const dateString = formatDateString(day.date);
+          const hasNonWorking = hasNonWorkingHoliday(dateString);
           const dateNotes = notes[dateString] || [];
           const notesCount = dateNotes.length;
           const dateBirthdays = getBirthdaysForDate(day.date.getMonth() + 1, day.date.getDate());
