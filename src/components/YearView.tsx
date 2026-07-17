@@ -112,6 +112,7 @@ function MiniMonth({ year, month, onMonthClick }: { year: number; month: number;
           const dayOfWeek = day.date.getDay();
           const isSaturday = dayOfWeek === 6;
           const isSunday = dayOfWeek === 0;
+          const hasNonWorking = day.isCurrentMonth && hasNonWorkingHoliday(formatDateString(day.date));
           const hasNational = day.holidays.some(h => h.type === 'national');
           const hasOrthodox = day.holidays.some(h => h.type === 'orthodox');
           const hasFolk = day.holidays.some(h => h.type === 'folk');
