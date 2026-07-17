@@ -116,7 +116,8 @@ export function DayView(props: DayViewProps) {
             'text-xl sm:text-2xl md:text-3xl font-display font-semibold text-center',
             dayIdx === 5 && 'text-[hsl(var(--day-saturday))]',
             dayIdx === 6 && 'text-[hsl(var(--day-sunday))]',
-            !isWeekend && 'text-foreground',
+            hasNonWorking && !isWeekend && "text-[hsl(var(--holiday-nonworking))]",
+            !isWeekend && !hasNonWorking && 'text-foreground',
           )}>
             {focusDate.getDate()} {monthName} {focusDate.getFullYear()}
           </h2>
