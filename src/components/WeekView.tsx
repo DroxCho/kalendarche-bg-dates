@@ -7,6 +7,7 @@ import {
   BULGARIAN_DAYS_FULL,
   BULGARIAN_MONTHS,
   getHolidaysForDate,
+  hasNonWorkingHoliday,
   Holiday,
 } from '@/data/bulgarianHolidays';
 import { translateHolidayName } from '@/data/holidayTranslations';
