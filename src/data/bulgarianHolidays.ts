@@ -4,6 +4,7 @@ export interface Holiday {
   date: string; // Format: YYYY-MM-DD
   name: string;
   type: HolidayType;
+  nonWorking?: boolean; // Official non-working public holiday
 }
 
 // Bulgarian month names
