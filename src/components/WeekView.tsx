@@ -159,6 +159,7 @@ export function WeekView(props: WeekViewProps) {
           const allHolidays = getHolidaysForDate(ds);
           const visibleHolidays = filterHolidays(allHolidays).filter(h => !isOrdinaryFasting(h));
           const hasFasting = allHolidays.some(h => h.type === 'fasting');
+          const hasNonWorking = hasNonWorkingHoliday(ds);
           const dayNotes = notes[ds] || [];
           const dayBirthdays = birthdays.filter(b => b.month === date.getMonth() + 1 && b.day === date.getDate());
           const dayEvents = recurringEvents.filter(e => e.month === date.getMonth() + 1 && e.day === date.getDate());
