@@ -54,19 +54,19 @@ function addDays(date: Date, days: number): Date {
 function getHolidaysForYear(year: number): Holiday[] {
   const holidays: Holiday[] = [];
   
-  // Fixed National Holidays
+  // Fixed National Holidays (all are official non-working days)
   holidays.push(
-    { date: `${year}-01-01`, name: 'Нова година', type: 'national' },
-    { date: `${year}-03-03`, name: 'Ден на Освобождението', type: 'national' },
-    { date: `${year}-05-01`, name: 'Ден на труда', type: 'national' },
-    { date: `${year}-05-06`, name: 'Гергьовден - Ден на храбростта', type: 'national' },
-    { date: `${year}-05-24`, name: 'Ден на славянската писменост', type: 'national' },
-    { date: `${year}-09-06`, name: 'Ден на Съединението', type: 'national' },
-    { date: `${year}-09-22`, name: 'Ден на Независимостта', type: 'national' },
-    { date: `${year}-11-01`, name: 'Ден на народните будители', type: 'national' },
-    { date: `${year}-12-24`, name: 'Бъдни вечер', type: 'national' },
-    { date: `${year}-12-25`, name: 'Коледа', type: 'national' },
-    { date: `${year}-12-26`, name: 'Коледа (втори ден)', type: 'national' },
+    { date: `${year}-01-01`, name: 'Нова година', type: 'national', nonWorking: true },
+    { date: `${year}-03-03`, name: 'Ден на Освобождението', type: 'national', nonWorking: true },
+    { date: `${year}-05-01`, name: 'Ден на труда', type: 'national', nonWorking: true },
+    { date: `${year}-05-06`, name: 'Гергьовден - Ден на храбростта', type: 'national', nonWorking: true },
+    { date: `${year}-05-24`, name: 'Ден на славянската писменост', type: 'national', nonWorking: true },
+    { date: `${year}-09-06`, name: 'Ден на Съединението', type: 'national', nonWorking: true },
+    { date: `${year}-09-22`, name: 'Ден на Независимостта', type: 'national', nonWorking: true },
+    { date: `${year}-11-01`, name: 'Ден на народните будители', type: 'national', nonWorking: true },
+    { date: `${year}-12-24`, name: 'Бъдни вечер', type: 'national', nonWorking: true },
+    { date: `${year}-12-25`, name: 'Коледа', type: 'national', nonWorking: true },
+    { date: `${year}-12-26`, name: 'Коледа (втори ден)', type: 'national', nonWorking: true },
   );
 
   // Orthodox Easter and related holidays
