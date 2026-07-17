@@ -192,6 +192,7 @@ export function WeekView(props: WeekViewProps) {
                     'text-2xl font-semibold leading-none mt-1',
                     idx === 5 && 'text-[hsl(var(--day-saturday))]',
                     idx === 6 && 'text-[hsl(var(--day-sunday))]',
+                    hasNonWorking && !isWeekend && "text-[hsl(var(--holiday-nonworking))]",
                   )}>
                     {date.getDate()}
                   </span>
