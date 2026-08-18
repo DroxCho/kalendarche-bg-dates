@@ -176,6 +176,7 @@ export function WeekView(props: WeekViewProps) {
                 isToday && 'ring-2 ring-primary ring-inset',
                 idx === 5 && 'bg-[hsl(var(--day-saturday-bg))]',
                 idx === 6 && 'bg-[hsl(var(--day-sunday-bg))]',
+                hasNonWorking && !isWeekend && 'bg-[hsl(var(--day-sunday-bg))]',
               )}
             >
               <div className="flex items-baseline justify-between mb-2">

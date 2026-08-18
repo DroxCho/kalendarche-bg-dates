@@ -278,6 +278,7 @@ export function CalendarGrid({
                 !day.isCurrentMonth && "opacity-40",
                 day.isSaturday && day.isCurrentMonth && "calendar-day-saturday",
                 day.isSunday && day.isCurrentMonth && "calendar-day-sunday",
+                hasNonWorking && !day.isSaturday && !day.isSunday && day.isCurrentMonth && "calendar-day-nonworking",
                 day.isToday && "calendar-day-today",
                 dragOverDate === dateString && "ring-2 ring-primary ring-inset bg-primary/10"
               )}

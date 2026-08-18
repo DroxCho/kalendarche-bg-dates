@@ -147,6 +147,10 @@
     @apply bg-[hsl(var(--day-sunday-bg))];
   }
 
+  .calendar-day-nonworking {
+    @apply bg-[hsl(var(--day-sunday-bg))];
+  }
+
   .calendar-day-today {
     @apply ring-2 ring-[hsl(var(--day-today))] ring-inset;
   }
@@ -243,7 +247,8 @@
   }
   
   .calendar-day-saturday,
-  .calendar-day-sunday {
+  .calendar-day-sunday,
+  .calendar-day-nonworking {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
