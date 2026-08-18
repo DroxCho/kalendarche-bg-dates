@@ -127,6 +127,7 @@ function MiniMonth({ year, month, onMonthClick }: { year: number; month: number;
                 !day.isCurrentMonth && "opacity-30",
                 day.isCurrentMonth && isSaturday && "text-[hsl(var(--day-saturday))]",
                 day.isCurrentMonth && isSunday && "text-[hsl(var(--day-sunday))]",
+                hasNonWorking && !isSaturday && !isSunday && day.isCurrentMonth && !isToday && "calendar-day-nonworking",
                 hasNonWorking && !isSaturday && !isSunday && !isToday && "text-[hsl(var(--holiday-nonworking))] font-bold",
                 isToday && "bg-primary text-primary-foreground rounded-full font-bold",
                 hasNational && day.isCurrentMonth && !isToday && "bg-[hsl(var(--holiday-national)/0.3)] rounded-sm",
