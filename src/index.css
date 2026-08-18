@@ -247,7 +247,8 @@
   }
   
   .calendar-day-saturday,
-  .calendar-day-sunday {
+  .calendar-day-sunday,
+  .calendar-day-nonworking {
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
