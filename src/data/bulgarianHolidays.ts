@@ -352,7 +352,54 @@ function getHolidaysForYear(year: number): Holiday[] {
     { date: formatDate(rusaliaStart), name: 'Русалска неделя', type: 'folk' },
   );
 
+  // Официални почивни дни при празник, съвпадащ със събота или неделя
+  // (чл. 154, ал. 2 КТ) — първият следващ работен ден е почивен.
+  // Великденските празници са изключение и не се компенсират.
+  const easterRelated = new Set([
+    formatDate(goodFriday),
+    formatDate(holySaturday),
+    formatDate(easter),
+    formatDate(easterMonday),
+    formatDate(holySpirit),
+  ]);
+
+  const substitutes: Holiday[] = [];
+  const nonWorkingDates = new Set(
+    holidays.filter(h => h.nonWorking).map(h => h.date)
+  );
+
+  holidays
+    .filter(h => h.nonWorking && !easterRelated.has(h.date))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .forEach(h => {
+      const [y, m, d] = h.date.split('-').map(Number);
+      const holidayDate = new Date(y, m - 1, d);
+      const weekday = holidayDate.getDay();
+      if (weekday !== 0 && weekday !== 6) return;
+
+      // Намираме първия следващ ден, който не е уикенд и не е вече почивен
+      let next = addDays(holidayDate, 1);
+      while (
+        next.getDay() === 0 ||
+        next.getDay() === 6 ||
+        nonWorkingDates.has(formatDate(next))
+      ) {
+        next = addDays(next, 1);
+      }
+      const nextDate = formatDate(next);
+      nonWorkingDates.add(nextDate);
+      substitutes.push({
+        date: nextDate,
+        name: `Почивен ден (${h.name})`,
+        type: 'national',
+        nonWorking: true,
+      });
+    });
+
+  holidays.push(...substitutes);
+
   return holidays;
+
 }
 
 // Generate all holidays from December 2025 to January 2027
