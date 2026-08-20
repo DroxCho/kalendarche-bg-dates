@@ -65,7 +65,7 @@ export function MonthPaginator({ currentIndex, onIndexChange, onGoToToday, showT
               variant="secondary"
               size="sm"
               onClick={onGoToToday}
-              className="gap-1.5 print:hidden bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200 hover:text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-900/60"
+              className="gap-1.5 print:hidden bg-emerald-100 text-emerald-700 border-2 border-emerald-700 hover:bg-emerald-200 hover:text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-400 dark:hover:bg-emerald-900/60"
             >
               <CalendarCheck className="h-4 w-4" />
               {t('calendar.today')}
