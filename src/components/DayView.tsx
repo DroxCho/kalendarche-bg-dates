@@ -122,7 +122,7 @@ export function DayView(props: DayViewProps) {
             {focusDate.getDate()} {monthName} {focusDate.getFullYear()}
           </h2>
           {!isToday && (
-            <Button variant="secondary" size="sm" onClick={handleToday} className="gap-1.5 bg-sky-100 text-sky-700 border-sky-200 hover:bg-sky-200 hover:text-sky-800 dark:bg-sky-900/40 dark:text-sky-300 dark:border-sky-800 dark:hover:bg-sky-900/60">
+            <Button variant="secondary" size="sm" onClick={handleToday} className="gap-1.5 bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-200 hover:text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300 dark:border-emerald-800 dark:hover:bg-emerald-900/60">
               <CalendarCheck className="h-4 w-4" />
               {t('calendar.today')}
             </Button>
