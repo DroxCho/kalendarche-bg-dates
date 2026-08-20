@@ -68,6 +68,51 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_events: {
+        Row: {
+          all_day: boolean
+          color: string
+          created_at: string
+          description: string | null
+          end_date: string
+          end_time: string | null
+          id: string
+          start_date: string
+          start_time: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          all_day?: boolean
+          color?: string
+          created_at?: string
+          description?: string | null
+          end_date: string
+          end_time?: string | null
+          id?: string
+          start_date: string
+          start_time?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          all_day?: boolean
+          color?: string
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          end_time?: string | null
+          id?: string
+          start_date?: string
+          start_time?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notification_preferences: {
         Row: {
           created_at: string
