@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
@@ -10,10 +10,6 @@ import { CalendarLegend } from './CalendarLegend';
 import { HolidaySidebar } from './HolidaySidebar';
 import { HolidaySearch } from './HolidaySearch';
 import { HolidayFilter, HolidayType } from './HolidayFilter';
-import { YearView } from './YearView';
-import { WeekView } from './WeekView';
-import { DayView } from './DayView';
-import { PrintAllCalendar } from './PrintAllCalendar';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
 import { useCalendarNotes, ImportResult as NotesImportResult } from '@/hooks/useCalendarNotes';
 import { useBirthdays, ImportResult as BirthdaysImportResult } from '@/hooks/useBirthdays';
@@ -23,7 +19,16 @@ import { useToast } from '@/hooks/use-toast';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
 import { ExportPrintButtons } from './ExportPrintButtons';
-import { PrintPreview } from './PrintPreview';
+
+const YearView = lazy(() => import('./YearView').then((module) => ({ default: module.YearView })));
+const WeekView = lazy(() => import('./WeekView').then((module) => ({ default: module.WeekView })));
+const DayView = lazy(() => import('./DayView').then((module) => ({ default: module.DayView })));
+const PrintAllCalendar = lazy(() =>
+  import('./PrintAllCalendar').then((module) => ({ default: module.PrintAllCalendar }))
+);
+const PrintPreview = lazy(() =>
+  import('./PrintPreview').then((module) => ({ default: module.PrintPreview }))
+);
 
 const ALL_HOLIDAY_TYPES: HolidayType[] = ['national', 'orthodox', 'nameday', 'folk', 'fasting'];
 
@@ -219,7 +224,9 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
 
       {/* Print all calendar - only visible when printing all */}
       {printAll && (
-        <PrintAllCalendar activeFilters={activeFilters} notes={notes} />
+        <Suspense fallback={null}>
+          <PrintAllCalendar activeFilters={activeFilters} notes={notes} />
+        </Suspense>
       )}
 
       {/* Regular view - hidden when printing all */}
@@ -262,59 +269,65 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
         )}
 
         {viewMode === 'year' && (
-          <div>
-            <YearView
-              year={currentMonth.year}
-              onMonthClick={handleYearMonthClick}
-            />
-            <div className="mt-6 hidden print:block">
-              <CalendarLegend />
+          <Suspense fallback={null}>
+            <div>
+              <YearView
+                year={currentMonth.year}
+                onMonthClick={handleYearMonthClick}
+              />
+              <div className="mt-6 hidden print:block">
+                <CalendarLegend />
+              </div>
             </div>
-          </div>
+          </Suspense>
         )}
 
         {viewMode === 'week' && (
-          <WeekView
-            focusDate={focusDate}
-            onDateChange={setFocusDate}
-            activeFilters={activeFilters}
-            notes={notes}
-            birthdays={birthdays}
-            recurringEvents={recurringEvents}
-            onAddNote={addNote}
-            onUpdateNote={updateNote}
-            onDeleteNote={removeNote}
-            onAddBirthday={addBirthday}
-            onUpdateBirthday={updateBirthday}
-            onDeleteBirthday={removeBirthday}
-            calculateAge={calculateAge}
-            onAddRecurringEvent={addEvent}
-            onUpdateRecurringEvent={updateEvent}
-            onDeleteRecurringEvent={removeEvent}
-            calculateYears={calculateYears}
-          />
+          <Suspense fallback={null}>
+            <WeekView
+              focusDate={focusDate}
+              onDateChange={setFocusDate}
+              activeFilters={activeFilters}
+              notes={notes}
+              birthdays={birthdays}
+              recurringEvents={recurringEvents}
+              onAddNote={addNote}
+              onUpdateNote={updateNote}
+              onDeleteNote={removeNote}
+              onAddBirthday={addBirthday}
+              onUpdateBirthday={updateBirthday}
+              onDeleteBirthday={removeBirthday}
+              calculateAge={calculateAge}
+              onAddRecurringEvent={addEvent}
+              onUpdateRecurringEvent={updateEvent}
+              onDeleteRecurringEvent={removeEvent}
+              calculateYears={calculateYears}
+            />
+          </Suspense>
         )}
 
         {viewMode === 'day' && (
-          <DayView
-            focusDate={focusDate}
-            onDateChange={setFocusDate}
-            activeFilters={activeFilters}
-            notes={notes}
-            birthdays={birthdays}
-            recurringEvents={recurringEvents}
-            onAddNote={addNote}
-            onUpdateNote={updateNote}
-            onDeleteNote={removeNote}
-            onAddBirthday={addBirthday}
-            onUpdateBirthday={updateBirthday}
-            onDeleteBirthday={removeBirthday}
-            calculateAge={calculateAge}
-            onAddRecurringEvent={addEvent}
-            onUpdateRecurringEvent={updateEvent}
-            onDeleteRecurringEvent={removeEvent}
-            calculateYears={calculateYears}
-          />
+          <Suspense fallback={null}>
+            <DayView
+              focusDate={focusDate}
+              onDateChange={setFocusDate}
+              activeFilters={activeFilters}
+              notes={notes}
+              birthdays={birthdays}
+              recurringEvents={recurringEvents}
+              onAddNote={addNote}
+              onUpdateNote={updateNote}
+              onDeleteNote={removeNote}
+              onAddBirthday={addBirthday}
+              onUpdateBirthday={updateBirthday}
+              onDeleteBirthday={removeBirthday}
+              calculateAge={calculateAge}
+              onAddRecurringEvent={addEvent}
+              onUpdateRecurringEvent={updateEvent}
+              onDeleteRecurringEvent={removeEvent}
+              calculateYears={calculateYears}
+            />
+          </Suspense>
         )}
       </div>
 
@@ -344,15 +357,17 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       />
 
       {/* Print preview modal */}
-      <PrintPreview
-        open={printPreviewOpen}
-        onOpenChange={setPrintPreviewOpen}
-        year={currentMonth.year}
-        month={currentMonth.month}
-        activeFilters={activeFilters}
-        notes={notes}
-        mode={printPreviewMode}
-      />
+      <Suspense fallback={null}>
+        <PrintPreview
+          open={printPreviewOpen}
+          onOpenChange={setPrintPreviewOpen}
+          year={currentMonth.year}
+          month={currentMonth.month}
+          activeFilters={activeFilters}
+          notes={notes}
+          mode={printPreviewMode}
+        />
+      </Suspense>
     </div>
   );
 }

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { BulgarianCalendar, type CalendarViewMode } from '@/components/BulgarianCalendar';
+import type { CalendarViewMode } from '@/components/BulgarianCalendar';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,12 @@ import { LogIn, LogOut, User, Settings } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationToggle } from '@/components/NotificationToggle';
+
+const BulgarianCalendar = lazy(() =>
+  import('@/components/BulgarianCalendar').then((module) => ({
+    default: module.BulgarianCalendar,
+  }))
+);
 
 const Index = () => {
   const { user, loading, signOut } = useAuth();
@@ -138,7 +144,9 @@ const Index = () => {
 
         {/* Calendar */}
         <main>
-          <BulgarianCalendar viewMode={viewMode} setViewMode={setViewMode} />
+          <Suspense fallback={null}>
+            <BulgarianCalendar viewMode={viewMode} setViewMode={setViewMode} />
+          </Suspense>
         </main>
 
         {/* Footer */}
