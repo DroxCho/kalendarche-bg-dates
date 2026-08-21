@@ -272,6 +272,20 @@ const en = {
     colorRed: 'Red',
   },
 
+  // Custom multi-day events
+  customEvents: {
+    title: 'My events',
+    add: 'Add',
+    titlePlaceholder: 'Event title',
+    descriptionPlaceholder: 'Description (optional)',
+    startDate: 'Start date',
+    endDate: 'End date',
+    allDay: 'All day',
+    startTime: 'Start time',
+    endTime: 'End time',
+    noEvents: 'No events added',
+  },
+
   // Search
   search: {
     placeholder: 'Search holiday or date...',
