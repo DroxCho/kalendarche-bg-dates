@@ -272,6 +272,20 @@ const bg = {
     colorRed: 'Червено',
   },
 
+  // Custom multi-day events
+  customEvents: {
+    title: 'Мои събития',
+    add: 'Добави',
+    titlePlaceholder: 'Заглавие на събитието',
+    descriptionPlaceholder: 'Описание (по избор)',
+    startDate: 'Начална дата',
+    endDate: 'Крайна дата',
+    allDay: 'Цял ден',
+    startTime: 'Начален час',
+    endTime: 'Краен час',
+    noEvents: 'Няма добавени събития',
+  },
+
   // Search
   search: {
     placeholder: 'Търси празник или дата...',
