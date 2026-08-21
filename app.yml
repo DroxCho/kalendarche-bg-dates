@@ -1,0 +1,27 @@
+version: 1
+app:
+  name: kalendarche
+  url: https://rock-blast.com/kalendarche
+  type: static
+
+build:
+  commands:
+    - npm ci
+    - npm run build
+  output_dir: dist
+
+deploy:
+  target_dir: /home/rockbla5/kalendarche
+  clean_target: true
+  copy:
+    - from: dist/
+      to: /home/rockbla5/kalendarche/
+
+routing:
+  base_path: /kalendarche/
+  spa_fallback: /kalendarche/index.html
+  cache_control:
+    - path: /kalendarche/assets/*
+      value: public, max-age=31536000, immutable
+    - path: /kalendarche/index.html
+      value: no-cache
