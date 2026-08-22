@@ -19,6 +19,8 @@ import { useToast } from '@/hooks/use-toast';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
 import { ExportPrintButtons } from './ExportPrintButtons';
+import { CustomEventsProvider } from '@/hooks/useCustomEventsContext';
+
 
 const YearView = lazy(() => import('./YearView').then((module) => ({ default: module.YearView })));
 const WeekView = lazy(() => import('./WeekView').then((module) => ({ default: module.WeekView })));
@@ -168,6 +170,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
   const portalTarget = document.getElementById('export-print-portal');
 
   return (
+    <CustomEventsProvider>
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {portalTarget && createPortal(
         <ExportPrintButtons
@@ -369,5 +372,6 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
         />
       </Suspense>
     </div>
+    </CustomEventsProvider>
   );
 }

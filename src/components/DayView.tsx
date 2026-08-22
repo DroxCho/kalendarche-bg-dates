@@ -16,6 +16,8 @@ import { NoteEditor } from './NoteEditor';
 import { BirthdayEditor } from './BirthdayEditor';
 import { RecurringEventEditor } from './RecurringEventEditor';
 import { ShareButtons } from './ShareButtons';
+import { CustomEventEditor } from './CustomEventEditor';
+import { useCustomEventsContext } from '@/hooks/useCustomEventsContext';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
@@ -70,6 +72,7 @@ export function DayView(props: DayViewProps) {
   const { focusDate, onDateChange, activeFilters, notes, birthdays, recurringEvents, calculateAge, calculateYears } = props;
   const { t, i18n } = useTranslation();
   const isEnglish = i18n.language === 'en';
+  const customEventsCtx = useCustomEventsContext();
 
   const today = useMemo(() => {
     const d = new Date();
@@ -201,6 +204,16 @@ export function DayView(props: DayViewProps) {
           currentYear={focusDate.getFullYear()}
           calculateYears={calculateYears}
         />
+
+        {customEventsCtx && (
+          <CustomEventEditor
+            date={ds}
+            events={customEventsCtx.getCustomEventsForDate(ds)}
+            onAdd={customEventsCtx.addCustomEvent}
+            onUpdate={customEventsCtx.updateCustomEvent}
+            onDelete={customEventsCtx.deleteCustomEvent}
+          />
+        )}
 
         <ShareButtons date={focusDate} holidays={allHolidays} />
       </div>
