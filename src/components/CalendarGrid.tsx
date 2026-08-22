@@ -82,6 +82,7 @@ export function CalendarGrid({
   calculateYears
 }: CalendarGridProps) {
   const { i18n, t } = useTranslation();
+  const customEventsCtx = useCustomEventsContext();
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
