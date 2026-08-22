@@ -15,6 +15,8 @@ import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
 import { ShareButtons } from './ShareButtons';
+import { CustomEventEditor } from './CustomEventEditor';
+import { useCustomEventsContext } from '@/hooks/useCustomEventsContext';
 import { useTranslation } from 'react-i18next';
 
 interface HolidayModalProps {
@@ -171,6 +173,7 @@ export function HolidayModal({
   const { t, i18n } = useTranslation();
   const lang = i18n.language;
   const isEnglish = lang === 'en';
+  const customEventsCtx = useCustomEventsContext();
 
   if (!date) return null;
 
