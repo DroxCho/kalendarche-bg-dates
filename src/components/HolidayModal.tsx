@@ -284,6 +284,16 @@ export function HolidayModal({
           />
         )}
 
+        {customEventsCtx && (
+          <CustomEventEditor
+            date={dateString}
+            events={customEventsCtx.getCustomEventsForDate(dateString)}
+            onAdd={customEventsCtx.addCustomEvent}
+            onUpdate={customEventsCtx.updateCustomEvent}
+            onDelete={customEventsCtx.deleteCustomEvent}
+          />
+        )}
+
         <ShareButtons date={date} holidays={holidays} />
       </DialogContent>
     </Dialog>
