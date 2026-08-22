@@ -372,5 +372,6 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
         />
       </Suspense>
     </div>
+    </CustomEventsProvider>
   );
 }
