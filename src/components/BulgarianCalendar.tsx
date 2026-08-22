@@ -19,6 +19,8 @@ import { useToast } from '@/hooks/use-toast';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
 import { ExportPrintButtons } from './ExportPrintButtons';
+import { CustomEventsProvider } from '@/hooks/useCustomEventsContext';
+
 
 const YearView = lazy(() => import('./YearView').then((module) => ({ default: module.YearView })));
 const WeekView = lazy(() => import('./WeekView').then((module) => ({ default: module.WeekView })));
