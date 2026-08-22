@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, ChevronRight, CalendarCheck, StickyNote, Cake, Heart, Leaf } from 'lucide-react';
+import { ChevronLeft, ChevronRight, CalendarCheck, StickyNote, Cake, Heart, Leaf, CalendarRange } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -16,6 +16,8 @@ import { HolidayModal } from './HolidayModal';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
+import { CUSTOM_EVENT_COLORS } from './CustomEventEditor';
+import { useCustomEventsContext } from '@/hooks/useCustomEventsContext';
 
 const ENGLISH_DAYS_FULL = [
   'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
@@ -69,6 +71,7 @@ export function WeekView(props: WeekViewProps) {
   const { focusDate, onDateChange, activeFilters, notes, birthdays, recurringEvents, calculateAge, calculateYears } = props;
   const { t, i18n } = useTranslation();
   const isEnglish = i18n.language === 'en';
+  const customEventsCtx = useCustomEventsContext();
   const [modalDate, setModalDate] = useState<Date | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -246,6 +249,16 @@ export function WeekView(props: WeekViewProps) {
                     </div>
                   );
                 })}
+                {(customEventsCtx?.getCustomEventsForDate(ds) ?? []).slice(0, 3).map(ev => (
+                  <div
+                    key={ev.id}
+                    className={cn('text-[11px] px-1.5 py-0.5 rounded truncate flex items-center gap-1', CUSTOM_EVENT_COLORS[ev.color].chip)}
+                    title={`${ev.title}${ev.allDay ? '' : ` (${ev.startTime}–${ev.endTime})`}`}
+                  >
+                    <CalendarRange className="w-3 h-3 shrink-0" />
+                    <span className="truncate">{ev.title}{!ev.allDay && ev.startTime ? ` ${ev.startTime}` : ''}</span>
+                  </div>
+                ))}
                 {dayNotes.slice(0, 2).map(n => (
                   <div key={n.id} className="text-[11px] px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-800 dark:text-amber-200 truncate flex items-center gap-1">
                     <StickyNote className="w-3 h-3 shrink-0" />

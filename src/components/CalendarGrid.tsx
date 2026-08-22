@@ -4,8 +4,10 @@ import { BULGARIAN_DAYS, getHolidaysForDate, hasNonWorkingHoliday, Holiday } fro
 import { translateHolidayName } from '@/data/holidayTranslations';
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
+import { CUSTOM_EVENT_COLORS } from './CustomEventEditor';
+import { useCustomEventsContext } from '@/hooks/useCustomEventsContext';
 import { HolidayType } from './HolidayFilter';
-import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake, Heart } from 'lucide-react';
+import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake, Heart, CalendarRange } from 'lucide-react';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
@@ -469,6 +471,18 @@ export function CalendarGrid({
                   </div>
                 );
               })}
+              {/* Custom multi-day events */}
+              {customEventsCtx?.getCustomEventsForDate(dateString).slice(0, 2).map((ev) => (
+                <div
+                  key={ev.id}
+                  className={cn('holiday-badge', CUSTOM_EVENT_COLORS[ev.color].chip)}
+                  title={`${ev.title}${ev.allDay ? '' : ` (${ev.startTime}–${ev.endTime})`}`}
+                >
+                  <CalendarRange className="w-2.5 h-2.5 flex-shrink-0" />
+                  <span className="truncate">{ev.title}</span>
+                </div>
+              ))}
+
               {dateBirthdays.length > 1 && day.isCurrentMonth && (
                 <div className="text-[10px] text-pink-500 mt-0.5 font-medium">
                   +{dateBirthdays.length - 1} 🎂
