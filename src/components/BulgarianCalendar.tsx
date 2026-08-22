@@ -170,6 +170,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
   const portalTarget = document.getElementById('export-print-portal');
 
   return (
+    <CustomEventsProvider>
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {portalTarget && createPortal(
         <ExportPrintButtons
