@@ -136,7 +136,7 @@
   }
 
   .calendar-day-number {
-    @apply text-xs sm:text-sm md:text-base font-medium;
+    @apply text-xs sm:text-sm md:text-base font-medium min-h-[1.5rem] sm:min-h-[1.75rem] flex items-center justify-center;
   }
 
   .calendar-day-saturday {
@@ -157,6 +157,10 @@
 
   .holiday-badge {
     @apply text-[9px] sm:text-[10px] md:text-xs px-0.5 sm:px-1 py-0.5 rounded-sm mt-0.5 sm:mt-1 leading-tight w-full flex items-center gap-0.5 overflow-hidden;
+  }
+
+  .custom-event-bar {
+    @apply -mx-0.5 sm:-mx-1 mt-0.5 px-1 py-0.5 text-[9px] sm:text-[10px] leading-tight text-white w-full overflow-hidden flex items-center gap-1;
   }
 
 

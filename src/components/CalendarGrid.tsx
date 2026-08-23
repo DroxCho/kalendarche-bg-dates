@@ -11,6 +11,7 @@ import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake, Heart, CalendarRang
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
+import { CustomEvent, CustomEventColor } from '@/hooks/useCustomEvents';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CalendarGridProps {
@@ -43,6 +44,17 @@ interface DayInfo {
   isSunday: boolean;
   holidays: Holiday[];
 }
+
+type CustomEventSegData = {
+  eventId: string;
+  color: CustomEventColor;
+  title: string;
+  allDay: boolean;
+  startTime?: string;
+  endTime?: string;
+  isStart: boolean;
+  isEnd: boolean;
+};
 
 function getDaysInMonth(year: number, month: number): number {
   return new Date(year, month + 1, 0).getDate();
@@ -235,6 +247,66 @@ export function CalendarGrid({
     }
   };
 
+  // Build per-cell slot layout so multi-day custom events render as one continuous
+  // bar across all the days they cover (splitting only at week-row boundaries).
+  const customEventSegments = useMemo<(CustomEventSegData | null)[][]>(() => {
+    const events = customEventsCtx?.customEvents ?? [];
+    const byCell: (CustomEventSegData | null)[][] = Array.from({ length: 42 }, () => []);
+    if (!events.length) return byCell;
+
+    const firstDate = formatDateString(days[0].date);
+    const lastDate = formatDateString(days[41].date);
+
+    const ranges: { ev: CustomEvent; from: number; to: number }[] = [];
+    for (const ev of events) {
+      let from: number;
+      if (ev.startDate < firstDate) from = 0;
+      else {
+        const f = days.findIndex(d => formatDateString(d.date) === ev.startDate);
+        if (f === -1) continue;
+        from = f;
+      }
+      let to: number;
+      if (ev.endDate > lastDate) to = 41;
+      else {
+        const f = days.findIndex(d => formatDateString(d.date) === ev.endDate);
+        if (f === -1) continue;
+        to = f;
+      }
+      if (from > to) continue;
+      ranges.push({ ev, from, to });
+    }
+
+    for (let r = 0; r < 6; r++) {
+      const rowStart = r * 7;
+      const rowEnd = rowStart + 6;
+      const inRow = ranges
+        .filter(rg => rg.from <= rowEnd && rg.to >= rowStart)
+        .sort((a, b) => a.from - b.from || a.to - b.to || a.ev.id.localeCompare(b.ev.id));
+      const maxSlot = Math.min(inRow.length, 4);
+      for (let c = rowStart; c <= rowEnd; c++) {
+        while (byCell[c].length < maxSlot) byCell[c].push(null);
+      }
+      inRow.slice(0, 4).forEach((rg, slot) => {
+        const segFrom = Math.max(rg.from, rowStart);
+        const segTo = Math.min(rg.to, rowEnd);
+        for (let c = segFrom; c <= segTo; c++) {
+          byCell[c][slot] = {
+            eventId: rg.ev.id,
+            color: rg.ev.color,
+            title: rg.ev.title,
+            allDay: rg.ev.allDay,
+            startTime: rg.ev.startTime,
+            endTime: rg.ev.endTime,
+            isStart: c === rg.from,
+            isEnd: c === rg.to,
+          };
+        }
+      });
+    }
+    return byCell;
+  }, [days, customEventsCtx?.customEvents]);
+
   return (
     <div className="animate-fade-in">
       {/* Day headers */}
@@ -412,7 +484,32 @@ export function CalendarGrid({
               >
                 {day.dayNumber}
               </span>
-              
+
+              {/* Multi-day custom event bars (united across all days) */}
+              {(customEventSegments[index] ?? []).map((seg, sIdx) => {
+                if (!seg) return <div key={sIdx} className="custom-event-bar invisible" />;
+                const color = CUSTOM_EVENT_COLORS[seg.color] ?? CUSTOM_EVENT_COLORS.blue;
+                return (
+                  <div
+                    key={seg.eventId}
+                    className={cn(
+                      'custom-event-bar',
+                      color.bar,
+                      seg.isStart ? 'rounded-l-sm' : 'rounded-l-none',
+                      seg.isEnd ? 'rounded-r-sm' : 'rounded-r-none',
+                    )}
+                    title={`${seg.title}${seg.allDay ? '' : ` (${seg.startTime}–${seg.endTime})`}`}
+                  >
+                    {seg.isStart && (
+                      <>
+                        <CalendarRange className="w-2.5 h-2.5 shrink-0" />
+                        <span className="truncate">{seg.title}{!seg.allDay && seg.startTime ? ` ${seg.startTime}` : ''}</span>
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+
               {filteredHolidays
                 .filter(holiday => shouldShowHolidayBadge(holiday))
                 .slice(0, 3)
@@ -472,17 +569,6 @@ export function CalendarGrid({
                   </div>
                 );
               })}
-              {/* Custom multi-day events */}
-              {customEventsCtx?.getCustomEventsForDate(dateString).slice(0, 2).map((ev) => (
-                <div
-                  key={ev.id}
-                  className={cn('holiday-badge', CUSTOM_EVENT_COLORS[ev.color].chip)}
-                  title={`${ev.title}${ev.allDay ? '' : ` (${ev.startTime}–${ev.endTime})`}`}
-                >
-                  <CalendarRange className="w-2.5 h-2.5 flex-shrink-0" />
-                  <span className="truncate">{ev.title}</span>
-                </div>
-              ))}
 
               {dateBirthdays.length > 1 && day.isCurrentMonth && (
                 <div className="text-[10px] text-pink-500 mt-0.5 font-medium">
