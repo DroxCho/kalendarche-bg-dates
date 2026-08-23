@@ -160,7 +160,7 @@
   }
 
   .custom-event-bar {
-    @apply -mx-0.5 sm:-mx-1 mt-0.5 px-1 py-0.5 text-[9px] sm:text-[10px] leading-tight text-white w-full overflow-hidden flex items-center gap-1;
+    @apply -mx-1 sm:-mx-1.5 mt-0.5 px-1 py-0.5 min-h-5 text-[9px] sm:text-[10px] leading-tight text-white w-full overflow-hidden flex items-center gap-1;
   }
 
 
