@@ -24,7 +24,7 @@ const App = () => (
         <Suspense fallback={null}>
           <ChatBot />
         </Suspense>
-        <BrowserRouter basename={import.meta.env.PROD ? "/kalendarche" : "/"}>
+        <BrowserRouter>
           <Suspense fallback={<div className="min-h-screen grid place-items-center text-muted-foreground">Зареждане...</div>}>
             <Routes>
               <Route path="/" element={<Index />} />
