@@ -160,7 +160,7 @@
   }
 
   .custom-event-bar {
-    @apply -mx-1.5 sm:-mx-2 mt-0.5 px-1 py-0.5 min-h-5 text-[9px] sm:text-[10px] leading-tight text-white w-full overflow-visible flex items-center gap-1;
+    @apply relative z-10 self-stretch -mx-[3px] sm:-mx-[5px] mt-0.5 px-1 py-0.5 min-h-5 text-[9px] sm:text-[10px] leading-tight text-white overflow-visible flex items-center gap-1;
   }
 
 
