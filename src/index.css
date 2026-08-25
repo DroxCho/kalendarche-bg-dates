@@ -189,6 +189,16 @@
   }
 }
 
+/* Hide Netlify public HUD badge */
+iframe[src*="/.netlify/scripts/hud"],
+iframe[src*="app.netlify.com"],
+button[aria-label*="Powered by Netlify"],
+button[title*="Powered by Netlify"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* Print styles */
 @page {
   size: A4 portrait;
