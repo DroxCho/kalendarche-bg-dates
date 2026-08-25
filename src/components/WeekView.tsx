@@ -16,7 +16,7 @@ import { HolidayModal } from './HolidayModal';
 import { CalendarNote } from '@/hooks/useCalendarNotes';
 import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
-import { CUSTOM_EVENT_COLORS } from './CustomEventEditor';
+import { CUSTOM_EVENT_COLORS } from './customEventColors';
 import { useCustomEventsContext } from '@/hooks/useCustomEventsContext';
 
 const ENGLISH_DAYS_FULL = [

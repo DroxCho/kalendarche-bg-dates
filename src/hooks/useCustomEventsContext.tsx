@@ -1,14 +1,9 @@
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext } from 'react';
 import { useCustomEvents } from './useCustomEvents';
 
-type CustomEventsContextValue = ReturnType<typeof useCustomEvents>;
+export type CustomEventsContextValue = ReturnType<typeof useCustomEvents>;
 
-const CustomEventsContext = createContext<CustomEventsContextValue | null>(null);
-
-export function CustomEventsProvider({ children }: { children: ReactNode }) {
-  const value = useCustomEvents();
-  return <CustomEventsContext.Provider value={value}>{children}</CustomEventsContext.Provider>;
-}
+export const CustomEventsContext = createContext<CustomEventsContextValue | null>(null);
 
 /** Returns null when no provider is mounted (e.g. print-only trees). */
 export function useCustomEventsContext(): CustomEventsContextValue | null {

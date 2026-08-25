@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { parseUrlDate } from '@/lib/sharing';
 import { HolidayModal } from './HolidayModal';
 import { ExportPrintButtons } from './ExportPrintButtons';
-import { CustomEventsProvider } from '@/hooks/useCustomEventsContext';
+import { CustomEventsProvider } from '@/hooks/CustomEventsProvider';
 
 
 const YearView = lazy(() => import('./YearView').then((module) => ({ default: module.YearView })));
@@ -121,7 +121,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       setCurrentIndex(index);
       setViewMode('month');
     }
-  }, [months]);
+  }, [months, setViewMode]);
 
   // Find current month index for "Today" button
   const todayMonthIndex = useMemo(() => {
@@ -136,7 +136,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       setCurrentIndex(todayMonthIndex);
       setViewMode('month');
     }
-  }, [todayMonthIndex]);
+  }, [todayMonthIndex, setViewMode]);
 
   const handleYearMonthClick = useCallback((month: number) => {
     const index = months.findIndex(m => m.year === currentMonth.year && m.month === month);
@@ -144,7 +144,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       setCurrentIndex(index);
       setViewMode('month');
     }
-  }, [months, currentMonth.year]);
+  }, [months, currentMonth.year, setViewMode]);
 
   const handlePrintAll = useCallback(() => {
     setPrintAll(true);

@@ -4,7 +4,7 @@ import { BULGARIAN_DAYS, getHolidaysForDate, hasNonWorkingHoliday, Holiday } fro
 import { translateHolidayName } from '@/data/holidayTranslations';
 import { cn } from '@/lib/utils';
 import { HolidayModal } from './HolidayModal';
-import { CUSTOM_EVENT_COLORS } from './CustomEventEditor';
+import { CUSTOM_EVENT_COLORS } from './customEventColors';
 import { useCustomEventsContext } from '@/hooks/useCustomEventsContext';
 import { HolidayType } from './HolidayFilter';
 import { Leaf, StickyNote, Flag, Cross, Star, Flower2, Cake, Heart, CalendarRange } from 'lucide-react';
