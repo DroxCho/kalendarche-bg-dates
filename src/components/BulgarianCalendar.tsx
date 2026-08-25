@@ -171,7 +171,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
 
   return (
     <CustomEventsProvider>
-    <div className="w-full max-w-6xl mx-auto space-y-6">
+    <div className="w-full lg:w-[80%] mx-auto space-y-6">
       {portalTarget && createPortal(
         <ExportPrintButtons
           year={currentMonth.year}
