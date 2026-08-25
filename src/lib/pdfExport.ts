@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import { BULGARIAN_MONTHS, BULGARIAN_DAYS, getMonthRange, getAllHolidays } from '@/data/bulgarianHolidays';
 import { loadDejaVuFont, loadDejaVuFontBold } from './fonts/dejaVuSans';
 import { translateHolidayName } from '@/data/holidayTranslations';
-import i18n from '@/i18n';
+import { getCurrentLanguage } from './language';
 
 interface PDFExportOptions {
   year: number;
@@ -18,7 +18,7 @@ const ENGLISH_MONTHS = [
 ];
 
 function isEnglish() {
-  return i18n.language === 'en';
+  return getCurrentLanguage() === 'en';
 }
 
 function getLocalizedDays() {
@@ -30,7 +30,7 @@ function getLocalizedMonth(month: number) {
 }
 
 function localizeHolidayName(name: string) {
-  return translateHolidayName(name, i18n.language);
+  return translateHolidayName(name, getCurrentLanguage());
 }
 
 function getDaysInMonth(year: number, month: number) {
@@ -305,7 +305,7 @@ function drawHolidayList(pdf: jsPDF, year: number, month: number, activeFilters:
   const pageWidth = pdf.internal.pageSize.getWidth();
   const numCols = 3;
   const colWidth = (pageWidth - marginLeft * 2) / numCols;
-  const lang = i18n.language;
+  const lang = getCurrentLanguage();
 
   pdf.setFont('DejaVuSans', 'bold');
   pdf.setFontSize(8);

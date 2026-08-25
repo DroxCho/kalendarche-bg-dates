@@ -1,9 +1,9 @@
 import { Holiday, HolidayType } from '@/data/bulgarianHolidays';
 import { translateHolidayName } from '@/data/holidayTranslations';
-import i18n from '@/i18n';
+import { getCurrentLanguage } from './language';
 
 function getHolidayDescription(type: HolidayType): string {
-  const lang = i18n.language;
+  const lang = getCurrentLanguage();
   if (lang === 'en') {
     switch (type) {
       case 'national': return 'National Holiday';
@@ -38,6 +38,7 @@ function escapeICSText(text: string): string {
 }
 
 export function generateICSFile(holidays: Holiday[], filename: string = 'bulgarian-calendar'): void {
+  const lang = getCurrentLanguage();
   const lines: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
@@ -57,7 +58,7 @@ export function generateICSFile(holidays: Holiday[], filename: string = 'bulgari
       `UID:${uid}`,
       `DTSTART;VALUE=DATE:${formatICSDate(holiday.date)}`,
       `DTEND;VALUE=DATE:${formatICSDate(holiday.date)}`,
-      `SUMMARY:${escapeICSText(translateHolidayName(holiday.name, i18n.language))}`,
+      `SUMMARY:${escapeICSText(translateHolidayName(holiday.name, lang))}`,
       `DESCRIPTION:${escapeICSText(description)}`,
       `CATEGORIES:${escapeICSText(description)}`,
       'TRANSP:TRANSPARENT',

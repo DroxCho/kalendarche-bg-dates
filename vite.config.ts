@@ -21,9 +21,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
-              return "react-vendor";
-            }
             if (id.includes("@supabase")) {
               return "supabase-vendor";
             }
@@ -37,8 +34,7 @@ export default defineConfig(({ mode }) => ({
             }
             if (
               id.includes("html2canvas") ||
-              id.includes("canvg") ||
-              id.includes("pako")
+              id.includes("canvg")
             ) {
               return "print-vendor";
             }
