@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BULGARIAN_DAYS, getHolidaysForDate, hasNonWorkingHoliday, Holiday } from '@/data/bulgarianHolidays';
 import { translateHolidayName } from '@/data/holidayTranslations';
@@ -98,8 +98,6 @@ export function CalendarGrid({
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
-  const todayRef = useRef<HTMLDivElement>(null);
-  const hasScrolled = useRef(false);
 
   // Get birthdays for a specific date
   const getBirthdaysForDate = (month: number, day: number): Birthday[] => {
@@ -110,14 +108,6 @@ export function CalendarGrid({
   const getEventsForDate = (month: number, day: number): RecurringEvent[] => {
     return recurringEvents.filter(e => e.month === month && e.day === day);
   };
-
-  // Scroll to today on initial mount
-  useEffect(() => {
-    if (todayRef.current && !hasScrolled.current) {
-      todayRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      hasScrolled.current = true;
-    }
-  }, []);
 
   const days = useMemo(() => {
     const result: DayInfo[] = [];
@@ -343,7 +333,6 @@ export function CalendarGrid({
           return (
             <div
               key={index}
-              ref={day.isToday && day.isCurrentMonth ? todayRef : null}
               onClick={() => handleDayClick(day)}
               onDragOver={(e) => handleDragOver(e, dateString)}
               onDragLeave={handleDragLeave}
