@@ -127,8 +127,13 @@
 }
 
 @layer components {
+  .calendar-grid {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
   .calendar-day {
-    @apply relative flex flex-col items-center justify-start p-0.5 sm:p-1 min-h-[58px] sm:min-h-[80px] md:min-h-[100px] border border-border/50 transition-all duration-200;
+    @apply relative flex flex-col items-center justify-start p-0.5 sm:p-1 border border-border/50 transition-all duration-200 min-w-0;
+    min-height: clamp(58px, 10vw, 110px);
   }
 
   .calendar-day:hover {

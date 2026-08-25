@@ -300,7 +300,7 @@ export function CalendarGrid({
   return (
     <div className="animate-fade-in">
       {/* Day headers */}
-      <div className="grid grid-cols-7 mb-2">
+      <div className="calendar-grid grid mb-2">
         {BULGARIAN_DAYS.map((day, index) => (
           <div
             key={day}
@@ -317,7 +317,7 @@ export function CalendarGrid({
       </div>
 
       {/* Calendar grid */}
-      <div className="grid grid-cols-7 border-t border-l border-border rounded-lg overflow-hidden">
+      <div className="calendar-grid grid border-t border-l border-border rounded-lg overflow-hidden">
         {days.map((day, index) => {
           const filteredHolidays = filterHolidays(day.holidays);
           const hasFastingDay = day.holidays.some(h => h.type === 'fasting');
