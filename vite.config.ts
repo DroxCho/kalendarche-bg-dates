@@ -3,6 +3,22 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 
+function getPackageName(id: string) {
+  const normalized = id.split('\\\\').join('/');
+  const parts = normalized.split('/node_modules/');
+  if (parts.length < 2) return null;
+
+  const modulePath = parts[1];
+  const segments = modulePath.split('/');
+
+  if (!segments[0]) return null;
+  if (segments[0].startsWith('@')) {
+    if (!segments[1]) return null;
+    return `${segments[0]}/${segments[1]}`;
+  }
+  return segments[0];
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
  base: "/",
@@ -21,6 +37,20 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
+            const pkg = getPackageName(id);
+
+            if (pkg === "react" || pkg === "react-dom" || pkg === "scheduler" || pkg === "react-router" || pkg === "react-router-dom" || pkg === "@remix-run/router") {
+              return "react-core-vendor";
+            }
+
+            if (pkg === "@tanstack/react-query") {
+              return "query-vendor";
+            }
+
+            if (pkg === "lucide-react") {
+              return "icons-vendor";
+            }
+
             if (id.includes("@supabase")) {
               return "supabase-vendor";
             }
@@ -53,6 +83,11 @@ export default defineConfig(({ mode }) => ({
             if (id.includes("@radix-ui")) {
               return "radix-vendor";
             }
+
+            if (pkg === "zod" || pkg === "date-fns" || pkg === "clsx" || pkg === "class-variance-authority" || pkg === "tailwind-merge") {
+              return "utils-vendor";
+            }
+
             return "vendor";
           }
 
