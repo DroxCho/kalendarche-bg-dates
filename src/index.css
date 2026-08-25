@@ -204,6 +204,20 @@ button[title*="Powered by Netlify"] {
   pointer-events: none !important;
 }
 
+/* Hide Lovable badge/overlay */
+iframe[src*="lovable.app"],
+iframe[src*="lovable.dev"],
+button[aria-label*="Lovable"],
+button[title*="Lovable"],
+a[aria-label*="Lovable"],
+a[title*="Lovable"],
+a[href*="lovable.app"],
+a[href*="lovable.dev"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 /* Print styles */
 @page {
   size: A4 portrait;
