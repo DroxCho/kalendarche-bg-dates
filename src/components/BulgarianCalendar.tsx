@@ -235,7 +235,7 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
       {/* Regular view - hidden when printing all */}
       <div className={printAll ? 'print:hidden' : ''}>
         {viewMode === 'month' && (
-          <div className="flex flex-col lg:flex-row gap-6">
+          <div className="w-full lg:w-[80%] mx-auto flex flex-col lg:flex-row gap-6">
             <div className="flex-1 min-w-0">
               <CalendarGrid
                 year={currentMonth.year}
