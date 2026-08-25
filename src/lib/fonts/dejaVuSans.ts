@@ -1,7 +1,7 @@
 // DejaVu Sans (Cyrillic) for jsPDF
 // Kept local to avoid CDN issues and ensure consistent PDF rendering.
 
-let fontCache: { normal?: string; bold?: string } = {};
+const fontCache: { normal?: string; bold?: string } = {};
 
 function arrayBufferToBase64(arrayBuffer: ArrayBuffer) {
   const bytes = new Uint8Array(arrayBuffer);

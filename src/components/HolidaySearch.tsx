@@ -51,7 +51,7 @@ export function HolidaySearch({ onNavigateToMonth }: HolidaySearchProps) {
     const lowerQuery = query.toLowerCase();
     
     // Normalize query: replace dots/slashes with dashes for date matching
-    const normalizedQuery = query.trim().replace(/[.\/]/g, '-');
+    const normalizedQuery = query.trim().replace(/[./]/g, '-');
     
     // Try to parse as date in formats: DD-MM-YYYY, DD-MM, DD
     const dateParts = normalizedQuery.split('-').map(p => parseInt(p, 10));

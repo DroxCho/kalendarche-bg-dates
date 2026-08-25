@@ -24,6 +24,10 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
+const getErrorMessage = (error: unknown) => {
+  return error instanceof Error ? error.message : 'Unknown error';
+};
+
 const Profile = () => {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -73,7 +77,7 @@ const Profile = () => {
           // Fallback to OAuth avatar
           setAvatarUrl(user.user_metadata.avatar_url);
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error loading profile:', error);
       }
     };
@@ -102,7 +106,7 @@ const Profile = () => {
           setEmailRecurringReminders(data.email_recurring_reminders ?? true);
           setReminderDays(String(data.reminder_days_before));
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error('Error loading preferences:', error);
       } finally {
         setLoadingPrefs(false);
@@ -175,9 +179,9 @@ const Profile = () => {
 
       setAvatarUrl(publicUrl);
       toast({ title: 'Успех!', description: 'Профилната снимка е обновена.' });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error uploading avatar:', error);
-      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+      toast({ title: 'Грешка', description: getErrorMessage(error), variant: 'destructive' });
     } finally {
       setUploadingAvatar(false);
       event.target.value = '';
@@ -225,8 +229,8 @@ const Profile = () => {
       }
 
       toast({ title: 'Успех!', description: 'Настройките са запазени.' });
-    } catch (error: any) {
-      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: 'Грешка', description: getErrorMessage(error), variant: 'destructive' });
     } finally {
       setSavingPrefs(false);
     }
@@ -268,8 +272,8 @@ const Profile = () => {
       toast({ title: 'Успех!', description: 'Паролата е променена успешно.' });
       setNewPassword('');
       setConfirmPassword('');
-    } catch (error: any) {
-      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: 'Грешка', description: getErrorMessage(error), variant: 'destructive' });
     } finally {
       setChangingPassword(false);
     }
@@ -331,8 +335,8 @@ const Profile = () => {
         title: 'Успех!', 
         description: `Експортирани ${notesData?.length || 0} бележки, ${birthdaysData?.length || 0} рождени дни и ${recurringEventsData?.length || 0} събития.` 
       });
-    } catch (error: any) {
-      toast({ title: 'Грешка', description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: 'Грешка', description: getErrorMessage(error), variant: 'destructive' });
     } finally {
       setExporting(false);
     }
@@ -467,11 +471,11 @@ const Profile = () => {
         title: 'Успех!', 
         description: `Импортирани ${notesImported} бележки, ${birthdaysImported} рождени дни и ${eventsImported} събития${skippedMessage}.` 
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Import error:', error);
       toast({ 
         title: 'Грешка при импортиране', 
-        description: error.message || 'Неуспешно импортиране на данните.', 
+        description: getErrorMessage(error) || 'Неуспешно импортиране на данните.', 
         variant: 'destructive' 
       });
     } finally {

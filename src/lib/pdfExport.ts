@@ -199,7 +199,7 @@ function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: nu
   const s = size * 0.5; // Scale factor for icon
   
   switch (iconType) {
-    case 'flag':
+    case 'flag': {
       // Flag: pole + triangular flag
       const poleX = cx - s * 0.4;
       pdf.line(poleX, cy - s, poleX, cy + s); // Pole
@@ -211,14 +211,16 @@ function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: nu
         'F'
       );
       break;
+    }
     
-    case 'cross':
+    case 'cross': {
       // Orthodox cross (simple +)
       pdf.line(cx, cy - s, cx, cy + s); // Vertical
       pdf.line(cx - s * 0.7, cy, cx + s * 0.7, cy); // Horizontal
       break;
+    }
     
-    case 'star':
+    case 'star': {
       // 5-point star
       const points = 5;
       const outerR = s;
@@ -238,8 +240,9 @@ function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: nu
         }
       }
       break;
+    }
     
-    case 'leaf':
+    case 'leaf': {
       // Leaf shape: curved teardrop
       pdf.setLineWidth(0.35);
       const leafTop = cy - s;
@@ -252,8 +255,9 @@ function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: nu
       pdf.line(leafRight, cy, cx, leafBottom);
       pdf.line(cx, leafTop + s * 0.3, cx, leafBottom - s * 0.2);
       break;
+    }
     
-    case 'flower':
+    case 'flower': {
       // Simple flower: circle center with petals
       pdf.setLineWidth(0.3);
       const petalCount = 5;
@@ -269,6 +273,7 @@ function drawIcon(pdf: jsPDF, iconType: string, cx: number, cy: number, size: nu
       // Draw center
       pdf.circle(cx, cy, centerR, 'F');
       break;
+    }
   }
   
   pdf.setLineWidth(0.2);

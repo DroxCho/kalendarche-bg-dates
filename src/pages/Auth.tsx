@@ -12,6 +12,10 @@ import { Calendar, ArrowLeft } from 'lucide-react';
 
 type AuthMode = 'login' | 'register' | 'forgot' | 'reset' | 'magic-link';
 
+const getErrorMessage = (error: unknown) => {
+  return error instanceof Error ? error.message : 'Unknown error';
+};
+
 const Auth = () => {
   const { t } = useTranslation();
   const [mode, setMode] = useState<AuthMode>('login');
@@ -61,13 +65,14 @@ const Auth = () => {
         toast({ title: t('auth.successRegister'), description: t('auth.canUseProfile') });
         navigate('/');
       }
-    } catch (error: any) {
-      let message = error.message;
-      if (error.message?.includes('User already registered')) {
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      let message = errorMessage;
+      if (errorMessage.includes('User already registered')) {
         message = t('auth.userExists');
-      } else if (error.message?.includes('Invalid login credentials')) {
+      } else if (errorMessage.includes('Invalid login credentials')) {
         message = t('auth.invalidCredentials');
-      } else if (error.message?.includes('Password should be')) {
+      } else if (errorMessage.includes('Password should be')) {
         message = t('auth.passwordMinLength');
       }
       toast({ title: t('auth.error'), description: message, variant: 'destructive' });
@@ -90,8 +95,8 @@ const Auth = () => {
         description: t('auth.checkEmail'),
       });
       setMode('login');
-    } catch (error: any) {
-      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: t('auth.error'), description: getErrorMessage(error), variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -115,9 +120,10 @@ const Auth = () => {
         description: t('auth.canLoginNewPassword'),
       });
       navigate('/');
-    } catch (error: any) {
-      let message = error.message;
-      if (error.message?.includes('Password should be')) {
+    } catch (error: unknown) {
+      const errorMessage = getErrorMessage(error);
+      let message = errorMessage;
+      if (errorMessage.includes('Password should be')) {
         message = t('auth.passwordMinLength');
       }
       toast({ title: t('auth.error'), description: message, variant: 'destructive' });
@@ -136,8 +142,8 @@ const Auth = () => {
         },
       });
       if (error) throw error;
-    } catch (error: any) {
-      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: t('auth.error'), description: getErrorMessage(error), variant: 'destructive' });
       setGoogleLoading(false);
     }
   };
@@ -152,8 +158,8 @@ const Auth = () => {
         },
       });
       if (error) throw error;
-    } catch (error: any) {
-      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: t('auth.error'), description: getErrorMessage(error), variant: 'destructive' });
       setAppleLoading(false);
     }
   };
@@ -175,8 +181,8 @@ const Auth = () => {
         title: t('auth.magicLinkSent'),
         description: t('auth.magicLinkCheck'),
       });
-    } catch (error: any) {
-      toast({ title: t('auth.error'), description: error.message, variant: 'destructive' });
+    } catch (error: unknown) {
+      toast({ title: t('auth.error'), description: getErrorMessage(error), variant: 'destructive' });
     } finally {
       setMagicLinkLoading(false);
     }

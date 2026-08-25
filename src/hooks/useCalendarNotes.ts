@@ -208,43 +208,6 @@ export function useCalendarNotes(onImport?: (result: ImportResult) => void) {
     }
   }, [user, saveToLocalStorage]);
 
-  const updateNote = useCallback(async (date: string, noteId: string, text: string) => {
-    const trimmedText = text.trim();
-    
-    if (!trimmedText) {
-      // Remove note if empty
-      await removeNote(date, noteId);
-      return;
-    }
-
-    if (user) {
-      const { error } = await supabase
-        .from('calendar_notes')
-        .update({ text: trimmedText })
-        .eq('id', noteId);
-
-      if (!error) {
-        setNotes(prev => {
-          const dateNotes = prev[date] || [];
-          const updatedNotes = dateNotes.map(n =>
-            n.id === noteId ? { ...n, text: trimmedText } : n
-          );
-          return { ...prev, [date]: updatedNotes };
-        });
-      }
-    } else {
-      setNotes(prev => {
-        const dateNotes = prev[date] || [];
-        const updatedNotes = dateNotes.map(n =>
-          n.id === noteId ? { ...n, text: trimmedText } : n
-        );
-        const newNotes = { ...prev, [date]: updatedNotes };
-        saveToLocalStorage(newNotes);
-        return newNotes;
-      });
-    }
-  }, [user, saveToLocalStorage]);
-
   const removeNote = useCallback(async (date: string, noteId: string) => {
     if (user) {
       const { error } = await supabase
@@ -279,6 +242,43 @@ export function useCalendarNotes(onImport?: (result: ImportResult) => void) {
       });
     }
   }, [user, saveToLocalStorage]);
+
+  const updateNote = useCallback(async (date: string, noteId: string, text: string) => {
+    const trimmedText = text.trim();
+
+    if (!trimmedText) {
+      // Remove note if empty
+      await removeNote(date, noteId);
+      return;
+    }
+
+    if (user) {
+      const { error } = await supabase
+        .from('calendar_notes')
+        .update({ text: trimmedText })
+        .eq('id', noteId);
+
+      if (!error) {
+        setNotes(prev => {
+          const dateNotes = prev[date] || [];
+          const updatedNotes = dateNotes.map(n =>
+            n.id === noteId ? { ...n, text: trimmedText } : n
+          );
+          return { ...prev, [date]: updatedNotes };
+        });
+      }
+    } else {
+      setNotes(prev => {
+        const dateNotes = prev[date] || [];
+        const updatedNotes = dateNotes.map(n =>
+          n.id === noteId ? { ...n, text: trimmedText } : n
+        );
+        const newNotes = { ...prev, [date]: updatedNotes };
+        saveToLocalStorage(newNotes);
+        return newNotes;
+      });
+    }
+  }, [user, saveToLocalStorage, removeNote]);
 
   const moveNote = useCallback(async (fromDate: string, toDate: string, noteId: string) => {
     if (fromDate === toDate) return;

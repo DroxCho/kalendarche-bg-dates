@@ -80,6 +80,9 @@ serve(async (req: Request): Promise<Response> => {
   const auditClient = createClient(supabaseUrl, supabaseServiceKey, {
     db: { schema: "private" },
   });
+const getErrorMessage = (error: unknown) => {
+  return error instanceof Error ? error.message : "Unknown error";
+};
 
   async function logAudit(success: boolean, reason: string | null) {
     const entry = {
@@ -355,10 +358,10 @@ serve(async (req: Request): Promise<Response> => {
       JSON.stringify({ message: "Reminders sent", sent: totalSent }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error in send-birthday-reminders function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: getErrorMessage(error) }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

@@ -10,6 +10,17 @@ const corsHeaders = {
 const MAX_MESSAGES = 50;
 const MAX_CONTENT_LENGTH = 4000;
 
+type ChatMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+const isChatMessage = (value: unknown): value is ChatMessage => {
+  if (!value || typeof value !== "object") return false;
+  const maybeMessage = value as Record<string, unknown>;
+  return (maybeMessage.role === "user" || maybeMessage.role === "assistant") && typeof maybeMessage.content === "string";
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -45,9 +56,9 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const messages = rawMessages
-      .filter((m: any) => m && (m.role === "user" || m.role === "assistant") && typeof m.content === "string")
-      .map((m: any) => ({ role: m.role, content: String(m.content).slice(0, MAX_CONTENT_LENGTH) }));
+    const messages: ChatMessage[] = rawMessages
+      .filter(isChatMessage)
+      .map((m) => ({ role: m.role, content: String(m.content).slice(0, MAX_CONTENT_LENGTH) }));
     if (messages.length === 0) {
       return new Response(JSON.stringify({ error: "Invalid messages payload" }), {
         status: 400,
