@@ -96,6 +96,7 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   const { i18n, t } = useTranslation();
   const customEventsCtx = useCustomEventsContext();
+  const currentDate = useCurrentDate();
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
