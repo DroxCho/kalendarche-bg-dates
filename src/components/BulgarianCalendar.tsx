@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
+import { useState, useCallback, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { CalendarDays, Grid3X3, CalendarRange, Sun } from 'lucide-react';
@@ -11,6 +11,7 @@ import { HolidaySidebar } from './HolidaySidebar';
 import { HolidaySearch } from './HolidaySearch';
 import { HolidayFilter, HolidayType } from './HolidayFilter';
 import { getMonthRange, getHolidaysForDate } from '@/data/bulgarianHolidays';
+import { useCurrentDate } from '@/hooks/useCurrentDate';
 import { useCalendarNotes, ImportResult as NotesImportResult } from '@/hooks/useCalendarNotes';
 import { useBirthdays, ImportResult as BirthdaysImportResult } from '@/hooks/useBirthdays';
 import { useRecurringEvents, ImportResult as EventsImportResult } from '@/hooks/useRecurringEvents';
@@ -45,6 +46,7 @@ interface BulgarianCalendarProps {
 export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarProps) {
   const { t } = useTranslation();
   const months = useMemo(() => getMonthRange(), []);
+  const currentDate = useCurrentDate();
   const [currentIndex, setCurrentIndex] = useState(() => {
     const now = new Date();
     const idx = months.findIndex(m => m.year === now.getFullYear() && m.month === now.getMonth());
@@ -125,9 +127,25 @@ export function BulgarianCalendar({ viewMode, setViewMode }: BulgarianCalendarPr
 
   // Find current month index for "Today" button
   const todayMonthIndex = useMemo(() => {
-    const today = new Date();
-    return months.findIndex(m => m.year === today.getFullYear() && m.month === today.getMonth());
-  }, [months]);
+    return months.findIndex(m => m.year === currentDate.getFullYear() && m.month === currentDate.getMonth());
+  }, [months, currentDate]);
+
+  // When the day rolls over (tab left open past midnight), follow the new
+  // current month/day unless the user has navigated somewhere else manually.
+  const prevTodayIndexRef = useRef(todayMonthIndex);
+  useEffect(() => {
+    const prev = prevTodayIndexRef.current;
+    if (prev === todayMonthIndex) return;
+    prevTodayIndexRef.current = todayMonthIndex;
+    setCurrentIndex(idx => (idx === prev && todayMonthIndex !== -1 ? todayMonthIndex : idx));
+    setFocusDate(prevDate => {
+      const prevDay = new Date(prevDate);
+      prevDay.setHours(0, 0, 0, 0);
+      const yesterday = new Date(currentDate);
+      yesterday.setDate(yesterday.getDate() - 1);
+      return prevDay.getTime() === yesterday.getTime() ? new Date(currentDate) : prevDate;
+    });
+  }, [todayMonthIndex, currentDate]);
 
   const isViewingCurrentMonth = currentIndex === todayMonthIndex;
 

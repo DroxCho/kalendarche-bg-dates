@@ -13,6 +13,7 @@ import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
 import { CustomEvent, CustomEventColor } from '@/hooks/useCustomEvents';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useCurrentDate } from '@/hooks/useCurrentDate';
 
 interface CalendarGridProps {
   year: number;
@@ -95,6 +96,7 @@ export function CalendarGrid({
 }: CalendarGridProps) {
   const { i18n, t } = useTranslation();
   const customEventsCtx = useCustomEventsContext();
+  const currentDate = useCurrentDate();
   const [selectedDay, setSelectedDay] = useState<DayInfo | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [dragOverDate, setDragOverDate] = useState<string | null>(null);
@@ -113,8 +115,8 @@ export function CalendarGrid({
     const result: DayInfo[] = [];
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfWeek = getFirstDayOfMonth(year, month);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = currentDate;
+
 
     // Previous month days
     const prevMonth = month === 0 ? 11 : month - 1;
@@ -170,7 +172,7 @@ export function CalendarGrid({
     }
 
     return result;
-  }, [year, month]);
+  }, [year, month, currentDate]);
 
   const handleDayClick = (day: DayInfo) => {
     setSelectedDay(day);

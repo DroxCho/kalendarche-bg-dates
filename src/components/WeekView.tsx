@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useCurrentDate } from '@/hooks/useCurrentDate';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, CalendarCheck, StickyNote, Cake, Heart, Leaf, CalendarRange } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -76,11 +77,7 @@ export function WeekView(props: WeekViewProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   const weekStart = useMemo(() => startOfWeek(focusDate), [focusDate]);
-  const today = useMemo(() => {
-    const t = new Date();
-    t.setHours(0, 0, 0, 0);
-    return t;
-  }, []);
+  const today = useCurrentDate();
 
   const days = useMemo(() => {
     return Array.from({ length: 7 }, (_, i) => {

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useCurrentDate } from '@/hooks/useCurrentDate';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, CalendarCheck, Calendar, Flag, Cross, Star, Flower2, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -74,11 +75,7 @@ export function DayView(props: DayViewProps) {
   const isEnglish = i18n.language === 'en';
   const customEventsCtx = useCustomEventsContext();
 
-  const today = useMemo(() => {
-    const d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }, []);
+  const today = useCurrentDate();
 
   const dayOfWeek = focusDate.getDay();
   const dayIdx = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
