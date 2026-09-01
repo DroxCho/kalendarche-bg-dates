@@ -13,6 +13,7 @@ import { Birthday } from '@/hooks/useBirthdays';
 import { RecurringEvent, EventType, EventIcon, EventColor } from '@/hooks/useRecurringEvents';
 import { CustomEvent, CustomEventColor } from '@/hooks/useCustomEvents';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useCurrentDate } from '@/hooks/useCurrentDate';
 
 interface CalendarGridProps {
   year: number;
