@@ -172,7 +172,7 @@ export function CalendarGrid({
     }
 
     return result;
-  }, [year, month]);
+  }, [year, month, currentDate]);
 
   const handleDayClick = (day: DayInfo) => {
     setSelectedDay(day);
