@@ -367,7 +367,7 @@ function drawLegend(pdf: jsPDF, legendY: number) {
   pdf.setFontSize(7);
   pdf.setFont('DejaVuSans', 'normal');
 
-  const lang = i18n.language;
+  const lang = getCurrentLanguage();
   const items = [
     { label: lang === 'en' ? 'National' : 'Национални', icon: 'flag', color: [180, 50, 80] as const },
     { label: lang === 'en' ? 'Orthodox' : 'Православни', icon: 'cross', color: [180, 140, 40] as const },
