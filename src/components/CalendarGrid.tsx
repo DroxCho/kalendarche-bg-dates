@@ -114,8 +114,8 @@ export function CalendarGrid({
     const result: DayInfo[] = [];
     const daysInMonth = getDaysInMonth(year, month);
     const firstDayOfWeek = getFirstDayOfMonth(year, month);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const today = currentDate;
+
 
     // Previous month days
     const prevMonth = month === 0 ? 11 : month - 1;
