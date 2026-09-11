@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { MessageCircle, X, Send, Bot, User, Trash2, Download, Upload, History } from "lucide-react";
+import { MessageCircle, X, Send, Bot, User, Trash2, Download, Upload, History, CalendarPlus, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import ReactMarkdown from "react-markdown";
@@ -12,6 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
+import { useCustomEventsContext } from "@/hooks/useCustomEventsContext";
+import { CustomEventColor, CustomEventInput } from "@/hooks/useCustomEvents";
+import { CUSTOM_EVENT_COLORS } from "./customEventColors";
+import { cn } from "@/lib/utils";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -24,6 +28,45 @@ type SavedConversation = {
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 const STORAGE_KEY = "chatbot_conversations";
+const EVENT_MARKER = /<!--CALENDAR_EVENT:(\{[^\n]*\})-->/g;
+const VALID_COLORS: CustomEventColor[] = ["blue", "green", "purple", "orange", "red"];
+
+type EventSuggestion = {
+  title: string;
+  startDate: string;
+  startTime: string | null;
+  color: CustomEventColor;
+};
+
+function parseEventSuggestion(content: string): EventSuggestion | null {
+  const matches = [...content.matchAll(EVENT_MARKER)];
+  const raw = matches.at(-1)?.[1];
+  if (!raw) return null;
+
+  try {
+    const value = JSON.parse(raw) as Record<string, unknown>;
+    const title = typeof value.title === "string" ? value.title.trim().slice(0, 120) : "";
+    const startDate = typeof value.startDate === "string" ? value.startDate : "";
+    const startTime = typeof value.startTime === "string" ? value.startTime : null;
+    const color = VALID_COLORS.includes(value.color as CustomEventColor)
+      ? value.color as CustomEventColor
+      : "blue";
+    if (!title || !/^\d{4}-\d{2}-\d{2}$/.test(startDate)) return null;
+    if (startTime !== null && !/^([01]\d|2[0-3]):[0-5]\d$/.test(startTime)) return null;
+    return { title, startDate, startTime, color };
+  } catch {
+    return null;
+  }
+}
+
+function stripEventMarker(content: string): string {
+  return content.replace(EVENT_MARKER, "").trim();
+}
+
+function addOneHour(time: string): string {
+  const [hours, minutes] = time.split(":").map(Number);
+  return `${String((hours + 1) % 24).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
 
 function loadConversations(): SavedConversation[] {
   try {
@@ -147,8 +190,34 @@ const ChatBot = () => {
   const [savedConversations, setSavedConversations] = useState<SavedConversation[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const customEvents = useCustomEventsContext();
 
   const isBg = i18n.language === "bg";
+
+  const addSuggestedEvent = useCallback(async (suggestion: EventSuggestion) => {
+    if (!customEvents) return;
+    const duplicate = customEvents.customEvents.some((event) =>
+      event.title === suggestion.title &&
+      event.startDate === suggestion.startDate &&
+      event.startTime === (suggestion.startTime ?? undefined)
+    );
+    if (duplicate) {
+      toast.info(isBg ? "Това събитие вече е в календара" : "This event is already in the calendar");
+      return;
+    }
+
+    const input: CustomEventInput = {
+      title: suggestion.title,
+      startDate: suggestion.startDate,
+      endDate: suggestion.startDate,
+      allDay: suggestion.startTime === null,
+      startTime: suggestion.startTime ?? undefined,
+      endTime: suggestion.startTime ? addOneHour(suggestion.startTime) : undefined,
+      color: suggestion.color,
+    };
+    await customEvents.addCustomEvent(input);
+    toast.success(isBg ? "Събитието е добавено в календара" : "Event added to the calendar");
+  }, [customEvents, isBg]);
 
   useEffect(() => {
     setSavedConversations(loadConversations());
@@ -399,27 +468,59 @@ const ChatBot = () => {
                       : "Hello! 👋 Ask me about Bulgarian holidays, name days, or anything else."}
                   </div>
                 )}
-                {messages.map((msg, i) => (
-                  <div
-                    key={i}
-                    className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
+                {messages.map((msg, i) => {
+                  const suggestion = msg.role === "assistant" ? parseEventSuggestion(msg.content) : null;
+                  const visibleContent = msg.role === "assistant" ? stripEventMarker(msg.content) : msg.content;
+                  const alreadyAdded = suggestion ? customEvents?.customEvents.some((event) =>
+                    event.title === suggestion.title &&
+                    event.startDate === suggestion.startDate &&
+                    event.startTime === (suggestion.startTime ?? undefined)
+                  ) : false;
+                  return (
+                  <div key={i} className={`flex gap-2 ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     {msg.role === "assistant" && (
                       <div className="flex-shrink-0 h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
                         <Bot className="h-4 w-4 text-primary" />
                       </div>
                     )}
-                    <div
-                      className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
+                    <div className={`max-w-[80%] rounded-xl px-3 py-2 text-sm ${
                         msg.role === "user"
                           ? "bg-primary text-primary-foreground"
                           : "bg-muted text-foreground"
                       }`}
                     >
                       {msg.role === "assistant" ? (
-                        <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:my-1 [&>ol]:my-1">
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        </div>
+                        <>
+                          <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:m-0 [&>ul]:my-1 [&>ol]:my-1">
+                            <ReactMarkdown>{visibleContent}</ReactMarkdown>
+                          </div>
+                          {suggestion && (
+                            <div className="mt-3 border-t border-border pt-2">
+                              <div className="flex items-start gap-2">
+                                <span className={cn("mt-1 h-8 w-1 shrink-0 rounded-full", CUSTOM_EVENT_COLORS[suggestion.color].bar)} />
+                                <div className="min-w-0 flex-1">
+                                  <p className="truncate text-xs font-medium">{suggestion.title}</p>
+                                  <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                                    {suggestion.startDate}
+                                    {suggestion.startTime && <><Clock className="ml-1 h-3 w-3" />{suggestion.startTime}</>}
+                                  </p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="mt-2 h-8 w-full gap-1.5 text-xs"
+                                onClick={() => addSuggestedEvent(suggestion)}
+                                disabled={alreadyAdded || !customEvents}
+                              >
+                                <CalendarPlus className="h-3.5 w-3.5" />
+                                {alreadyAdded
+                                  ? (isBg ? "Добавено в календара" : "Added to calendar")
+                                  : (isBg ? "Добави в календара" : "Add to calendar")}
+                              </Button>
+                            </div>
+                          )}
+                        </>
                       ) : (
                         msg.content
                       )}
@@ -430,7 +531,8 @@ const ChatBot = () => {
                       </div>
                     )}
                   </div>
-                ))}
+                  );
+                })}
                 {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
                   <div className="flex gap-2 items-center">
                     <div className="h-7 w-7 rounded-full bg-primary/10 flex items-center justify-center">
