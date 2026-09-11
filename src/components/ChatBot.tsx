@@ -40,7 +40,7 @@ type EventSuggestion = {
 
 function parseEventSuggestion(content: string): EventSuggestion | null {
   const matches = [...content.matchAll(EVENT_MARKER)];
-  const raw = matches.at(-1)?.[1];
+  const raw = matches.length > 0 ? matches[matches.length - 1]?.[1] : undefined;
   if (!raw) return null;
 
   try {
