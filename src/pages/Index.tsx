@@ -63,6 +63,15 @@ const Index = () => {
             <div className="flex flex-wrap items-center gap-1">
               <ThemeToggle />
               <NotificationToggle />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/events')}
+                className="gap-1.5"
+              >
+                <CalendarRange className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('customEvents.manage')}</span>
+              </Button>
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">
