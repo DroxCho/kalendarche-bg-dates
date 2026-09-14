@@ -11,6 +11,7 @@ import { CustomEventsProvider } from "./hooks/CustomEventsProvider";
 const Auth = lazy(() => import("./pages/Auth"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
+const MyEvents = lazy(() => import("./pages/MyEvents"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ChatBot = lazy(() => import("./components/ChatBot"));
 
@@ -33,6 +34,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/settings" element={<Settings />} />
+                <Route path="/events" element={<MyEvents />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

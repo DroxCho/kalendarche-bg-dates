@@ -14,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogIn, LogOut, User, Settings } from 'lucide-react';
+import { LogIn, LogOut, User, Settings, CalendarRange } from 'lucide-react';
 import { LanguageToggle } from '@/components/LanguageToggle';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { NotificationToggle } from '@/components/NotificationToggle';
@@ -63,6 +63,15 @@ const Index = () => {
             <div className="flex flex-wrap items-center gap-1">
               <ThemeToggle />
               <NotificationToggle />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/events')}
+                className="gap-1.5"
+              >
+                <CalendarRange className="h-4 w-4" />
+                <span className="hidden sm:inline">{t('customEvents.manage')}</span>
+              </Button>
             </div>
 
             <div className="flex flex-wrap items-center justify-end gap-2">

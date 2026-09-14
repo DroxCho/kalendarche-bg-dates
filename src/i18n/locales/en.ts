@@ -284,6 +284,10 @@ const en = {
     startTime: 'Start time',
     endTime: 'End time',
     noEvents: 'No events added',
+    delete: 'Delete',
+    deleteTitle: 'Delete event',
+    deleteConfirm: 'Are you sure you want to delete "{{title}}"? This cannot be undone.',
+    manage: 'My events',
   },
 
   // Search
