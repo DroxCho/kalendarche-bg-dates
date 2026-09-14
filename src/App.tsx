@@ -11,6 +11,7 @@ import { CustomEventsProvider } from "./hooks/CustomEventsProvider";
 const Auth = lazy(() => import("./pages/Auth"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
+const MyEvents = lazy(() => import("./pages/MyEvents"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ChatBot = lazy(() => import("./components/ChatBot"));
 
